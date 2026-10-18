@@ -32,7 +32,7 @@ const menuItems = [
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
  {key:"learning" as const,href:"#courses",icon:BookOpen},
  {key:"practice" as const,href:"/learn/starter",icon:Dumbbell},
- {key:"tutor" as const,href:"#ai-tutor",icon:MessageCircle,ai:true},
+ {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
  {key:"speaking" as const,href:"#speaking",icon:Mic2},
  {key:"dictionary" as const,href:"#dictionary",icon:BookText}
 ];
@@ -76,7 +76,7 @@ export default function LearnPage() {
   <section className="aunora-main">
    <header className="aunora-topbar"><button className="mobile-menu-button" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div><span className="topbar-kicker">{t.journey}</span><b>{t.dashboard}</b></div><div className="topbar-actions"><div className="language-control" role="group" aria-label="Select interface language"><span className="language-control-label"><Languages size={14}/> LANGUAGE</span><div className="language-segment"><button type="button" className={lang==="vi"?"selected":""} aria-pressed={lang==="vi"} onClick={()=>changeLang("vi")} title="Tiếng Việt">VI</button><button type="button" className={lang==="en"?"selected":""} aria-pressed={lang==="en"} onClick={()=>changeLang("en")} title="English">EN</button></div></div><div className="topbar-user">{profile?.name||profile?.email||t.demoAccount}</div></div></header>
    <div className="learnwrap"><div className="eyebrow">{t.space}</div><h1>{t.hello} <em>AUNORA.</em></h1><p className="learnlead">{t.lead}</p>
-    <div className="learnfeatures"><article><BookOpen/><b>{t.lessons}</b><span>{t.topics}</span></article><article><Dumbbell/><b>{t.practiceCard}</b><span>{t.quizzes}</span></article><article id="ai-tutor"><MessageCircle/><b>{t.assistant}</b><span>{t.support}</span></article></div>
+    <div className="learnfeatures"><article><BookOpen/><b>{t.lessons}</b><span>{t.topics}</span></article><article><Dumbbell/><b>{t.practiceCard}</b><span>{t.quizzes}</span></article><Link href="/learn/tutor" className="learnfeature-link"><article id="ai-tutor"><MessageCircle/><b>{t.assistant}</b><span>{t.support}</span></article></Link></div>
     <div id="courses"><h2>{t.courses}</h2><div className="coursegrid">{courseNames.map((name,i)=><article className="learncourse" key={name}><div className="learncoursehead"><span className={i===0?"freeflag":"lockflag"}>{i===0?t.free:<><LockKeyhole size={12}/> {t.soon}</>}</span><span>{String(i+1).padStart(2,"0")}</span></div><div className="learnletter">{name.slice(0,1)}</div><h3>{name}</h3><p>{t.descriptions[i]}</p><div className="learnmeta"><span>{t.levels[i]}</span><span>{i===0?t.lessonsCount:(lang==="vi"?"Sắp ra mắt":"Coming soon")}</span></div>{i===0?<Link href="/learn/starter" className="coursebutton">{t.enter} <ArrowRight size={15}/></Link>:<button className="coursebutton disabled" disabled>{t.locked}</button>}</article>)}</div></div>
     <p className="demo-note">{t.demo}</p>
    </div>
