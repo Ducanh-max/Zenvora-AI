@@ -25,7 +25,7 @@ export default function LearnPage() {
   function logout(){localStorage.removeItem("zenvora_demo_session");document.cookie="zenvora_demo_session=; Path=/; Max-Age=0; SameSite=Lax";window.location.href="/login";}
   return <main className="aunora-app">
     <aside className={`aunora-sidebar ${mobileOpen?"sidebar-open":""}`}>
-      <Link href="/learn" className="aunora-brand"><span className="wolf-logo">🐺</span><span><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
+      <Link href="/learn" className="aunora-brand"><span className="wolf-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 8 19 13 24 9 29 13 41 8 38 29 31 39 24 34 17 39 10 29Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/><path d="m16 21 5 2m11-2-5 2m-3 2v5m-6 1 6-3 6 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
       <div className="sidebar-group-title">LEARNING SPACE</div>
       <nav className="aunora-menu">{menu.map(item=><Link key={item.label} href={item.href} onClick={()=>setMobileOpen(false)} className={`aunora-menu-item ${item.active?"active":""}`}><item.icon size={19}/><span>{item.label}</span>{item.ai&&<b className="ai-tag">AI</b>}</Link>)}</nav>
       <div className="wolf-rewards"><div className="reward-heading"><span>WORD REWARDS</span><span className="reward-level">LV. 0</span></div><div className="reward-mascot">🐺</div><div className="reward-xp"><b>0 XP</b><span>50,000 XP</span></div><div className="reward-track"><i/></div><p>0 / 50000 XP</p><small>Keep learning to grow!</small></div>
