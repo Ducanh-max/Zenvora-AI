@@ -11,7 +11,7 @@ const copy = {
   journey:"HÀNH TRÌNH HỌC TẬP CỦA BẠN", dashboard:"Bảng điều khiển học tập", hello:"Chào mừng đến với", lead:"Tiến bộ từng ngày — bắt đầu hành trình tiếng Anh của bạn ngay hôm nay.",
   lessons:"Bài học", topics:"Học theo chủ đề", practiceCard:"Luyện tập", quizzes:"Câu hỏi tương tác", assistant:"Gia sư AI", support:"Trợ lý học tập",
   courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"3 bài học",
-  demo:"Bạn đang dùng chế độ trải nghiệm. Tài khoản và tiến độ demo được lưu trên trình duyệt này.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản demo",
+  demo:"Bạn đang dùng chế độ trải nghiệm. Tài khoản và tiến độ demo được lưu trên trình duyệt này.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản demo",
   descriptions:["Xây dựng nền tảng tiếng Anh với những mẫu câu giao tiếp đầu tiên.","Luyện những tình huống giao tiếp quen thuộc hằng ngày.","Nắm chắc ngữ pháp qua ví dụ và bài tập ngắn.","Rèn kỹ năng nghe và nhận biết từ vựng.","Tự tin diễn đạt suy nghĩ bằng tiếng Anh."],
   levels:["Cơ bản","Cơ bản","Sơ cấp","Sơ cấp","Tiền trung cấp"]
  },
@@ -21,7 +21,7 @@ const copy = {
   journey:"YOUR LEARNING JOURNEY", dashboard:"Learning dashboard", hello:"Welcome to", lead:"Make progress every day — start your English journey today.",
   lessons:"Lessons", topics:"Learn by topic", practiceCard:"Practice", quizzes:"Interactive quizzes", assistant:"AI Tutor", support:"Your learning assistant",
   courses:"Your courses", free:"FREE", soon:"COMING SOON", enter:"Start learning", locked:"Locked", lessonsCount:"3 lessons",
-  demo:"You're using demo mode. Your account and progress are saved in this browser.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", menu:"Open menu", demoAccount:"Demo account",
+  demo:"You're using demo mode. Your account and progress are saved in this browser.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Demo account",
   descriptions:["Build your English foundation with your first everyday phrases.","Practice familiar everyday conversations.","Master grammar through examples and short exercises.","Improve listening skills and vocabulary recognition.","Express your thoughts in English with confidence."],
   levels:["Beginner","Beginner","Elementary","Elementary","Pre-intermediate"]
  }
@@ -39,6 +39,7 @@ export default function LearnPage() {
  const [profile,setProfile] = useState<{name:string;email:string}|null>(null);
  const [mobileOpen,setMobileOpen] = useState(false);
  const [lang,setLang] = useState<Lang>("vi");
+ const [showLogoutConfirm,setShowLogoutConfirm] = useState(false);
  useEffect(()=>{
   try {
    const raw=localStorage.getItem("zenvora_demo_session"); if(raw)setProfile(JSON.parse(raw));
@@ -53,12 +54,12 @@ export default function LearnPage() {
    <Link href="/learn" className="aunora-brand"><span className="wolf-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 8 19 13 24 9 29 13 41 8 38 29 31 39 24 34 17 39 10 29Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/><path d="m16 21 5 2m11-2-5 2m-3 2v5m-6 1 6-3 6 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
    <div className="sidebar-group-title">{t.space}</div>
    <nav className="aunora-menu">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={`aunora-menu-item ${item.active?"active":""}`}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<b className="ai-tag">AI</b>}</Link>)}</nav>
+   <div className="sidebar-account"><div className="account-avatar">{(profile?.name||profile?.email||"U").slice(0,1).toUpperCase()}</div><div className="account-details"><b>{profile?.name||profile?.email||t.account}</b><span>{t.levelUnknown}</span></div><button onClick={()=>setShowLogoutConfirm(true)} title={t.logout} aria-label={t.logout}><LogOut size={17}/></button></div>
    <div className="wolf-rewards">
     <div className="reward-heading"><span>{t.rewards}</span><span className="reward-level">{t.level} 0</span></div>
     <div className="reward-emblem"><div className="reward-emblem-ring"><Trophy size={30} strokeWidth={1.8}/><Sparkles className="reward-sparkle" size={15}/></div></div>
     <div className="reward-xp"><b>0 XP</b><span>50,000 XP</span></div><div className="reward-track"><i/></div><p>0 / 50000 XP</p><small>{t.keep}</small>
    </div>
-   <div className="sidebar-account"><div className="account-avatar">{(profile?.name||profile?.email||"U").slice(0,1).toUpperCase()}</div><div className="account-details"><b>{profile?.name||profile?.email||t.account}</b><span>{t.levelUnknown}</span></div><button onClick={logout} title={t.logout} aria-label={t.logout}><LogOut size={17}/></button></div>
   </aside>
   <section className="aunora-main">
    <header className="aunora-topbar"><button className="mobile-menu-button" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div><span className="topbar-kicker">{t.journey}</span><b>{t.dashboard}</b></div><div className="topbar-actions"><div className="language-control" role="group" aria-label="Select interface language"><span className="language-control-label"><Languages size={14}/> LANGUAGE</span><div className="language-segment"><button type="button" className={lang==="vi"?"selected":""} aria-pressed={lang==="vi"} onClick={()=>changeLang("vi")} title="Tiếng Việt">VI</button><button type="button" className={lang==="en"?"selected":""} aria-pressed={lang==="en"} onClick={()=>changeLang("en")} title="English">EN</button></div></div><div className="topbar-user">{profile?.name||profile?.email||t.demoAccount}</div></div></header>
@@ -68,5 +69,6 @@ export default function LearnPage() {
     <p className="demo-note">{t.demo}</p>
    </div>
   </section>
+  {showLogoutConfirm&&<div className="logout-modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogoutConfirm(false);}}><section className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-title"><div className="logout-modal-icon"><LogOut size={22}/></div><h2 id="logout-title">{t.confirmTitle}</h2><p>{t.confirmBody}</p><div className="logout-modal-actions"><button type="button" className="logout-cancel" onClick={()=>setShowLogoutConfirm(false)}>{t.cancel}</button><button type="button" className="logout-confirm" onClick={logout}>{t.confirm}</button></div></section></div>}
  </main>;
 }
