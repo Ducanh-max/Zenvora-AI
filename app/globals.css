@@ -24,3 +24,63 @@
 .aunora-main{width:calc(100% - 268px);min-height:100vh;margin-left:268px;background:#0c111b}.aunora-topbar{height:76px;display:flex;align-items:center;gap:15px;padding:0 42px;border-bottom:1px solid #202b3c;background:#101827}.aunora-topbar>div:first-of-type{display:grid;gap:4px}.topbar-kicker{color:#77869d;font-size:9px;font-weight:800;letter-spacing:1.3px}.aunora-topbar>div:first-of-type b{font:700 14px Manrope;color:#e9eef7}.topbar-user{margin-left:auto;color:#a8b4c8;font-size:11px}.mobile-menu-button{display:none}
 .aunora-main .learnwrap{width:min(1160px,calc(100% - 84px));margin:44px auto}.aunora-main .eyebrow{color:#9ab5ff}.aunora-main .learnwrap h1{color:#f2f5fb}.aunora-main .learnwrap h1 em{color:#9ab5ff}.aunora-main .learnlead{color:#98a5ba}.aunora-main .learnfeatures article,.aunora-main .learncourse{background:#141e2d;border-color:#283449;color:#a9bbd7}.aunora-main .learnfeatures b,.aunora-main .learnwrap h2,.aunora-main .learncourse h3{color:#edf2fa}.aunora-main .learnfeatures span,.aunora-main .learncourse p,.aunora-main .learnmeta{color:#91a0b6}.aunora-main .learnletter{background:#263750;color:#a9c2ff}.aunora-main .learncoursehead{color:#78869c}.aunora-main .freeflag{background:#173c35;color:#70d8b0}.aunora-main .lockflag{background:#293346;color:#a2aec1}.aunora-main .learnmeta{border-color:#2a3548}.aunora-main .coursebutton{background:#789bfa;color:#101a2b}.aunora-main .coursebutton.disabled{background:#263247;color:#8592a8}.aunora-main .demo-note{color:#77869c}
 @media(max-width:850px){.aunora-sidebar{transform:translateX(-100%);transition:transform .25s}.aunora-sidebar.sidebar-open{transform:translateX(0);box-shadow:20px 0 60px #0008}.aunora-main{width:100%;margin-left:0}.aunora-topbar{padding:0 20px}.mobile-menu-button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #344158;border-radius:9px;background:#1b2638;color:#dce6f7}.aunora-main .learnwrap{width:calc(100% - 36px);margin:32px auto}.aunora-main .learnfeatures{grid-template-columns:1fr}.aunora-main .learnfeatures span{margin-left:auto}.aunora-main .coursegrid{grid-template-columns:1fr}}
+
+
+/* AUNORA dark public landing and authentication */
+.marketing-page{min-height:100vh;background:#0c111b;color:#edf2fa}
+.marketing-page .nav{border-color:#273247}
+.marketing-page .brand{color:#f1f5fc}
+.marketing-page .brand b{background:#263b5b;color:#a9c2ff}
+.marketing-page .brand span{color:#9ab5ff}
+.marketing-page .nav a:not(.btn){color:#a8b5ca}
+.marketing-page .nav a:not(.btn):hover{color:#fff}
+.marketing-page .hero h1,.marketing-page .center h2,.marketing-page .courseinner h2{color:#f2f5fb}
+.marketing-page .hero h1 em,.marketing-page h2 em{color:#9ab5ff}
+.marketing-page .lead,.marketing-page .center p,.marketing-page .courseinner>div>p{color:#9aa8bd}
+.marketing-page .eyebrow{color:#a7bdff}
+.marketing-page .plain{color:#dce5f5}
+.marketing-page .trust{color:#8796ad}
+.marketing-page .glow{background:radial-gradient(circle,#293e60,#17243a 65%,transparent 70%)}
+.marketing-page .study{background:#151f2f;border-color:#2c3b52;box-shadow:0 25px 80px #0006}
+.marketing-page .tiny,.marketing-page .progress{color:#9baac0}
+.marketing-page .progress b{color:#a9c2ff}
+.marketing-page .bar{background:#2a3850}
+.marketing-page .bar i{background:linear-gradient(90deg,#7398f6,#b2c5ff)}
+.marketing-page .word{background:#1d2b40}
+.marketing-page .word small{color:#9ab5ff}
+.marketing-page .word strong{color:#f2f5fb}
+.marketing-page .word label,.marketing-page .word p{color:#a7b4c8}
+.marketing-page .word hr{border-color:#35445c}
+.marketing-page .word>b{color:#a9c2ff}
+.marketing-page .streak,.marketing-page .badge{background:#1a2639;border-color:#34435a;color:#e8effb}
+.marketing-page .streak small{color:#9aa8bd}
+.marketing-page .badge{box-shadow:0 12px 30px #0005}
+.marketing-page .grid article,.marketing-page .coursecard{background:#141e2d;border-color:#2b394f;box-shadow:0 20px 55px #0003}
+.marketing-page .grid h3,.marketing-page .coursecard h3{color:#edf2fa}
+.marketing-page .grid p,.marketing-page .coursecard>p{color:#9aa8bd}
+.marketing-page .icon,.marketing-page .letter{background:#263750;color:#a9c2ff}
+.marketing-page .courses{background:#111a29}
+.marketing-page .coursehead{color:#9aa8bd}
+.marketing-page .coursehead b{background:#263750;color:#a9c2ff}
+.marketing-page .meta{border-color:#344158;color:#a6b3c7}
+.marketing-page .footer{color:#8593a9}
+.aunora-auth-brand{display:inline-flex;align-items:center;gap:11px;color:#f2f5fb;text-decoration:none}
+.aunora-mark{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:#243650;color:#a9c2ff}
+.aunora-mark svg{width:34px;height:34px}
+.aunora-wordmark b{display:block;font:800 18px Manrope;letter-spacing:1.6px}
+.aunora-wordmark small{display:block;margin-top:3px;color:#8797b0;font-size:8px;font-weight:800;letter-spacing:1.3px}
+.authpage{background:radial-gradient(ellipse at 50% 10%,#1c2c46 0%,transparent 48%),#0c111b;color:#edf2fa}
+.authpage>.aunora-auth-brand{margin-bottom:30px}
+.authcard{background:#141e2d;border-color:#2c3b52;box-shadow:0 25px 80px #0006;color:#edf2fa}
+.authcard h1{color:#f2f5fb}
+.authcard h1 em{color:#9ab5ff}
+.authcard>p,.authswitch{color:#9aa8bd}
+.authcard label{color:#c7d1e1}
+.authcard input{background:#0f1725;border-color:#344158;color:#f2f5fb}
+.authcard input::placeholder{color:#74839b}
+.authcard input:focus{border-color:#91adff;box-shadow:0 0 0 3px #91adff20}
+.authcard .btn{background:#789bfa;color:#101a2b!important;box-shadow:0 8px 25px #789bfa25}
+.authcard .btn:hover{background:#91adff}
+.authswitch a{color:#a9c2ff}
+.authcard .demo-note{color:#8493aa}
+@media(max-width:760px){.marketing-page .navlinks{display:none}.marketing-page .hero{padding-top:42px}.marketing-page .courses{padding:55px 0}}
