@@ -16,7 +16,7 @@ export default function RegisterPage() {
     e.preventDefault(); setBusy(true); setError(""); setMessage("");
     try {
       const supabase=createClient();
-      const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name}}});
+      const {data,error}=await supabase.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:`${window.location.origin}/auth/callback?next=/learn`}});
       if(error) throw error;
       if(data.session){router.push("/learn");router.refresh();}
       else setMessage("Tạo tài khoản thành công. Hãy kiểm tra email để xác nhận trước khi đăng nhập.");
