@@ -18,18 +18,18 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const { data } = await supabase.auth.getClaims();
+  const { data: { user } } = await supabase.auth.getUser();
   const isProtected = request.nextUrl.pathname.startsWith("/learn") || request.nextUrl.pathname.startsWith("/admin");
   const isAuthPage = request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/register";
 
-  if (isProtected && !data?.claims) {
+  if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }
 
-  if (isAuthPage && data?.claims) {
+  if (isAuthPage && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/learn";
     url.search = "";
