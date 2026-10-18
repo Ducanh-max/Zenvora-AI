@@ -84,3 +84,24 @@
 .authswitch a{color:#a9c2ff}
 .authcard .demo-note{color:#8493aa}
 @media(max-width:760px){.marketing-page .navlinks{display:none}.marketing-page .hero{padding-top:42px}.marketing-page .courses{padding:55px 0}}
+
+/* Consistent AUNORA wolf mark and dark lesson experience */
+.wolf-logo{color:#a9c2ff}
+.wolf-logo svg{width:32px;height:32px}
+.aunora-quiz{background:#0c111b;color:#edf2fa}
+.aunora-quiz .quiztop{color:#9aa8bd}
+.aunora-quiz .quiztop a{color:#a9c2ff}
+.aunora-quiz .quizcard{background:#141e2d;border-color:#2c3b52;box-shadow:0 22px 70px #0005}
+.aunora-quiz .quizcard h1{color:#f1f5fb}
+.aunora-quiz .quizcard .eyebrow{color:#a9c2ff}
+.aunora-quiz .quizcard>small{color:#91a0b6}
+.aunora-quiz .quizprogress{background:#2a3850}
+.aunora-quiz .quizprogress i{background:linear-gradient(90deg,#789bfa,#b8c9ff)}
+.aunora-quiz .options button{background:#101a29;border-color:#344158;color:#e5ebf5}
+.aunora-quiz .options button:hover,.aunora-quiz .options button.selected{background:#243550;border-color:#8eacff;color:#fff}
+.aunora-quiz .feedback.good{background:#173c35;color:#8be0bd}
+.aunora-quiz .feedback.bad{background:#45272e;color:#ffb0b0}
+.aunora-quiz .nextbtn{background:#789bfa;color:#101a2b}
+.aunora-quiz .nextbtn:disabled{background:#344158;color:#8391a7}
+.aunora-quiz .result p{color:#aab6c9}
+.aunora-quiz .result .eyebrow{justify-content:center}
