@@ -20,8 +20,8 @@ export default async function AdminPage() {
   catch {
     return <main className="admin-gate"><section><ShieldCheck size={34}/><h1>Admin AUNORA</h1><p>Chưa cấu hình kết nối Supabase trên môi trường triển khai. Hãy kiểm tra biến NEXT_PUBLIC_SUPABASE_URL và NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.</p><Link href="/">Về trang chủ</Link></section></main>;
   }
-  const { data: authData, error: authError } = await supabase.auth.getClaims();
-  const claims = authData?.claims as ({ app_metadata?: { role?: string }; email?: string } | undefined);
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+  const claims = authUser ? { app_metadata: authUser.app_metadata, email: authUser.email } : undefined;
   if (authError || !claims) {
     return <main className="admin-gate"><section><ShieldCheck size={34}/><h1>Khu vực quản trị</h1><p>Bạn cần đăng nhập bằng tài khoản Supabase để truy cập Admin. Tài khoản demo lưu trong trình duyệt hiện tại chưa thể dùng cho quyền quản trị.</p><Link href="/login">Đến trang đăng nhập</Link><Link href="/" className="admin-gate-back">Về trang chủ</Link></section></main>;
   }
