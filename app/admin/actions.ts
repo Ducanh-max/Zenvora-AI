@@ -5,9 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 
 async function requireAdmin() {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
-  const claims = data?.claims as ({ app_metadata?: { role?: string } } | undefined);
-  if (error || claims?.app_metadata?.role !== "admin") {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || user?.app_metadata?.role !== "admin") {
     throw new Error("Bạn không có quyền quản trị AUNORA.");
   }
   return supabase;
