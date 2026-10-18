@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, LockKeyhole, ArrowRight, Menu, Trophy, Sparkles, Languages } from "lucide-react";
+import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, LockKeyhole, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound } from "lucide-react";
 
 type Lang = "vi" | "en";
 const copy = {
@@ -27,7 +27,7 @@ const copy = {
   levels:["Beginner","Beginner","Elementary","Elementary","Pre-intermediate"]
  }
 };
-const courseNames=["English Starter","Daily Conversation","Grammar Boost","Listening Lab","Speaking Confidence"];
+const courseNames=["Aunora Sprout","Aunora Explorer","Aunora Achiever","Aunora Mastery"];\nconst coursePrices=["FREE","49.000đ / tháng","99.000đ / tháng","149.000đ / tháng"];
 const menuItems = [
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
  {key:"learning" as const,href:"#courses",icon:BookOpen},
@@ -37,7 +37,7 @@ const menuItems = [
  {key:"dictionary" as const,href:"#dictionary",icon:BookText}
 ];
 export default function LearnPage() {
- const [profile,setProfile] = useState<{name:string;email:string}|null>(null);
+ const [profile,setProfile] = useState<{name:string;email:string;avatar:string}|null>(null);
  const [mobileOpen,setMobileOpen] = useState(false);
  const [lang,setLang] = useState<Lang>("vi");
  const [showLogoutConfirm,setShowLogoutConfirm] = useState(false);
@@ -49,8 +49,8 @@ export default function LearnPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { window.location.href = "/login"; return; }
     const { data } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
-    if (active) setProfile({ name: data?.display_name || user.user_metadata?.display_name || "", email: user.email || "" });
-   } catch { if (active) setProfile({ name: "", email: "" }); }
+    if (active) setProfile({ name: data?.display_name || user.user_metadata?.display_name || "", email: user.email || "", avatar: user.user_metadata?.avatar_url || "" });
+   } catch { if (active) setProfile({ name: "", email: "", avatar: "" }); }
   }
   loadAccount();
   try { const saved=localStorage.getItem("aunora_language"); if(saved==="en"||saved==="vi")setLang(saved); } catch {}
@@ -66,7 +66,7 @@ export default function LearnPage() {
    <Link href="/learn" className="aunora-brand"><span className="wolf-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 8 19 13 24 9 29 13 41 8 38 29 31 39 24 34 17 39 10 29Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/><path d="m16 21 5 2m11-2-5 2m-3 2v5m-6 1 6-3 6 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
    <div className="sidebar-group-title">{t.space}</div>
    <nav className="aunora-menu">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={`aunora-menu-item ${item.active?"active":""}`}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<b className="ai-tag">AI</b>}</Link>)}</nav>
-   <div className="sidebar-account"><div className="account-avatar">{(profile?.name||profile?.email||"U").slice(0,1).toUpperCase()}</div><div className="account-details"><b>{profile?.name||profile?.email||t.account}</b><span>{t.levelUnknown}</span></div><button onClick={()=>setShowLogoutConfirm(true)} title={t.logout} aria-label={t.logout}><LogOut size={17}/></button></div>
+   <div className="sidebar-account"><Link href="/learn/profile" className="account-avatar account-avatar-link" title="Chỉnh sửa hồ sơ">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:(profile?.name||profile?.email?<span>{(profile?.name||profile?.email||"U").slice(0,1).toUpperCase()}</span>:<UserRound size={17}/>)}</Link><Link href="/learn/profile" className="account-details account-details-link"><b>{profile?.name||profile?.email||t.account}</b><span>{lang==="vi"?"Chỉnh sửa hồ sơ":"Edit profile"}</span></Link><button onClick={()=>setShowLogoutConfirm(true)} title={t.logout} aria-label={t.logout}><LogOut size={17}/></button></div>
    <div className="wolf-rewards">
     <div className="reward-heading"><span>{t.rewards}</span><span className="reward-level">{t.level} 0</span></div>
     <div className="reward-emblem"><div className="reward-emblem-ring"><Trophy size={30} strokeWidth={1.8}/><Sparkles className="reward-sparkle" size={15}/></div></div>
@@ -77,7 +77,7 @@ export default function LearnPage() {
    <header className="aunora-topbar"><button className="mobile-menu-button" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div><span className="topbar-kicker">{t.journey}</span><b>{t.dashboard}</b></div><div className="topbar-actions"><div className="language-control" role="group" aria-label="Select interface language"><span className="language-control-label"><Languages size={14}/> LANGUAGE</span><div className="language-segment"><button type="button" className={lang==="vi"?"selected":""} aria-pressed={lang==="vi"} onClick={()=>changeLang("vi")} title="Tiếng Việt">VI</button><button type="button" className={lang==="en"?"selected":""} aria-pressed={lang==="en"} onClick={()=>changeLang("en")} title="English">EN</button></div></div><div className="topbar-user">{profile?.name||profile?.email||t.demoAccount}</div></div></header>
    <div className="learnwrap"><div className="eyebrow">{t.space}</div><h1>{t.hello} <em>AUNORA.</em></h1><p className="learnlead">{t.lead}</p>
     <div className="learnfeatures"><article><BookOpen/><b>{t.lessons}</b><span>{t.topics}</span></article><article><Dumbbell/><b>{t.practiceCard}</b><span>{t.quizzes}</span></article><Link href="/learn/tutor" className="learnfeature-link"><article id="ai-tutor"><MessageCircle/><b>{t.assistant}</b><span>{t.support}</span></article></Link></div>
-    <div id="courses"><h2>{t.courses}</h2><div className="coursegrid">{courseNames.map((name,i)=><article className="learncourse" key={name}><div className="learncoursehead"><span className={i===0?"freeflag":"lockflag"}>{i===0?t.free:<><LockKeyhole size={12}/> {t.soon}</>}</span><span>{String(i+1).padStart(2,"0")}</span></div><div className="learnletter">{name.slice(0,1)}</div><h3>{name}</h3><p>{t.descriptions[i]}</p><div className="learnmeta"><span>{t.levels[i]}</span><span>{i===0?t.lessonsCount:(lang==="vi"?"Sắp ra mắt":"Coming soon")}</span></div>{i===0?<Link href="/learn/starter" className="coursebutton">{t.enter} <ArrowRight size={15}/></Link>:<button className="coursebutton disabled" disabled>{t.locked}</button>}</article>)}</div></div>
+    <div id="courses"><div className="course-section-heading"><h2>{t.courses}</h2><Link href="/courses" className="all-plans-link">{lang==="vi"?"Xem chi tiết 4 gói học":"Explore all 4 plans"} <ArrowRight size={15}/></Link></div><div className="coursegrid">{courseNames.map((name,i)=><article className="learncourse" key={name}><div className="learncoursehead"><span className={i===0?"freeflag":"lockflag"}>{i===0?t.free:<><LockKeyhole size={12}/> {lang==="vi"?"GÓI THÀNH VIÊN":"MEMBERSHIP"}</>}</span><span>{String(i+1).padStart(2,"0")}</span></div><div className="learnletter">{name.slice(7,8)}</div><h3>{name}</h3><p>{t.descriptions[i]}</p><div className="learnmeta"><span>{t.levels[i]}</span><span>{coursePrices[i]}</span></div>{i===0?<Link href="/learn/starter" className="coursebutton">{t.enter} <ArrowRight size={15}/></Link>:<Link href="/courses" className="coursebutton">{lang==="vi"?"Xem quyền lợi":"View benefits"} <ArrowRight size={15}/></Link>}</article>)}</div></div>
     <p className="demo-note">{t.demo}</p>
    </div>
   </section>
