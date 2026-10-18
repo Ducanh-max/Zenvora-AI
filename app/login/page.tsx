@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -45,4 +45,13 @@ export default function LoginPage() {
       </form><div className="authswitch">Chưa có tài khoản? <Link href="/register">Đăng ký miễn phí</Link></div><p className="demo-note">Tài khoản được xác thực an toàn qua Supabase.</p>
     </section>
   </main>;
+}
+
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<main className="authpage"><section className="authcard"><p>Đang tải trang đăng nhập...</p></section></main>}>
+      <LoginPageContent />
+    </Suspense>
+  );
 }
