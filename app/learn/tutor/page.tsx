@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowLeft, Bot, Send, Sparkles, User, Trash2, ImagePlus, X } from "lucide-react";
-type Message={role:"user"|"assistant";content:string;imageData?:string};\ntype QuotaInfo={allowed:boolean;used:number;quota:number;plan_id:string;remaining:number};
+type Message={role:"user"|"assistant";content:string;imageData?:string};
+type QuotaInfo={allowed:boolean;used:number;quota:number;plan_id:string;remaining:number};
 const starters=["Explain the present simple tense","Help me practice introducing myself","What is the difference between do and does?","Let's have a simple English conversation"];
 export default function TutorPage(){
  const [messages,setMessages]=useState<Message[]>([{role:"assistant",content:"Xin chào! Mình là AUNORA AI Tutor. 🌟\n\nMình có thể giúp bạn học từ vựng, giải thích ngữ pháp, sửa câu tiếng Anh hoặc cùng bạn luyện hội thoại. Hôm nay bạn muốn học gì?"}]);
