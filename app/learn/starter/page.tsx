@@ -29,7 +29,7 @@ export default function StarterLesson(){
  const [score,setScore]=useState(0);
  const [answered,setAnswered]=useState(false);
  const [finished,setFinished]=useState<number[]>([]);
- useEffect(()=>{try{const l=localStorage.getItem("aunora_language");if(l==="en"||l==="vi")setLang(l);const p=JSON.parse(localStorage.getItem("aunora_starter_progress")||"[]");if(Array.isArray(p))setFinished(p);}catch{};fetch("/api/lesson-progress").then(async r=>{if(!r.ok)return;const data=await r.json();const ids=new Set((data.progress||[]).filter((p:any)=>p.completed&&/^starter-\d+$/.test(p.lesson_id)).map((p:any)=>Number(p.lesson_id.split("-")[1])-1));if(ids.size)setFinished(previous=>[...new Set([...previous,...ids])]);}).catch(()=>{});},[]);
+ useEffect(()=>{try{const l=localStorage.getItem("aunora_language");if(l==="en"||l==="vi")setLang(l);const p=JSON.parse(localStorage.getItem("aunora_starter_progress")||"[]");if(Array.isArray(p))setFinished(p);}catch{};fetch("/api/lesson-progress").then(async r=>{if(!r.ok)return;const data=await r.json();const ids=new Set<number>((data.progress||[]).filter((p:any)=>p.completed&&/^starter-\d+$/.test(p.lesson_id)).map((p:any)=>Number(p.lesson_id.split("-")[1])-1));if(ids.size)setFinished(previous=>Array.from(new Set<number>([...previous,...ids])));}).catch(()=>{});},[]);
  const t=text[lang],unit=units[unitIndex],q=unit.questions[questionIndex];
  function setLanguage(l:Lang){setLang(l);localStorage.setItem("aunora_language",l);}
  function begin(){setMode("quiz");setQuestionIndex(0);setChoice(null);setScore(0);setAnswered(false);}
