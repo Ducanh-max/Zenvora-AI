@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, LockKeyhole, ArrowRight, Menu, Trophy, Sparkles, Languages } from "lucide-react";
 
 type Lang = "vi" | "en";
@@ -11,7 +12,7 @@ const copy = {
   journey:"HÀNH TRÌNH HỌC TẬP CỦA BẠN", dashboard:"Bảng điều khiển học tập", hello:"Chào mừng đến với", lead:"Tiến bộ từng ngày — bắt đầu hành trình tiếng Anh của bạn ngay hôm nay.",
   lessons:"Bài học", topics:"Học theo chủ đề", practiceCard:"Luyện tập", quizzes:"Câu hỏi tương tác", assistant:"Gia sư AI", support:"Trợ lý học tập",
   courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"3 bài học",
-  demo:"Bạn đang dùng chế độ trải nghiệm. Tài khoản và tiến độ demo được lưu trên trình duyệt này.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản demo",
+  demo:"Tài khoản và dữ liệu học tập của bạn được đồng bộ an toàn qua Supabase.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản demo",
   descriptions:["Xây dựng nền tảng tiếng Anh với những mẫu câu giao tiếp đầu tiên.","Luyện những tình huống giao tiếp quen thuộc hằng ngày.","Nắm chắc ngữ pháp qua ví dụ và bài tập ngắn.","Rèn kỹ năng nghe và nhận biết từ vựng.","Tự tin diễn đạt suy nghĩ bằng tiếng Anh."],
   levels:["Cơ bản","Cơ bản","Sơ cấp","Sơ cấp","Tiền trung cấp"]
  },
@@ -21,7 +22,7 @@ const copy = {
   journey:"YOUR LEARNING JOURNEY", dashboard:"Learning dashboard", hello:"Welcome to", lead:"Make progress every day — start your English journey today.",
   lessons:"Lessons", topics:"Learn by topic", practiceCard:"Practice", quizzes:"Interactive quizzes", assistant:"AI Tutor", support:"Your learning assistant",
   courses:"Your courses", free:"FREE", soon:"COMING SOON", enter:"Start learning", locked:"Locked", lessonsCount:"3 lessons",
-  demo:"You're using demo mode. Your account and progress are saved in this browser.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Demo account",
+  demo:"Your account and learning data are securely synced with Supabase.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Demo account",
   descriptions:["Build your English foundation with your first everyday phrases.","Practice familiar everyday conversations.","Master grammar through examples and short exercises.","Improve listening skills and vocabulary recognition.","Express your thoughts in English with confidence."],
   levels:["Beginner","Beginner","Elementary","Elementary","Pre-intermediate"]
  }
@@ -41,13 +42,24 @@ export default function LearnPage() {
  const [lang,setLang] = useState<Lang>("vi");
  const [showLogoutConfirm,setShowLogoutConfirm] = useState(false);
  useEffect(()=>{
-  try {
-   const raw=localStorage.getItem("zenvora_demo_session"); if(raw)setProfile(JSON.parse(raw));
-   const saved=localStorage.getItem("aunora_language"); if(saved==="en"||saved==="vi")setLang(saved);
-  } catch {}
+  let active = true;
+  async function loadAccount() {
+   try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { window.location.href = "/login"; return; }
+    const { data } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
+    if (active) setProfile({ name: data?.display_name || user.user_metadata?.display_name || "", email: user.email || "" });
+   } catch { if (active) setProfile({ name: "", email: "" }); }
+  }
+  loadAccount();
+  try { const saved=localStorage.getItem("aunora_language"); if(saved==="en"||saved==="vi")setLang(saved); } catch {}
+  return ()=>{ active = false; };
  },[]);
- function changeLang(value:Lang){setLang(value);localStorage.setItem("aunora_language",value);}
- function logout(){localStorage.removeItem("zenvora_demo_session");document.cookie="zenvora_demo_session=; Path=/; Max-Age=0; SameSite=Lax";window.location.href="/login";}
+ function changeLang(value:Lang){setLang(value);try{localStorage.setItem("aunora_language",value);}catch{}}
+ async function logout(){
+  try { const supabase=createClient(); await supabase.auth.signOut(); } finally { window.location.href="/"; }
+ }
  const t=copy[lang];
  return <main className="aunora-app">
   <aside className={`aunora-sidebar ${mobileOpen?"sidebar-open":""}`}>
