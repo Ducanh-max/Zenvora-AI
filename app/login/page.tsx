@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,7 +23,11 @@ export default function LoginPage() {
         password,
       });
       if (error) throw error;
-      router.replace("/learn");
+      const next = searchParams.get("next");
+      const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+      const { data: { user } } = await supabase.auth.getUser();
+      const destination = safeNext || (user?.app_metadata?.role === "admin" ? "/admin" : "/learn");
+      router.replace(destination);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Không thể đăng nhập. Vui lòng thử lại.");
