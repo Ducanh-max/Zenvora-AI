@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next.startsWith("/") ? next : "/learn", request.url));
+    if (!error) return NextResponse.redirect(new URL(next.startsWith("/") && !next.startsWith("//") ? next : "/learn", request.url));
   }
 
   return NextResponse.redirect(new URL("/login?message=confirm_failed", request.url));
