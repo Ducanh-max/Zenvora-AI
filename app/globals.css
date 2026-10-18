@@ -17,3 +17,20 @@
 @media(max-width:850px){.aunora-sidebar{transform:translateX(-100%);transition:transform .25s}.aunora-sidebar.sidebar-open{transform:translateX(0);box-shadow:20px 0 60px #0008}.aunora-main{width:100%;margin-left:0}.aunora-topbar{padding:0 20px}.mobile-menu-button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #2c3a50;border-radius:9px;background:#182438;color:#c3d1e6}.aunora-main .learnwrap{width:calc(100% - 40px)}}
 @media(max-width:760px){.wrap{width:calc(100% - 34px)}.nav{height:72px}.navlinks{display:none}.navactions{gap:12px}.navactions>a:first-child{font-size:12px}.btn.small{font-size:11px;padding:10px}.hero{grid-template-columns:1fr;gap:10px;padding-top:60px}.hero h1{font-size:45px}.lead{font-size:15px}.visual{min-height:380px}.badge{right:0}.features{padding:40px 0 65px}.center h2,.courseinner h2{font-size:31px}.grid{grid-template-columns:1fr}.courseinner{grid-template-columns:1fr;gap:28px}.coursecard{max-width:430px;width:100%}.footer{align-items:flex-start;flex-direction:column;gap:12px}.learnwrap{width:calc(100% - 34px);margin:35px auto}.learnfeatures{grid-template-columns:1fr}.learnfeatures span{margin-left:auto}.coursegrid{grid-template-columns:1fr}.quizcard{padding:25px 20px}.quizcard h1{font-size:23px}.quiztop{margin-bottom:22px}.authcard{padding:27px 22px}}
 @media(max-width:620px){.language-control{gap:6px;padding:4px 5px 4px 8px}.language-control-label{font-size:0;padding-right:2px}.language-control-label svg{width:16px;height:16px}.language-segment button{min-width:32px;height:26px;padding:0 7px}.topbar-actions{gap:9px}.topbar-actions .topbar-user{display:none}.quiztop{align-items:center;gap:8px;flex-wrap:wrap}}
+
+/* Account placement and logout confirmation */
+.aunora-sidebar .sidebar-account{margin-top:18px;padding:16px 4px 15px;border-top:1px solid #293447;border-bottom:1px solid #293447}
+.aunora-sidebar .wolf-rewards{margin-top:auto}
+.logout-modal-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:#050912bf;backdrop-filter:blur(7px)}
+.logout-modal{width:min(420px,100%);padding:30px;border:1px solid #35445d;border-radius:20px;background:linear-gradient(145deg,#1a2639,#111a29);box-shadow:0 25px 90px #0009;text-align:center;color:#edf2fa;animation:logout-pop .18s ease-out}
+@keyframes logout-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.logout-modal-icon{width:52px;height:52px;margin:0 auto 17px;display:grid;place-items:center;border:1px solid #53678a;border-radius:16px;background:#263750;color:#b8caff}
+.logout-modal h2{margin:0;font:800 20px/1.4 Manrope;color:#f2f5fb}
+.logout-modal p{margin:10px 0 24px;color:#9aa8bd;font-size:13px;line-height:1.6}
+.logout-modal-actions{display:flex;gap:10px}
+.logout-modal-actions button{flex:1;min-height:43px;border:1px solid #3b4a62;border-radius:10px;font:700 12px 'DM Sans';cursor:pointer}
+.logout-cancel{background:#202d42;color:#dce5f2}
+.logout-cancel:hover{background:#2b3b54}
+.logout-confirm{border-color:#789bfa!important;background:#789bfa;color:#101a2b}
+.logout-confirm:hover{background:#9ab5ff}
+@media(max-width:850px){.aunora-sidebar .sidebar-account{margin-top:18px}}
