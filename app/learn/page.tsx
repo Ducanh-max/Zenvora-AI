@@ -12,7 +12,7 @@ const copy = {
   journey:"HÀNH TRÌNH HỌC TẬP CỦA BẠN", dashboard:"Bảng điều khiển học tập", hello:"Chào mừng đến với", lead:"Tiến bộ từng ngày — bắt đầu hành trình tiếng Anh của bạn ngay hôm nay.",
   lessons:"Bài học", topics:"Học theo chủ đề", practiceCard:"Luyện tập", quizzes:"Câu hỏi tương tác", assistant:"Gia sư AI", support:"Trợ lý học tập",
   courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"3 bài học",
-  demo:"Tài khoản và dữ liệu học tập của bạn được đồng bộ an toàn qua Supabase.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản demo",
+  demo:"Tài khoản và dữ liệu học tập của bạn được đồng bộ an toàn qua Supabase.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản",
   descriptions:["Xây dựng nền tảng tiếng Anh với những mẫu câu giao tiếp đầu tiên.","Luyện những tình huống giao tiếp quen thuộc hằng ngày.","Nắm chắc ngữ pháp qua ví dụ và bài tập ngắn.","Rèn kỹ năng nghe và nhận biết từ vựng.","Tự tin diễn đạt suy nghĩ bằng tiếng Anh."],
   levels:["Cơ bản","Cơ bản","Sơ cấp","Sơ cấp","Tiền trung cấp"]
  },
@@ -22,7 +22,7 @@ const copy = {
   journey:"YOUR LEARNING JOURNEY", dashboard:"Learning dashboard", hello:"Welcome to", lead:"Make progress every day — start your English journey today.",
   lessons:"Lessons", topics:"Learn by topic", practiceCard:"Practice", quizzes:"Interactive quizzes", assistant:"AI Tutor", support:"Your learning assistant",
   courses:"Your courses", free:"FREE", soon:"COMING SOON", enter:"Start learning", locked:"Locked", lessonsCount:"3 lessons",
-  demo:"Your account and learning data are securely synced with Supabase.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Demo account",
+  demo:"Your account and learning data are securely synced with Supabase.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Account",
   descriptions:["Build your English foundation with your first everyday phrases.","Practice familiar everyday conversations.","Master grammar through examples and short exercises.","Improve listening skills and vocabulary recognition.","Express your thoughts in English with confidence."],
   levels:["Beginner","Beginner","Elementary","Elementary","Pre-intermediate"]
  }
