@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Activity, ArrowLeft, BookOpen, GraduationCap, Layers3, ShieldCheck, Users } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createCourse, createLesson, deleteCourse, deleteLesson, updateCourse, updateLesson } from "./actions";
 
@@ -10,7 +10,7 @@ type Course = { id: string; slug: string; title: string; level: string; descript
 type Lesson = { id: string; course_id: string; slug: string; title: string; summary: string; content: unknown; sort_order: number };
 type Profile = { id: string; display_name: string | null; created_at: string };
 
-function StatCard({ icon: Icon, label, value, note }: { icon: typeof Users; label: string; value: number; note: string }) {
+function StatCard({ icon: Icon, label, value, note }: { icon: LucideIcon; label: string; value: number; note: string }) {
   return <article className="admin-stat"><span className="admin-stat-icon"><Icon size={19}/></span><div><small>{label}</small><strong>{value.toLocaleString("vi-VN")}</strong><span>{note}</span></div></article>;
 }
 
