@@ -25,7 +25,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
     supabase.from("aunora_user_entitlements").select("plan_id,active_until").eq("user_id", user.id).maybeSingle(),
   ]);
 
-  let planId = entitlement?.plan_id || "starter";
+  let planId = "starter";
   if (entitlement?.active_until && new Date(entitlement.active_until).getTime() < Date.now()) planId = "starter";
   const plan = planLimits[planId] || planLimits.starter;
   const { data: progress } = await supabase.from("aunora_lesson_progress")
@@ -42,10 +42,10 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH</div>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Chọn một bài học, ôn từ vựng, luyện câu ví dụ và hoàn thành bài kiểm tra tương tác.</p>
-      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>Đã có nội dung thực tế cho cả 5 khóa học.</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
+      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>Cả 5 khóa học đều miễn phí.</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
       <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={15} initialCourseSlug={params?.course} />}
-    <p className="library-footnote">Bốn khóa học mới đang được mở thử nghiệm miễn phí trong thời gian hoàn thiện hệ thống thành viên. Thanh toán hiện chưa được bật.</p>
+    <p className="library-footnote">Toàn bộ 5 khóa học AUNORA đều miễn phí. Không cần mua gói thành viên để học.</p>
   </main>;
 }
