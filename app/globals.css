@@ -427,3 +427,17 @@
 .dash-membership-card:nth-child(3) .dash-plan-benefits{color:#7848dc}
 .dash-membership-card:nth-child(4) .dash-plan-benefits{color:#d68a06}
 @media(max-width:520px){.dash-memberships{padding:17px}.dash-membership-card{min-height:350px;padding:16px 12px}.dash-memberships .dash-section-heading h2{font-size:22px}}
+
+/* Fix plan button contrast and make benefits interactive */
+.dash-membership-card .dash-plan-details{width:100%;margin-top:14px}
+.dash-membership-card .dash-plan-details summary{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;width:100%;padding:10px 12px;box-sizing:border-box;border:2px solid #1758c7;border-radius:12px;background:#1769e6;color:#fff!important;font-size:13px;font-weight:800;cursor:pointer;list-style:none;text-align:center}
+.dash-membership-card .dash-plan-details summary::-webkit-details-marker{display:none}
+.dash-membership-card .dash-plan-details summary:hover{background:#104db4;color:#fff!important}
+.dash-membership-card .dash-plan-details summary:focus-visible{outline:3px solid #15b9ff;outline-offset:3px}
+.dash-membership-card .dash-plan-details[open] summary svg{transform:rotate(90deg)}
+.dash-plan-detail-content{margin-top:12px;padding:14px;border:1px solid #c7ddf6;border-radius:12px;background:#fff;color:#163968}
+.dash-plan-detail-content b{font-size:13px;color:#103a79}
+.dash-plan-detail-content p,.dash-plan-detail-content li{color:#294d7a!important;font-size:12px;line-height:1.65}
+.dash-plan-detail-content ul{margin:10px 0 0;padding-left:18px}
+.dash-membership-card .dash-plan-feature-list li,.dash-membership-card>p{color:#274a76!important}
+.dash-membership-card .dash-membership-unavailable{color:#3f5d85!important;background:#dce8f6}
