@@ -446,3 +446,48 @@
 .dash-membership-card .dash-plan-link{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:47px;box-sizing:border-box;padding:11px 13px;margin-top:15px;border:0;border-radius:12px;background:#1d6de6!important;color:#fff!important;text-decoration:none;font-size:13px;font-weight:800;line-height:1.4;box-shadow:0 5px 12px #1c64d31b}
 .dash-membership-card .dash-plan-link:hover{background:#1455bb!important;color:#fff!important}
 .dash-membership-card .dash-plan-link:focus-visible{outline:3px solid #32c8ff;outline-offset:3px}
+
+/* AUNORA immersive plan detail pages */
+.aunora-plan-page{--plan-accent:#2876f0;--plan-soft:#e5f2ff;min-height:100vh;padding:32px 22px 70px;background:radial-gradient(ellipse at 85% 4%,#d8e8ff 0%,transparent 45%),linear-gradient(160deg,#f5f9ff,#eaf2ff);color:#153766;font-family:inherit}
+.aunora-plan-starter{--plan-accent:#089c83;--plan-soft:#dcfaf0}
+.aunora-plan-pro{--plan-accent:#7950df;--plan-soft:#ebe4ff}
+.aunora-plan-premium{--plan-accent:#c38a12;--plan-soft:#fff1c7}
+.aunora-plan-wrap{max-width:1120px;margin:auto}
+.aunora-plan-nav,.aunora-plan-footer{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.aunora-plan-nav a,.aunora-plan-footer a{color:#29568e;text-decoration:none;font-size:14px;font-weight:800}
+.aunora-plan-nav a:hover,.aunora-plan-footer a:hover{color:var(--plan-accent)}
+.aunora-plan-hero{display:grid;grid-template-columns:1.1fr .9fr;overflow:hidden;position:relative;min-height:460px;margin-top:30px;border:1px solid #ffffff80;border-radius:30px;background:linear-gradient(125deg,#101f46,#17376d 64%,#28509a);box-shadow:0 26px 75px #173d7830;color:white}
+.aunora-plan-hero:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 30%,color-mix(in srgb,var(--plan-accent) 55%,transparent),transparent 55%);pointer-events:none}
+.aunora-plan-hero-copy{z-index:1;padding:clamp(28px,5vw,65px)}
+.aunora-plan-eyebrow{display:block;font-size:11px;font-weight:900;letter-spacing:2px;color:#9fcbff}
+.aunora-plan-emblem{display:grid;place-items:center;width:58px;height:58px;margin-top:28px;border-radius:19px;background:#ffffff1d;border:1px solid #ffffff55;color:#e2f5ff;font-size:38px}
+.aunora-plan-pill{display:inline-block;margin-top:24px;padding:8px 12px;border:1px solid #ffffff55;border-radius:100px;background:#ffffff16;color:#d5e8ff;font-size:10px;font-weight:900;letter-spacing:1.5px}
+.aunora-plan-hero h1{font-size:clamp(35px,5vw,62px);letter-spacing:-1.7px;line-height:1.1;margin:16px 0 12px;color:#fff}
+.aunora-plan-subtitle{font-size:17px;color:#c1d9f7;margin:0 0 24px}
+.aunora-plan-price{font-size:clamp(34px,4vw,51px);font-weight:900;letter-spacing:-1px;color:#fff}
+.aunora-plan-price span{font-size:16px;font-weight:500;letter-spacing:0;color:#c7dcf5}
+.aunora-plan-availability{color:#c2ddfa;font-size:13px;margin:12px 0 22px}
+.aunora-plan-primary{display:inline-flex;justify-content:space-between;align-items:center;gap:35px;padding:14px 20px;border-radius:13px;background:#fff;color:#17427e;text-decoration:none;font-weight:900;font-size:14px}
+.aunora-plan-disabled{background:#ffffff25;color:#fff;border:1px solid #ffffff55}
+.aunora-plan-hero-art{position:relative;min-height:340px;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.aunora-plan-orbit{position:absolute;width:340px;height:340px;border:1px solid #ffffff35;border-radius:50%;transform:rotate(-30deg) scaleX(1.2)}
+.aunora-plan-orbit.orbit-two{width:260px;height:260px;border-color:#8ddcff77;transform:rotate(30deg) scaleX(1.45)}
+.aunora-plan-art-symbol{display:grid;place-items:center;width:230px;height:230px;border-radius:38%;background:radial-gradient(circle at 35% 25%,#ffffff70,transparent 38%),linear-gradient(145deg,#6acbff,var(--plan-accent));box-shadow:0 0 100px #63c9ff88,0 20px 40px #001a4d70;border:2px solid #ffffff7a;font-size:135px;color:white;transform:rotate(-12deg)}
+.aunora-plan-art-label{position:absolute;bottom:60px;right:10%;padding:14px 25px;border:1px solid #ffffff70;border-radius:14px;background:#ffffff20;backdrop-filter:blur(15px);font-size:16px;font-weight:900;letter-spacing:3px;text-align:center}
+.aunora-plan-art-label small{font-size:10px;letter-spacing:2px}
+.aunora-plan-spark{position:absolute;color:#b7e8ff;font-size:34px}
+.aunora-plan-spark.spark-one{top:65px;left:18%}.aunora-plan-spark.spark-two{bottom:95px;right:10%}
+.aunora-plan-benefits{padding:44px 0 20px}
+.aunora-plan-section-title>span{font-size:11px;letter-spacing:2px;font-weight:900;color:var(--plan-accent)}
+.aunora-plan-section-title h2{margin:10px 0;font-size:clamp(25px,3vw,36px);color:#143b78}
+.aunora-plan-section-title p{color:#6580a5;margin:0 0 25px}
+.aunora-plan-benefit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.aunora-plan-benefit{display:flex;align-items:center;gap:19px;min-height:125px;padding:24px;border:1px solid #d6e6fb;border-radius:20px;background:#fff;box-shadow:0 9px 24px #1649810d}
+.aunora-plan-benefit-icon{display:grid;place-items:center;flex-shrink:0;width:59px;height:59px;border-radius:17px;background:var(--plan-soft);color:var(--plan-accent);font-size:27px;font-weight:900}
+.aunora-plan-benefit span{font-size:10px;letter-spacing:1.3px;font-weight:900;color:#8a9db6}
+.aunora-plan-benefit h3{font-size:19px;line-height:1.4;margin:8px 0 0;color:#153d76}
+.aunora-plan-notice{display:flex;align-items:flex-start;gap:13px;margin:20px 0 28px;padding:18px 22px;border:1px solid #d2e3fa;border-radius:16px;background:#eaf3ff;color:#42658e}
+.aunora-plan-notice span{font-size:22px;color:var(--plan-accent)}
+.aunora-plan-notice p{margin:0;font-size:13px;line-height:1.7}
+@media(max-width:750px){.aunora-plan-hero{grid-template-columns:1fr}.aunora-plan-hero-art{min-height:240px}.aunora-plan-art-symbol{width:155px;height:155px;font-size:85px}.aunora-plan-orbit{width:230px;height:230px}.aunora-plan-orbit.orbit-two{width:180px;height:180px}.aunora-plan-art-label{bottom:20px;right:10%;font-size:12px}.aunora-plan-benefit-grid{grid-template-columns:1fr}}
+@media(max-width:450px){.aunora-plan-page{padding:17px 12px 45px}.aunora-plan-hero{margin-top:20px;border-radius:22px}.aunora-plan-hero-copy{padding:27px}.aunora-plan-benefit{padding:17px;min-height:95px}.aunora-plan-benefit h3{font-size:16px}.aunora-plan-nav a,.aunora-plan-footer a{font-size:12px}}
