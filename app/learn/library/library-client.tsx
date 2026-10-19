@@ -15,27 +15,29 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
   return base
     .filter(question =>
       Array.isArray(question.options) &&
-      question.options.length >= 2 &&
-      new Set(question.options).size === question.options.length &&
+      question.options.length === 4 &&
+      question.options.every(option => typeof option === "string" && option.trim().length > 0) &&
+      new Set(question.options.map(option => option.trim().toLowerCase())).size === 4 &&
       Number.isInteger(question.answer) &&
       question.answer >= 0 &&
-      question.answer < question.options.length
+      question.answer < 4
     )
     .map(question => {
-      // Keep exactly four selectable choices. Older questions have three;
-      // the fourth is a neutral "not sure" choice, never a correct answer.
-      const sourceOptions = question.options.slice(0, 4);
-      const sourceAnswer = question.answer;
-      while (sourceOptions.length < 4) sourceOptions.push("None of the above");
-      const order = sourceOptions.map((_, index) => index);
+      // "All of the above" depends on the other choices, so keep it in D.
+      const hasAllAbove = question.options[3].trim().toLowerCase() === "all of the above";
+      if (hasAllAbove) return question;
+      const order = question.options.map((_, index) => index);
       for (let i = order.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [order[i], order[j]] = [order[j], order[i]];
       }
       return {
         ...question,
-        options: order.map(index => sourceOptions[index]),
-        answer: order.indexOf(sourceAnswer),
+        options: order.map(index => question.options[index]),
+        answer: order.indexOf(question.answer),
+        optionExplains: question.optionExplains
+          ? order.map(index => question.optionExplains?.[index] || "")
+          : undefined,
       };
     })
     .sort(() => Math.random() - 0.5);
