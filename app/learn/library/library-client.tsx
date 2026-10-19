@@ -26,7 +26,7 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
       // the fourth is a neutral "not sure" choice, never a correct answer.
       const sourceOptions = question.options.slice(0, 4);
       const sourceAnswer = question.answer;
-      while (sourceOptions.length < 4) sourceOptions.push("Mình chưa chắc");
+      while (sourceOptions.length < 4) sourceOptions.push("None of the above");
       const order = sourceOptions.map((_, index) => index);
       for (let i = order.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
