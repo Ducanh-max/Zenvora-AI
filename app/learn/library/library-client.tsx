@@ -67,21 +67,38 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     if (questionIndex < questions.length - 1) { setQuestionIndex(value => value + 1); setChoice(null); setAnswered(false); }
     else setMode("result");
   }
-  async function saveProgress() {
-    if (!selected) return;
+  async function saveProgress(): Promise<boolean> {
+    if (!selected) return false;
     setSaving(true); setNotice("");
     try {
       const response = await fetch("/api/lesson-progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonId: selected.slug, courseId: selectedCourseSlug || "english-starter", score, totalQuestions: questions.length }) });
       if (!response.ok) throw new Error("Không thể đồng bộ tiến độ. Hãy thử lại.");
       setDone(previous => previous.includes(selected.slug) ? previous : [...previous, selected.slug]);
       setNotice("Đã lưu kết quả học tập của bạn.");
-    } catch (error) { setNotice(error instanceof Error ? error.message : "Không thể lưu kết quả."); }
-    finally { setSaving(false); }
+      return true;
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Không thể lưu kết quả.");
+      return false;
+    } finally { setSaving(false); }
   }
   function resetLesson() { setSelected(null); setMode("learn"); setNotice(""); }
 
   const activeCourse = courses.find(course => course.slug === selectedCourseSlug) || null;
-  const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id) : [];
+  const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id).sort((a, b) => a.sort_order - b.sort_order) : [];
+  const currentLessonIndex = selected ? courseLessons.findIndex(lesson => lesson.id === selected.id) : -1;
+  const nextLesson = currentLessonIndex >= 0 ? courseLessons[currentLessonIndex + 1] || null : null;
+  async function saveAndGoNext() {
+    if (!nextLesson) return;
+    const saved = await saveProgress();
+    if (!saved) return;
+    setSelected(nextLesson);
+    setMode("learn");
+    setQuestionIndex(0);
+    setChoice(null);
+    setAnswered(false);
+    setScore(0);
+    setNotice("Bài trước đã được lưu. Bắt đầu bài học tiếp theo nhé!");
+  }
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
   if (selected) {
@@ -100,7 +117,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         {answered && <div className={choice === question.answer ? "feedback good" : "feedback bad"}>{choice === question.answer ? <CheckCircle2/> : <XCircle/>}<span><b>{choice === question.answer ? "Chính xác!" : "Chưa chính xác"}</b><br/>{choice !== question.answer && <>Bạn chọn: <b>{question.options[choice ?? 0]}</b>. Đáp án đúng: <b>{question.options[question.answer]}</b>. Lựa chọn của bạn chưa khớp với yêu cầu của câu hỏi.<br/></>}{question.translation && <><b>Dịch nghĩa:</b> {question.translation}<br/></>}<b>Giải thích:</b> {question.explain}{question.optionExplains?.[choice ?? -1] && <><br/><b>Vì sao lựa chọn này sai:</b> {question.optionExplains[choice ?? -1]}</>}</span></div>}
         <button className="btn nextbtn" disabled={choice === null} onClick={answered ? nextQuestion : submitAnswer}>{answered ? questionIndex === questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo" : "Kiểm tra đáp án"}</button>
       </>}
-      {mode === "result" && <div className="lesson-result"><Trophy size={44}/><div className="eyebrow">KẾT QUẢ BÀI KIỂM TRA</div><h2>{selected.title}</h2><strong>{score}/{questions.length}</strong><span>Số câu trả lời đúng</span><p>{Math.round(score / Math.max(questions.length, 1) * 100)}% chính xác</p><button className="btn nextbtn" onClick={saveProgress} disabled={saving}>{saving ? "Đang lưu..." : "Lưu tiến độ"} <ArrowRight size={16}/></button><button className="lesson-retry" onClick={startQuiz}><RotateCcw size={14}/>Làm lại bài</button>{notice && <p role="status">{notice}</p>}</div>}
+      {mode === "result" && <div className="lesson-result"><Trophy size={44}/><div className="eyebrow">KẾT QUẢ BÀI KIỂM TRA</div><h2>{selected.title}</h2><strong>{score}/{questions.length}</strong><span>Số câu trả lời đúng</span><p>{Math.round(score / Math.max(questions.length, 1) * 100)}% chính xác</p><button className="btn nextbtn" onClick={saveProgress} disabled={saving}>{saving ? "Đang lưu..." : "Lưu tiến độ"} <ArrowRight size={16}/></button>{nextLesson ? <button className="btn nextbtn" onClick={saveAndGoNext} disabled={saving}>{saving ? "Đang lưu..." : "Lưu & học bài tiếp theo"} <ChevronRight size={17}/></button> : <button className="btn nextbtn" onClick={() => { setSelected(null); setMode("learn"); setNotice(""); }} disabled={saving}>Bạn đã đến bài cuối — quay lại danh sách <ArrowRight size={16}/></button>}<button className="lesson-retry" onClick={startQuiz}><RotateCcw size={14}/>Làm lại bài</button>{notice && <p role="status">{notice}</p>}</div>}
     </section>;
   }
 
