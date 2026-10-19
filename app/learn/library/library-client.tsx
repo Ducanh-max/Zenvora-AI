@@ -115,8 +115,4 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
     return <article className="library-card library-course-card" key={course.id}><div className="library-card-top"><span>{course.is_free ? "KHÓA HỌC MIỄN PHÍ" : "ĐANG MỞ THỬ NGHIỆM"}</span><BookOpen size={18}/></div><h2>{course.title}</h2><p>{course.description}</p><div className="library-card-meta"><span>{course.level}</span><span>{courseLessonsForCard.length} bài học</span><span>{completeCount}/{courseLessonsForCard.length} hoàn thành</span></div><button className="btn nextbtn" onClick={() => setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={16}/></button></article>;
   })}</section>;
-    const complete = done.includes(lesson.slug);
-    const questionCount = buildQuestionBank(lesson).slice(0, quizSize).length;
-    return <article className="library-card" key={lesson.id}><div className="library-card-top"><span>{complete ? "ĐÃ HOÀN THÀNH" : `BÀI ${String(index + 1).padStart(2, "0")}`}</span><BookOpen size={18}/></div><h2>{lesson.title}</h2><p>{lesson.summary}</p><div className="library-card-meta"><span>{(lesson.content.vocabulary || []).length} từ vựng</span><span>{questionCount} câu kiểm tra</span></div><button className="btn nextbtn" onClick={() => { setSelected(lesson); setMode("learn"); }}>{complete ? "Ôn tập lại" : "Vào học"} <ArrowRight size={16}/></button></article>;
-  })}</section>;
 }
