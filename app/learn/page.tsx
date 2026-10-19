@@ -98,8 +98,8 @@ export default function LearnPage(){
      <aside className="dash-side-column"><section className="dash-aivanta-card"><div className="mini-aivanta"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><b>{t.tutorTitle}</b><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={14}/></Link></div></section><section className="dash-quote-card"><div className="quote-stars">✦ ✧ ✦</div><p>{t.quote}</p><small>— Aivanta</small></section></aside>
     </div>
     <section className="dash-memberships" id="memberships">
-      <div className="dash-section-heading"><div><span>{lang==="vi"?"LỰA CHỌN HỌC TẬP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Các gói học AUNORA":"AUNORA learning plans"}</h2></div></div>
-      <p className="dash-memberships-intro">{lang==="vi"?"Khám phá các gói học. Hiện tại tất cả 5 khóa học vẫn được truy cập miễn phí; các gói nâng cấp chưa mở bán.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
+      <div className="dash-section-heading"><div><span>{lang==="vi"?"CHỌN GÓI HỌC PHÙ HỢP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Khám phá gói học phù hợp với bạn":"Find your ideal learning plan"}</h2></div></div>
+      <p className="dash-memberships-intro">{lang==="vi"?"Xem đặc quyền của từng gói và chọn lộ trình phù hợp. Hiện tại cả 5 khóa học vẫn miễn phí; các gói nâng cấp chưa mở bán.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
       <div className="dash-membership-grid">
        {[
         {name:"Free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start your journey",featured:false},
