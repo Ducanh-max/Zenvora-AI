@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw,
 
 type Vocabulary = { word: string; meaning: string; pronunciation?: string; example: string };
 type Example = { english: string; vietnamese: string };
-type Question = { q: string; options: string[]; answer: number; explain: string };
+type Question = { q: string; options: string[]; answer: number; explain: string; translation?: string; optionExplains?: string[] };
 export type LibraryCourse = { id: string; slug: string; title: string; level: string; description: string; is_free: boolean; sort_order: number };
 export type LibraryLesson = { id: string; course_id: string; slug: string; title: string; summary: string; sort_order: number; content: { vocabulary?: Vocabulary[]; examples?: Example[]; questions?: Question[] } };
 type Progress = { lesson_id: string; completed: boolean; score: number; total_questions: number };
@@ -22,15 +22,20 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
       question.answer < question.options.length
     )
     .map(question => {
-      const order = question.options.map((_, index) => index);
+      // Keep exactly four selectable choices. Older questions have three;
+      // the fourth is a neutral "not sure" choice, never a correct answer.
+      const sourceOptions = question.options.slice(0, 4);
+      const sourceAnswer = question.answer;
+      while (sourceOptions.length < 4) sourceOptions.push("Mình chưa chắc");
+      const order = sourceOptions.map((_, index) => index);
       for (let i = order.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [order[i], order[j]] = [order[j], order[i]];
       }
       return {
         ...question,
-        options: order.map(index => question.options[index]),
-        answer: order.indexOf(question.answer),
+        options: order.map(index => sourceOptions[index]),
+        answer: order.indexOf(sourceAnswer),
       };
     })
     .sort(() => Math.random() - 0.5);
@@ -89,7 +94,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       {mode === "quiz" && question && <>
         <div className="eyebrow">CÂU {questionIndex + 1} / {questions.length}</div><div className="quizprogress"><i style={{ width: ((questionIndex + 1) / questions.length * 100) + "%" }}/></div>
         <h2>{question.q}</h2><div className="options">{question.options.map((option, index) => <button key={index} className={choice === index ? "selected" : ""} onClick={() => !answered && setChoice(index)} disabled={answered}>{String.fromCharCode(65 + index)}. {option}</button>)}</div>
-        {answered && <div className={choice === question.answer ? "feedback good" : "feedback bad"}>{choice === question.answer ? <CheckCircle2/> : <XCircle/>}<span><b>{choice === question.answer ? "Chính xác!" : "Chưa chính xác"}</b><br/>{question.explain}</span></div>}
+        {answered && <div className={choice === question.answer ? "feedback good" : "feedback bad"}>{choice === question.answer ? <CheckCircle2/> : <XCircle/>}<span><b>{choice === question.answer ? "Chính xác!" : "Chưa chính xác"}</b><br/>{choice !== question.answer && <>Bạn chọn: <b>{question.options[choice ?? 0]}</b>. Đáp án đúng: <b>{question.options[question.answer]}</b>. Lựa chọn của bạn chưa khớp với yêu cầu của câu hỏi.<br/></>}{question.translation && <><b>Dịch nghĩa:</b> {question.translation}<br/></>}<b>Giải thích:</b> {question.explain}{question.optionExplains?.[choice ?? -1] && <><br/><b>Vì sao lựa chọn này sai:</b> {question.optionExplains[choice ?? -1]}</>}</span></div>}
         <button className="btn nextbtn" disabled={choice === null} onClick={answered ? nextQuestion : submitAnswer}>{answered ? questionIndex === questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo" : "Kiểm tra đáp án"}</button>
       </>}
       {mode === "result" && <div className="lesson-result"><Trophy size={44}/><div className="eyebrow">KẾT QUẢ BÀI KIỂM TRA</div><h2>{selected.title}</h2><strong>{score}/{questions.length}</strong><span>Số câu trả lời đúng</span><p>{Math.round(score / Math.max(questions.length, 1) * 100)}% chính xác</p><button className="btn nextbtn" onClick={saveProgress} disabled={saving}>{saving ? "Đang lưu..." : "Lưu tiến độ"} <ArrowRight size={16}/></button><button className="lesson-retry" onClick={startQuiz}><RotateCcw size={14}/>Làm lại bài</button>{notice && <p role="status">{notice}</p>}</div>}
