@@ -364,3 +364,17 @@
 .auth-mascot-message strong{display:block;margin-top:8px;color:white;font-size:15px}
 .auth-mascot-message p{margin:7px 0 0;color:#c3e6ff;font-size:12px}
 @media(max-width:760px){.auth-layout{grid-template-columns:1fr;max-width:510px}.auth-mascot-panel{min-height:280px}.auth-mascot-panel>img{max-height:280px}.auth-mascot-message{right:0;bottom:0;padding:12px}.authpage{padding:20px 15px 35px}}
+
+/* Official AUNORA identity: admin, course library and AI tutor */
+.admin-brand-photo{width:49px;height:49px;flex-shrink:0;overflow:hidden;display:grid;place-items:center;border:2px solid #6cdaff;border-radius:50%;background:#133e83}
+.admin-brand-photo img{width:100%;height:100%;object-fit:cover}
+.admin-aivanta{margin:20px 10px;padding:12px;border:1px solid #4a92cc66;border-radius:16px;background:linear-gradient(135deg,#123d77,#153266);text-align:center;color:#d5efff}
+.admin-aivanta img{display:block;width:100%;max-height:160px;object-fit:contain;filter:drop-shadow(0 8px 15px #091f4b80)}
+.admin-aivanta p{margin:6px 0;font-size:11px;line-height:1.5}.admin-aivanta b{color:#fff;font-size:14px}
+.library-heading{position:relative;isolation:isolate;padding-right:min(28vw,260px);min-height:195px}
+.library-aivanta{position:absolute;right:0;bottom:0;width:min(26vw,235px);max-height:215px;object-fit:contain;filter:drop-shadow(0 12px 15px #0c54a450)}
+.tutor-welcome{position:relative;isolation:isolate;min-height:165px;padding-right:170px}
+.tutor-welcome-mascot{position:absolute;right:0;bottom:0;width:160px;height:165px;object-fit:contain;filter:drop-shadow(0 9px 15px #0a58a350)}
+.tutor-brand-icon,.tutor-avatar,.message-avatar{overflow:hidden}
+.tutor-brand-icon img,.tutor-avatar img,.message-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
+@media(max-width:650px){.library-heading{padding-right:0;padding-bottom:110px}.library-aivanta{width:120px;max-height:120px}.tutor-welcome{padding-right:0;padding-bottom:110px}.tutor-welcome-mascot{width:115px;height:115px}}
