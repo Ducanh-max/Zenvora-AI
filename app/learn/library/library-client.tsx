@@ -82,6 +82,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
 
   const activeCourse = courses.find(course => course.slug === selectedCourseSlug) || null;
   const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id) : [];
+  const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
   if (selected) {
     const content = selected.content || {};
@@ -91,7 +92,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         <div className="eyebrow">BÀI HỌC · {selected.sort_order}</div><h2>{selected.title}</h2><p>{selected.summary}</p>
         <h3>Từ vựng trọng tâm</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
         <h3>Ví dụ giao tiếp</h3><div className="library-examples">{(content.examples || []).map((item, index) => <article key={index}><b>{item.english}</b><span>{item.vietnamese}</span></article>)}</div>
-        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, (content.questions || []).length)} câu</b><span>Trả lời từng câu để xem giải thích và tổng kết kết quả.</span><button className="btn nextbtn" onClick={startQuiz}>Bắt đầu kiểm tra <ChevronRight size={17}/></button></div>
+        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, availableQuestionCount)} câu</b><span>{availableQuestionCount ? "Trả lời từng câu để xem giải thích và tổng kết kết quả." : "Bài học này đang được biên tập câu hỏi. Vui lòng quay lại sau."}</span><button className="btn nextbtn" onClick={startQuiz} disabled={availableQuestionCount === 0}>Bắt đầu kiểm tra <ChevronRight size={17}/></button></div>
       </>}
       {mode === "quiz" && question && <>
         <div className="eyebrow">CÂU {questionIndex + 1} / {questions.length}</div><div className="quizprogress"><i style={{ width: ((questionIndex + 1) / questions.length * 100) + "%" }}/></div>
@@ -109,7 +110,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <div className="library-course-intro"><span className="eyebrow">{activeCourse.level} · {activeCourse.is_free ? "MIỄN PHÍ" : "MỞ THỬ NGHIỆM"}</span><h2>{activeCourse.title}</h2><p>{activeCourse.description}</p><b>{courseLessons.length} bài học · {courseLessons.reduce((sum, lesson) => sum + (lesson.content.vocabulary || []).length, 0)} từ vựng</b></div>
       <div className="library-grid">{courseLessons.map((lesson, index) => {
         const complete = done.includes(lesson.slug);
-        const questionCount = (lesson.content.questions || []).length || buildQuestionBank(lesson).length;
+        const questionCount = buildQuestionBank(lesson).length;
         return <article className="library-card" key={lesson.id}><div className="library-card-top"><span>{complete ? "ĐÃ HOÀN THÀNH" : `BÀI ${String(index + 1).padStart(2, "0")}`}</span><BookOpen size={18}/></div><h2>{lesson.title}</h2><p>{lesson.summary}</p><div className="library-card-meta"><span>{(lesson.content.vocabulary || []).length} từ vựng</span><span>{Math.min(quizSize, questionCount)} câu kiểm tra</span></div><button className="btn nextbtn" onClick={() => { setSelected(lesson); setMode("learn"); }}>{complete ? "Ôn tập lại" : "Vào học"} <ArrowRight size={16}/></button></article>;
       })}</div>
     </section>;
