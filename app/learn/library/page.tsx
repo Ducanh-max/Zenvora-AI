@@ -13,13 +13,15 @@ const planLimits: Record<string, { name: string; lessonLimit: number; quizSize: 
   elite: { name: "Aunora Mastery", lessonLimit: 2100, quizSize: 50 },
 };
 
-export default async function LibraryPage() {
+export default async function LibraryPage({ searchParams }: { searchParams?: Promise<{ course?: string }> }) {
+  const params = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: lessons, error: lessonsError }, { data: entitlement }] = await Promise.all([
-    supabase.from("zenvora_lessons").select("id,slug,title,summary,content,sort_order").order("sort_order", { ascending: true }),
+  const [{ data: courses, error: coursesError }, { data: lessons, error: lessonsError }, { data: entitlement }] = await Promise.all([
+    supabase.from("zenvora_courses").select("id,slug,title,level,description,is_free,sort_order").order("sort_order", { ascending: true }),
+    supabase.from("zenvora_lessons").select("id,course_id,slug,title,summary,content,sort_order").order("sort_order", { ascending: true }),
     supabase.from("aunora_user_entitlements").select("plan_id,active_until").eq("user_id", user.id).maybeSingle(),
   ]);
 
@@ -42,8 +44,8 @@ export default async function LibraryPage() {
       <p>Chọn một bài học, ôn từ vựng, luyện câu ví dụ và hoàn thành bài kiểm tra tương tác.</p>
       <div className="library-summary"><b>{lessons?.length || 0} bài học đã xuất bản</b><span>Gói hiện tại cho phép tối đa {plan.lessonLimit.toLocaleString("vi-VN")} bài học khi thư viện được mở rộng.</span><span>{plan.quizSize} câu kiểm tra mỗi bài theo quyền lợi gói.</span></div>
     </section>
-    {lessonsError ? <div className="lesson-alert">Không thể tải thư viện. Hãy kiểm tra quyền đọc bảng zenvora_lessons trong Supabase.</div> :
-      <LibraryClient lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} />}
-    <p className="library-footnote">Hiện thư viện có {lessons?.length || 0} bài học thực tế. Số lượng 500–2.100 là hạn mức mục tiêu theo gói, không phải số bài đã xuất bản.</p>
+    {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
+      <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={15} initialCourseSlug={params?.course} />}
+    <p className="library-footnote">Bốn khóa học mới đang được mở thử nghiệm miễn phí trong thời gian hoàn thiện hệ thống thành viên. Thanh toán hiện chưa được bật.</p>
   </main>;
 }
