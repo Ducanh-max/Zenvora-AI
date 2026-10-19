@@ -100,17 +100,19 @@ export default function LearnPage(){
     <section className="dash-memberships" id="memberships">
       <div className="dash-section-heading"><div><span>{lang==="vi"?"CHỌN GÓI HỌC PHÙ HỢP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Khám phá gói học phù hợp với bạn":"Find your ideal learning plan"}</h2></div></div>
       <p className="dash-memberships-intro">{lang==="vi"?"Xem đặc quyền của từng gói và chọn lộ trình phù hợp. Hiện tại cả 5 khóa học vẫn miễn phí; các gói nâng cấp chưa mở bán.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
-      <div className="dash-membership-grid">
+      <a className="dash-benefits-all" href="#plan-benefits">{lang==="vi"?"Xem tất cả đặc quyền":"View all benefits"} <ArrowRight size={16}/></a>
+      <div className="dash-membership-grid" id="plan-benefits">
        {[
-        {name:"Free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start your journey",featured:false},
-        {name:"Starter",icon:"✧",vi:"Học đều mỗi ngày",en:"Build a daily habit",featured:false},
-        {name:"Pro",icon:"★",vi:"Học tập chuyên sâu",en:"Learn more deeply",featured:true},
-        {name:"Premium",icon:"✺",vi:"Trải nghiệm nâng cao",en:"An enhanced experience",featured:false}
+        {name:"Free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start your journey",featured:false,featuresVi:["Truy cập 5 khóa học hiện tại","Bài học, luyện tập và kiểm tra","Sử dụng AI Tutor","Theo dõi tiến trình"],featuresEn:["Access 5 current courses","Lessons, practice and quizzes","Use AI Tutor","Track your progress"]},
+        {name:"Starter",icon:"♧",vi:"Học đều mỗi ngày",en:"Build a daily habit",featured:false,featuresVi:["Dự kiến bao gồm quyền lợi Free","Bài tập mở rộng (dự kiến)","Báo cáo học tập (dự kiến)"],featuresEn:["Planned Free benefits","Extra exercises (planned)","Learning reports (planned)"]},
+        {name:"Pro",icon:"♛",vi:"Học tập chuyên sâu",en:"Learn more deeply",featured:true,featuresVi:["Dự kiến bao gồm quyền lợi Starter","Lộ trình cá nhân hóa (dự kiến)","Phân tích điểm mạnh (dự kiến)"],featuresEn:["Planned Starter benefits","Personalized paths (planned)","Strength analysis (planned)"]},
+        {name:"Premium",icon:"◆",vi:"Trải nghiệm nâng cao",en:"An enhanced experience",featured:false,featuresVi:["Dự kiến bao gồm quyền lợi Pro","Tính năng AI mở rộng (dự kiến)","Hỗ trợ ưu tiên (dự kiến)"],featuresEn:["Planned Pro benefits","Expanded AI tools (planned)","Priority support (planned)"]}
        ].map(plan=><article className={`dash-membership-card ${plan.featured?"featured":""}`} key={plan.name}>
         <span className="dash-membership-icon">{plan.icon}</span>
-        <h3>{plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p>
+        <h3>{plan.name==="Free"?(lang==="vi"?"Gói Miễn Phí":"Free Plan"):(lang==="vi"?"Gói ":"Plan ")+plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p><ul className="dash-plan-feature-list">{(lang==="vi"?plan.featuresVi:plan.featuresEn).map(feature=><li key={feature}><span>✓</span>{feature}</li>)}</ul>
         <strong>{plan.name==="Free"?(lang==="vi"?"Miễn phí":"Free"):(lang==="vi"?"Sắp ra mắt":"Coming soon")}</strong>
         {plan.name==="Free"?<Link href="/learn/library">{lang==="vi"?"Vào học":"Start learning"} <ArrowRight size={15}/></Link>:<span className="dash-membership-unavailable">{lang==="vi"?"Chưa mở đăng ký":"Not available yet"}</span>}
+        <a className="dash-plan-benefits" href="#plan-benefits">{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></a>
        </article>)}
       </div>
     </section>
