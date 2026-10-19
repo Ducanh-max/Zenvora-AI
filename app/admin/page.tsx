@@ -49,13 +49,13 @@ export default async function AdminPage() {
 
   return <main className="admin-page">
     <aside className="admin-sidebar">
-      <Link href="/" className="admin-brand"><span>A</span><b>AUNORA<small>ADMIN CONSOLE</small></b></Link>
+      <Link href="/" className="admin-brand"><span className="admin-brand-photo"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA"/></span><b>AUNORA<small>ADMIN CONSOLE</small></b></Link>
       <div className="admin-side-label">QUẢN TRỊ</div>
       <a href="#overview" className="admin-side-link active"><Activity size={17}/> Tổng quan</a>
       <a href="#users" className="admin-side-link"><Users size={17}/> Người dùng</a>
       <a href="#courses" className="admin-side-link"><BookOpen size={17}/> Khóa học</a>
       <a href="#lessons" className="admin-side-link"><GraduationCap size={17}/> Bài học</a>
-      <div className="admin-sidebar-bottom"><span className="admin-secure"><ShieldCheck size={15}/> Admin access</span><Link href="/learn"><ArrowLeft size={15}/> Về ứng dụng</Link></div>
+      <div className="admin-aivanta"><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta"/><p><b>Aivanta</b><br/>Trợ lý đồng hành cùng AUNORA</p></div><div className="admin-sidebar-bottom"><span className="admin-secure"><ShieldCheck size={15}/> Admin access</span><Link href="/learn"><ArrowLeft size={15}/> Về ứng dụng</Link></div>
     </aside>
     <div className="admin-content">
       <header className="admin-topbar"><div><small>AUNORA / ADMIN</small><h1>Bảng điều khiển</h1></div><div className="admin-user"><span className="admin-avatar">{(claims.email || "A").slice(0,1).toUpperCase()}</span><span><b>{claims.email || "Administrator"}</b><small>Quản trị viên</small></span></div></header>
