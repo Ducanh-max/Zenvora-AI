@@ -2,86 +2,102 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound } from "lucide-react";
+import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound, Bell, Compass, ClipboardCheck, Flame, Star, Target, ChevronDown } from "lucide-react";
 
 type Lang = "vi" | "en";
 const copy = {
  vi: {
-  overview:"Tổng quan", learning:"Khóa học của tôi", practice:"Luyện tập", tutor:"Gia sư AI", speaking:"Luyện nói", dictionary:"Từ điển",
-  space:"KHÔNG GIAN HỌC TẬP", rewards:"WORD REWARDS", keep:"Tiếp tục học để mở khóa phần thưởng!", level:"CẤP ĐỘ",
-  journey:"HÀNH TRÌNH HỌC TẬP CỦA BẠN", dashboard:"Bảng điều khiển học tập", hello:"Chào mừng đến với", lead:"Tiến bộ từng ngày — bắt đầu hành trình tiếng Anh của bạn ngay hôm nay.",
-  lessons:"Bài học", topics:"Học theo chủ đề", practiceCard:"Luyện tập", quizzes:"Câu hỏi tương tác", assistant:"Gia sư AI", support:"Trợ lý học tập",
-  courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"12 bài học hiện có",
-  demo:"Tài khoản và dữ liệu học tập của bạn được đồng bộ an toàn qua Supabase.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản",
-  descriptions:["500 bài học, luyện nói, 15 câu kiểm tra mỗi bài và 40 năng lượng Sói.","800 bài học, luyện nói, 50 câu kiểm tra mỗi bài và 100 năng lượng Sói.","1.400 bài học, luyện nói, 50 câu kiểm tra và năng lượng không giới hạn.","2.100 bài học, luyện thi IELTS/TOEFL và gọi thoại cùng mascot Sói."],
-  levels:["Miễn phí","49.000đ/tháng","99.000đ/tháng","149.000đ/tháng"]
+  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển",
+  space:"KHÔNG GIAN HỌC TẬP", journey:"HÀNH TRÌNH CỦA BẠN", dashboard:"Bảng điều khiển",
+  hello:"Chào mừng trở lại!", lead:"Cùng AUNORA và AI Tutor, chinh phục tiếng Anh mỗi ngày!",
+  heroQuote:"Better English, Brighter Future", tutorTitle:"Mình là Aivanta!", tutorText:"Gia sư AI đồng hành cùng bạn trên hành trình học tiếng Anh. Cùng bắt đầu nhé!",
+  courses:"Khóa học", coursesText:"5 khóa học từ cơ bản đến nâng cao.", explore:"Khám phá",
+  practiceTitle:"Luyện tập", practiceText:"Ôn từ vựng và củng cố kiến thức.", start:"Bắt đầu",
+  tests:"Kiểm tra", testsText:"Đánh giá kiến thức qua câu hỏi tương tác.", testNow:"Làm bài",
+  chat:"Trò chuyện AI", chatText:"Hỏi bài và luyện tiếng Anh cùng Aivanta.", chatNow:"Chat ngay",
+  yourCourses:"Khóa học của bạn", seeAll:"Xem tất cả", free:"MIỄN PHÍ", enter:"Vào học",
+  profile:"Hồ sơ", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang chủ.", cancel:"Ở lại", confirm:"Đăng xuất",
+  encouragement:"Mỗi ngày học một chút, bạn sẽ tiến bộ rất nhiều!", quote:"“Small steps every day lead to big changes.”",
+  cta:"Học cùng AI – Thật đơn giản!", ctaText:"Aivanta luôn sẵn sàng giải đáp và luyện tập cùng bạn.", begin:"Bắt đầu ngay",
+  account:"Tài khoản", language:"Ngôn ngữ", menu:"Mở menu", courseDescriptions:["Nền tảng tiếng Anh cho người mới bắt đầu.","Giao tiếp tự nhiên trong các tình huống hằng ngày.","Tiếng Anh thực tế khi đi du lịch.","Nắm vững ngữ pháp qua ví dụ và bài tập.","Tự tin trò chuyện và bày tỏ ý kiến."]
  },
  en: {
-  overview:"Overview", learning:"My learning", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary",
-  space:"LEARNING SPACE", rewards:"WORD REWARDS", keep:"Keep learning to unlock rewards!", level:"LEVEL",
-  journey:"YOUR LEARNING JOURNEY", dashboard:"Learning dashboard", hello:"Welcome to", lead:"Make progress every day — start your English journey today.",
-  lessons:"Lessons", topics:"Learn by topic", practiceCard:"Practice", quizzes:"Interactive quizzes", assistant:"AI Tutor", support:"Your learning assistant",
-  courses:"Your courses", free:"FREE", soon:"COMING SOON", enter:"Start learning", locked:"Locked", lessonsCount:"12 lessons available",
-  demo:"Your account and learning data are securely synced with Supabase.", account:"User", levelUnknown:"Level: Not set", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken back to the login page.", cancel:"Stay", confirm:"Log out", menu:"Open menu", demoAccount:"Account",
-  descriptions:["500 lessons, speaking, 15-question mini tests and 40 Wolf Energy.","800 lessons, speaking, 50-question mini tests and 100 Wolf Energy.","1,400 lessons, speaking, 50-question mini tests and unlimited energy.","2,100 lessons, IELTS/TOEFL practice and voice calls with the Wolf mascot."],
-  levels:["Free","49,000 VND/month","99,000 VND/month","149,000 VND/month"]
+  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary",
+  space:"YOUR LEARNING SPACE", journey:"YOUR JOURNEY", dashboard:"Learning dashboard",
+  hello:"Welcome back!", lead:"Learn English every day with AUNORA and your AI Tutor!",
+  heroQuote:"Better English, Brighter Future", tutorTitle:"I'm Aivanta!", tutorText:"Your AI tutor and learning companion. Let's make your English journey brighter!",
+  courses:"Courses", coursesText:"Five courses from beginner to advanced.", explore:"Explore",
+  practiceTitle:"Practice", practiceText:"Review vocabulary and strengthen your skills.", start:"Start",
+  tests:"Quick tests", testsText:"Check your knowledge with interactive questions.", testNow:"Take a test",
+  chat:"AI Chat", chatText:"Ask questions and practise English with Aivanta.", chatNow:"Chat now",
+  yourCourses:"Your courses", seeAll:"View all", free:"FREE", enter:"Start learning",
+  profile:"Profile", logout:"Log out", confirmTitle:"Are you sure you want to log out?", confirmBody:"You will be taken to the home page.", cancel:"Stay", confirm:"Log out",
+  encouragement:"A little practice every day makes a big difference!", quote:"“Small steps every day lead to big changes.”",
+  cta:"Learn with AI – It's that simple!", ctaText:"Aivanta is always ready to answer and practise with you.", begin:"Start now",
+  account:"Account", language:"Language", menu:"Open menu", courseDescriptions:["Build your English foundation from scratch.","Communicate naturally in everyday situations.","Practical English for travelling.","Master grammar through examples and practice.","Speak confidently and share your opinions."]
  }
 };
 const courseNames=["English Starter","Everyday English","English for Travel","Grammar in Action","Confident Conversations"];
 const courseSlugs=["english-starter","everyday-english","english-for-travel","grammar-in-action","confident-conversations"];
 const courseLevels=["A1","A1–A2","A2","A2–B1","B1"];
-const courseDescriptions={vi:["19 bài học nền tảng miễn phí: từ chào hỏi đến giao tiếp quen thuộc.","Giao tiếp tự nhiên khi chào hỏi, ăn uống, mua sắm và trò chuyện.","Tiếng Anh thực tế tại sân bay, khách sạn và các điểm tham quan.","Nắm vững các thì và cấu trúc ngữ pháp qua tình huống thực tế.","Tự tin nêu ý kiến, chia sẻ cảm xúc và xử lý hội thoại."],en:["19 free beginner lessons, from greetings to everyday communication.","Communicate naturally when greeting, dining, shopping and chatting.","Practical English for airports, hotels and sightseeing.","Master tenses and grammar structures through real-life situations.","Share opinions, express feelings and handle conversations confidently."]};
-const menuItems = [
+const menuItems=[
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
- {key:"learning" as const,href:"#courses",icon:BookOpen},
+ {key:"learning" as const,href:"/learn/library",icon:BookOpen},
  {key:"practice" as const,href:"/learn/library",icon:Dumbbell},
  {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
- {key:"speaking" as const,href:"#speaking",icon:Mic2},
- {key:"dictionary" as const,href:"#dictionary",icon:BookText}
+ {key:"speaking" as const,href:"/learn/tutor",icon:Mic2},
+ {key:"dictionary" as const,href:"/learn/library",icon:BookText}
 ];
-export default function LearnPage() {
- const [profile,setProfile] = useState<{name:string;email:string;avatar:string}|null>(null);
- const [mobileOpen,setMobileOpen] = useState(false);
- const [lang,setLang] = useState<Lang>("vi");
- const [showLogoutConfirm,setShowLogoutConfirm] = useState(false);
+export default function LearnPage(){
+ const [profile,setProfile]=useState<{name:string;email:string;avatar:string}|null>(null);
+ const [mobileOpen,setMobileOpen]=useState(false);
+ const [lang,setLang]=useState<Lang>("vi");
+ const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
  useEffect(()=>{
-  let active = true;
-  async function loadAccount() {
-   try {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { window.location.href = "/login"; return; }
-    const { data } = await supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle();
-    if (active) setProfile({ name: data?.display_name || user.user_metadata?.display_name || "", email: user.email || "", avatar: user.user_metadata?.avatar_url || "" });
-   } catch { if (active) setProfile({ name: "", email: "", avatar: "" }); }
+  let active=true;
+  async function loadAccount(){
+   try{
+    const supabase=createClient();
+    const {data:{user}}=await supabase.auth.getUser();
+    if(!user){window.location.href="/login";return;}
+    const {data}=await supabase.from("profiles").select("display_name,avatar_url").eq("id",user.id).maybeSingle();
+    if(active)setProfile({name:data?.display_name||user.user_metadata?.display_name||user.email?.split("@")[0]||"",email:user.email||"",avatar:data?.avatar_url||user.user_metadata?.avatar_url||""});
+   }catch{if(active)setProfile({name:"",email:"",avatar:""});}
   }
-  loadAccount();
-  try { const saved=localStorage.getItem("aunora_language"); if(saved==="en"||saved==="vi")setLang(saved); } catch {}
-  return ()=>{ active = false; };
+  void loadAccount();
+  try{const saved=localStorage.getItem("aunora_language");if(saved==="en"||saved==="vi")setLang(saved);}catch{}
+  return()=>{active=false;};
  },[]);
  function changeLang(value:Lang){setLang(value);try{localStorage.setItem("aunora_language",value);}catch{}}
- async function logout(){
-  try { const supabase=createClient(); await supabase.auth.signOut(); } finally { window.location.href="/"; }
- }
+ async function logout(){try{const supabase=createClient();await supabase.auth.signOut();}finally{window.location.href="/";}}
  const t=copy[lang];
- return <main className="aunora-app">
-  <aside className={`aunora-sidebar ${mobileOpen?"sidebar-open":""}`}>
-   <Link href="/learn" className="aunora-brand"><span className="wolf-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 8 19 13 24 9 29 13 41 8 38 29 31 39 24 34 17 39 10 29Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/><path d="m16 21 5 2m11-2-5 2m-3 2v5m-6 1 6-3 6 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
-   <div className="sidebar-group-title">{t.space}</div>
-   <nav className="aunora-menu">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={`aunora-menu-item ${item.active?"active":""}`}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<b className="ai-tag">AI</b>}</Link>)}</nav>
-   <div className="sidebar-account"><Link href="/learn/profile" className="account-avatar account-avatar-link" title="Chỉnh sửa hồ sơ">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:(profile?.name||profile?.email?<span>{(profile?.name||profile?.email||"U").slice(0,1).toUpperCase()}</span>:<UserRound size={17}/>)}</Link><Link href="/learn/profile" className="account-details account-details-link"><b>{profile?.name||profile?.email||t.account}</b><span>{lang==="vi"?"Chỉnh sửa hồ sơ":"Edit profile"}</span></Link><button onClick={()=>setShowLogoutConfirm(true)} title={t.logout} aria-label={t.logout}><LogOut size={17}/></button></div>
-   <div className="wolf-rewards">
-    <div className="reward-heading"><span>{t.rewards}</span><span className="reward-level">{t.level} 0</span></div>
-    <div className="reward-emblem"><div className="reward-emblem-ring"><Trophy size={30} strokeWidth={1.8}/><Sparkles className="reward-sparkle" size={15}/></div></div>
-    <div className="reward-xp"><b>0 XP</b><span>50,000 XP</span></div><div className="reward-track"><i/></div><p>0 / 50000 XP</p><small>{t.keep}</small>
+ return <main className="aunora-dashboard">
+  <aside className={`aunora-side ${mobileOpen?"is-open":""}`}>
+   <Link href="/learn" className="aunora-logo-lockup"><span className="aunora-logo-symbol">A</span><span><b>AUNORA</b><small>HỌC TIẾNG ANH CÙNG AI</small></span></Link>
+   <div className="side-caption">{t.space}</div>
+   <nav className="side-nav">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={item.active?"current":""}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<i>AI</i>}</Link>)}</nav>
+   <div className="side-bottom"><div className="side-account"><Link href="/learn/profile" className="side-user-avatar">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:<UserRound size={19}/>}</Link><div><b>{profile?.name||t.account}</b><Link href="/learn/profile">{t.profile}</Link></div><button onClick={()=>setShowLogoutConfirm(true)} aria-label={t.logout} title={t.logout}><LogOut size={17}/></button></div>
+    <div className="side-language"><Languages size={17}/><span>{t.language}</span><div><button className={lang==="vi"?"chosen":""} onClick={()=>changeLang("vi")}>VI</button><button className={lang==="en"?"chosen":""} onClick={()=>changeLang("en")}>EN</button></div></div>
    </div>
   </aside>
-  <section className="aunora-main">
-   <header className="aunora-topbar"><button className="mobile-menu-button" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div><span className="topbar-kicker">{t.journey}</span><b>{t.dashboard}</b></div><div className="topbar-actions"><div className="language-control" role="group" aria-label="Select interface language"><span className="language-control-label"><Languages size={14}/> LANGUAGE</span><div className="language-segment"><button type="button" className={lang==="vi"?"selected":""} aria-pressed={lang==="vi"} onClick={()=>changeLang("vi")} title="Tiếng Việt">VI</button><button type="button" className={lang==="en"?"selected":""} aria-pressed={lang==="en"} onClick={()=>changeLang("en")} title="English">EN</button></div></div><div className="topbar-user">{profile?.name||profile?.email||t.demoAccount}</div></div></header>
-   <div className="learnwrap"><div className="eyebrow">{t.space}</div><h1>{t.hello} <em>AUNORA.</em></h1><p className="learnlead">{t.lead}</p>
-    <div className="learnfeatures"><article><BookOpen/><b>{t.lessons}</b><span>{t.topics}</span></article><article><Dumbbell/><b>{t.practiceCard}</b><span>{t.quizzes}</span></article><Link href="/learn/tutor" className="learnfeature-link"><article id="ai-tutor"><MessageCircle/><b>{t.assistant}</b><span>{t.support}</span></article></Link></div>
-    <div id="courses"><div className="course-section-heading"><h2>{t.courses}</h2><Link href="/learn/library" className="all-plans-link">{lang==="vi"?"Xem tất cả 5 khóa học":"Explore all 5 courses"} <ArrowRight size={15}/></Link></div><div className="coursegrid">{courseNames.map((name,i)=><article className="learncourse" key={name}><div className="learncoursehead"><span className={i===0?"freeflag":"lockflag"}>{i===0?t.free:(lang==="vi"?"MỞ THỬ NGHIỆM":"BETA ACCESS")}</span><span>{String(i+1).padStart(2,"0")}</span></div><div className="learnletter">{name.slice(0,1)}</div><h3>{name}</h3><p>{courseDescriptions[lang][i]}</p><div className="learnmeta"><span>{courseLevels[i]}</span><span>{i===0?(lang==="vi"?"Miễn phí":"Free"):(lang==="vi"?"Đang thử nghiệm":"Beta")}</span></div><Link href={`/learn/library?course=${courseSlugs[i]}`} className="coursebutton">{t.enter} <ArrowRight size={15}/></Link></article>)}</div></div>
-    <p className="demo-note">{t.demo}</p>
+  <section className="aunora-dash-main">
+   <header className="dash-topbar"><button className="dash-mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div className="dash-breadcrumb"><span>{t.journey}</span><b>{t.dashboard}</b></div><div className="dash-top-actions"><button className="dash-notification" aria-label="Notifications"><Bell size={20}/><i/></button><Link href="/learn/profile" className="dash-profile">{profile?.avatar?<img src={profile.avatar} alt=""/>:<span className="dash-avatar-fallback">{(profile?.name||"A").slice(0,1).toUpperCase()}</span>}<b>{profile?.name||t.account}</b><ChevronDown size={15}/></Link></div></header>
+   <div className="dash-content">
+    <div className="dash-welcome"><div><span className="dash-eyebrow"><Sparkles size={14}/> AUNORA · LEARN • GROW • GLOW</span><h1>{t.hello} <span>👋</span></h1><p>{t.lead}</p></div><div className="dash-date-pill"><Star size={15}/> {t.encouragement}</div></div>
+    <section className="dash-hero">
+     <div className="dash-hero-copy"><span>{t.heroQuote}</span><h2>{lang==="vi"?"Mỗi bước nhỏ, một tương lai tự tin hơn.":"Every small step builds a brighter future."}</h2><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={16}/></Link></div>
+     <div className="aivanta-hero" aria-label="Aivanta, AI English tutor"><div className="aivanta-orbit orbit-one"/><div className="aivanta-orbit orbit-two"/><div className="aivanta-avatar"><span>🐺</span><i>A</i></div><div className="aivanta-bubble"><b>{t.tutorTitle}</b><span>{lang==="vi"?"Cùng học tiếng Anh nhé!":"Let's learn English together!"}</span><small>✦ Aivanta · AI Tutor</small></div><div className="aivanta-spark spark-a">✦</div><div className="aivanta-spark spark-b">✧</div></div>
+    </section>
+    <section className="dash-shortcuts">
+     <article className="shortcut-card shortcut-blue"><div className="shortcut-icon"><BookOpen/></div><h3>{t.courses}</h3><p>{t.coursesText}</p><Link href="/learn/library">{t.explore} <ArrowRight size={15}/></Link></article>
+     <article className="shortcut-card shortcut-mint"><div className="shortcut-icon"><Target/></div><h3>{t.practiceTitle}</h3><p>{t.practiceText}</p><Link href="/learn/library">{t.start} <ArrowRight size={15}/></Link></article>
+     <article className="shortcut-card shortcut-violet"><div className="shortcut-icon"><ClipboardCheck/></div><h3>{t.tests}</h3><p>{t.testsText}</p><Link href="/learn/library">{t.testNow} <ArrowRight size={15}/></Link></article>
+     <article className="shortcut-card shortcut-cyan"><div className="shortcut-icon"><MessageCircle/></div><h3>{t.chat}</h3><p>{t.chatText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={15}/></Link></article>
+    </section>
+    <div className="dash-lower-grid"><section className="dash-courses" id="courses"><div className="dash-section-heading"><div><span>{t.space}</span><h2>{t.yourCourses}</h2></div><Link href="/learn/library">{t.seeAll} <ArrowRight size={15}/></Link></div><div className="dash-course-grid">{courseNames.map((name,i)=><Link key={name} href={`/learn/library?course=${courseSlugs[i]}`} className={`dash-course-card course-tone-${i}`}><div className="dash-course-art"><span>{["A","Hi","✈","文","✦"][i]}</span><small>{courseLevels[i]}</small></div><div className="dash-course-info"><b>{name}</b><span>{courseLevels[i]} · {i===0?t.free:(lang==="vi"?"Khóa học":"Course")}</span></div><div className="dash-course-link">{t.enter} <ArrowRight size={14}/></div></Link>)}</div></section>
+     <aside className="dash-side-column"><section className="dash-aivanta-card"><div className="mini-aivanta">🐺</div><div><b>{t.tutorTitle}</b><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={14}/></Link></div></section><section className="dash-quote-card"><div className="quote-stars">✦ ✧ ✦</div><p>{t.quote}</p><small>— Aivanta</small></section></aside>
+    </div>
+    <section className="dash-bottom-cta"><div className="cta-mascot">🐺</div><div><h2>{t.cta}</h2><p>{t.ctaText}</p></div><Link href="/learn/tutor">{t.begin} <ArrowRight size={16}/></Link></section>
    </div>
   </section>
   {showLogoutConfirm&&<div className="logout-modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogoutConfirm(false);}}><section className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-title"><div className="logout-modal-icon"><LogOut size={22}/></div><h2 id="logout-title">{t.confirmTitle}</h2><p>{t.confirmBody}</p><div className="logout-modal-actions"><button type="button" className="logout-cancel" onClick={()=>setShowLogoutConfirm(false)}>{t.cancel}</button><button type="button" className="logout-confirm" onClick={logout}>{t.confirm}</button></div></section></div>}
