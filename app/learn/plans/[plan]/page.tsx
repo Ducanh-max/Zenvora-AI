@@ -7,4 +7,27 @@ pro:{name:"Aunora Achiever",symbol:"♛",status:"99.000đ/tháng",color:"#794de3
 premium:{name:"Aunora Mastery",symbol:"◆",status:"149.000đ/tháng",color:"#c88800",subtitle:"Làm chủ tiếng Anh",features:["2.100 bài học","50 câu hỏi kiểm tra mỗi bài","AI Tutor không giới hạn","Năng lượng Sói không giới hạn"],note:"Gói chưa mở đăng ký hoặc thanh toán. Đây là quyền lợi theo bảng giá đã công bố, chưa phải cam kết tính năng đã hoạt động."}
 };
 export function generateStaticParams(){return Object.keys(plans).map(plan=>({plan}));}
-export default async function PlanDetail({params}:{params:Promise<{plan:string}>}){const {plan}=await params;const info=plans[plan as keyof typeof plans];if(!info)notFound();return <main style={{minHeight:"100vh",background:"linear-gradient(135deg,#eaf4ff,#f9fbff)",padding:"clamp(20px,5vw,65px)",fontFamily:"Arial,sans-serif",color:"#153b73"}}><div style={{maxWidth:930,margin:"auto"}}><Link href="/learn" style={{color:"#1769e6",fontWeight:700}}>← Quay lại trang học tập</Link><div style={{marginTop:32,padding:"clamp(24px,5vw,50px)",borderRadius:26,background:"white",boxShadow:"0 18px 50px #133d7916",border:"1px solid #dbe9fa"}}><span style={{fontSize:45,color:info.color}}>{info.symbol}</span><p style={{color:info.color,fontWeight:800}}>{info.status}</p><h1 style={{fontSize:"clamp(30px,5vw,48px)",margin:"12px 0"}}>Đặc quyền {info.name}</h1><p style={{fontSize:18,color:"#5c779d"}}>{info.subtitle}</p><h2 style={{marginTop:32}}>Quyền lợi của gói</h2><ul style={{paddingLeft:23,lineHeight:2.5,fontSize:17}}>{info.features.map(feature=><li key={feature}>{feature}</li>)}</ul><p style={{marginTop:24,padding:18,background:"#eef6ff",borderRadius:13,lineHeight:1.7}}>{info.note}</p>{plan==="free"?<Link href="/learn/library" style={{display:"inline-block",marginTop:18,padding:"14px 22px",background:"#1769e6",color:"white",borderRadius:12,textDecoration:"none",fontWeight:800}}>Vào học →</Link>:<span style={{display:"inline-block",marginTop:18,padding:"14px 22px",background:"#e6eef9",color:"#5877a1",borderRadius:12,fontWeight:800}}>Chưa mở đăng ký</span>}</div><p style={{marginTop:22}}><Link href="/learn/plans" style={{color:"#1769e6"}}>Xem các gói học khác →</Link></p></div></main>}
+export default async function PlanDetail({params}:{params:Promise<{plan:string}>}){
+ const {plan}=await params;const info=plans[plan as keyof typeof plans];if(!info)notFound();
+ const stats=info.features;
+ return <main className={`aunora-plan-page aunora-plan-${plan}`}>
+  <div className="aunora-plan-wrap">
+   <nav className="aunora-plan-nav"><Link href="/learn">← Trang học tập</Link><Link href="/learn/plans">So sánh các gói →</Link></nav>
+   <section className="aunora-plan-hero">
+    <div className="aunora-plan-hero-copy">
+     <span className="aunora-plan-eyebrow">✦ AUNORA · LEARN • GROW • GLOW</span>
+     <div className="aunora-plan-emblem">{info.symbol}</div>
+     <span className="aunora-plan-pill">{plan==="free"?"GÓI MIỄN PHÍ":"GÓI HỌC NÂNG CAO"}</span>
+     <h1>{info.name}</h1><p className="aunora-plan-subtitle">{info.subtitle}</p>
+     <div className="aunora-plan-price">{plan==="free"?"0đ":info.status.split("/")[0]}<span> / tháng</span></div>
+     <p className="aunora-plan-availability">{plan==="free"?"✓ Có thể bắt đầu ngay":"✧ Chưa mở đăng ký — xem trước đặc quyền"}</p>
+     {plan==="free"?<Link className="aunora-plan-primary" href="/learn/library">Bắt đầu học ngay <span>↗</span></Link>:<span className="aunora-plan-primary aunora-plan-disabled">Sắp ra mắt <span>✦</span></span>}
+    </div>
+    <div className="aunora-plan-hero-art" aria-hidden="true"><div className="aunora-plan-orbit orbit-one"/><div className="aunora-plan-orbit orbit-two"/><div className="aunora-plan-art-symbol">{info.symbol}</div><div className="aunora-plan-art-label">AUNORA<br/><small>{info.name.replace("Aunora ","").toUpperCase()}</small></div><span className="aunora-plan-spark spark-one">✧</span><span className="aunora-plan-spark spark-two">✦</span></div>
+   </section>
+   <section className="aunora-plan-benefits"><div className="aunora-plan-section-title"><span>ĐẶC QUYỀN CỦA BẠN</span><h2>Học tập theo cách của bạn</h2><p>Những quyền lợi được thiết kế cho hành trình chinh phục tiếng Anh.</p></div><div className="aunora-plan-benefit-grid">{stats.map((feature,index)=><article className="aunora-plan-benefit" key={feature}><div className="aunora-plan-benefit-icon">{["▤","✓","✧","⚡"][index]}</div><div><span>QUYỀN LỢI {String(index+1).padStart(2,"0")}</span><h3>{feature}</h3></div></article>)}</div></section>
+   <div className="aunora-plan-notice"><span>ⓘ</span><p>{info.note}</p></div>
+   <div className="aunora-plan-footer"><Link href="/learn/plans">← Khám phá các gói khác</Link><Link href="/learn">Về trang học tập →</Link></div>
+  </div>
+ </main>;
+}
