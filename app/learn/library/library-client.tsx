@@ -20,8 +20,8 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
     generated.push({ q: `Which English phrase means “${item.meaning}”?`, options: [item.word, wrong[0]?.word || "", wrong[1]?.word || ""], answer: 0, explain: `“${item.word}” có nghĩa là “${item.meaning}”.` });
     generated.push({ q: `Choose the correct meaning of “${item.word}”.`, options: [item.meaning, wrong[0]?.meaning || "", wrong[1]?.meaning || ""], answer: 0, explain: `Hãy ghi nhớ: ${item.word} = ${item.meaning}.` });
     generated.push({ q: `Which sentence uses “${item.word}” correctly?`, options: [item.example, wrong[0]?.example || "", wrong[1]?.example || ""], answer: 0, explain: `Ví dụ đúng: ${item.example}` });
-    const escaped = item.word.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");
-    const blank = item.example.replace(new RegExp(escaped, "i"), "_____");
+    const wordStart = item.example.toLowerCase().indexOf(item.word.toLowerCase());
+    const blank = wordStart >= 0 ? item.example.slice(0, wordStart) + "_____" + item.example.slice(wordStart + item.word.length) : item.example;
     generated.push({ q: `Complete the example: “${blank}”`, options: [item.word, wrong[0]?.word || "", wrong[1]?.word || ""], answer: 0, explain: `Câu hoàn chỉnh: ${item.example}` });
     generated.push({ q: `Select the matching vocabulary for “${item.meaning}”.`, options: [item.word, wrong[1]?.word || "", wrong[0]?.word || ""], answer: 0, explain: `Đáp án: ${item.word}.` });
   });
