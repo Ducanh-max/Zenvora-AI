@@ -112,7 +112,7 @@ export default function LearnPage(){
         <h3>{plan.name==="Free"?(lang==="vi"?"Gói Miễn Phí":"Free Plan"):(lang==="vi"?"Gói ":"Plan ")+plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p><ul className="dash-plan-feature-list">{(lang==="vi"?plan.featuresVi:plan.featuresEn).map(feature=><li key={feature}><span>✓</span>{feature}</li>)}</ul>
         <strong>{plan.name==="Free"?(lang==="vi"?"Miễn phí":"Free"):(lang==="vi"?"Sắp ra mắt":"Coming soon")}</strong>
         {plan.name==="Free"?<Link href="/learn/library">{lang==="vi"?"Vào học":"Start learning"} <ArrowRight size={15}/></Link>:<span className="dash-membership-unavailable">{lang==="vi"?"Chưa mở đăng ký":"Not available yet"}</span>}
-        <a className="dash-plan-benefits" href="#plan-benefits">{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></a>
+        <details className="dash-plan-details"><summary>{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></summary><div className="dash-plan-detail-content"><b>{lang==="vi"?"Đặc quyền của gói ":"Benefits of "}{plan.name}</b><p>{plan.name==="Free"?(lang==="vi"?"Bạn có thể học ngay với 5 khóa học đang mở và các công cụ học tập hiện có.":"Start now with five available courses and current learning tools."):(lang==="vi"?"Đây là các đặc quyền dự kiến. Gói này chưa mở đăng ký, chưa có giá chính thức và chưa thay đổi quyền truy cập của bạn.":"These benefits are planned. This plan is not available to subscribe to and has no official price yet.")}</p><ul>{(lang==="vi"?plan.featuresVi:plan.featuresEn).map(feature=><li key={feature}>✓ {feature}</li>)}</ul></div></details>
        </article>)}
       </div>
     </section>
