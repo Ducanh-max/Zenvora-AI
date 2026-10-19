@@ -97,6 +97,23 @@ export default function LearnPage(){
     <div className="dash-lower-grid"><section className="dash-courses" id="courses"><div className="dash-section-heading"><div><span>{t.space}</span><h2>{t.yourCourses}</h2></div><Link href="/learn/library">{t.seeAll} <ArrowRight size={15}/></Link></div><div className="dash-course-grid">{courseNames.map((name,i)=><Link key={name} href={`/learn/library?course=${courseSlugs[i]}`} className={`dash-course-card course-tone-${i}`}><div className="dash-course-art"><span>{["A","Hi","✈","文","✦"][i]}</span><small>{courseLevels[i]}</small></div><div className="dash-course-info"><b>{name}</b><span>{courseLevels[i]} · {i===0?t.free:(lang==="vi"?"Khóa học":"Course")}</span></div><div className="dash-course-link">{t.enter} <ArrowRight size={14}/></div></Link>)}</div></section>
      <aside className="dash-side-column"><section className="dash-aivanta-card"><div className="mini-aivanta"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><b>{t.tutorTitle}</b><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={14}/></Link></div></section><section className="dash-quote-card"><div className="quote-stars">✦ ✧ ✦</div><p>{t.quote}</p><small>— Aivanta</small></section></aside>
     </div>
+    <section className="dash-memberships" id="memberships">
+      <div className="dash-section-heading"><div><span>{lang==="vi"?"LỰA CHỌN HỌC TẬP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Các gói học AUNORA":"AUNORA learning plans"}</h2></div></div>
+      <p className="dash-memberships-intro">{lang==="vi"?"Khám phá các gói học. Hiện tại tất cả 5 khóa học vẫn được truy cập miễn phí; các gói nâng cấp chưa mở bán.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
+      <div className="dash-membership-grid">
+       {[
+        {name:"Free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start your journey",featured:false},
+        {name:"Starter",icon:"✧",vi:"Học đều mỗi ngày",en:"Build a daily habit",featured:false},
+        {name:"Pro",icon:"★",vi:"Học tập chuyên sâu",en:"Learn more deeply",featured:true},
+        {name:"Premium",icon:"✺",vi:"Trải nghiệm nâng cao",en:"An enhanced experience",featured:false}
+       ].map(plan=><article className={`dash-membership-card ${plan.featured?"featured":""}`} key={plan.name}>
+        <span className="dash-membership-icon">{plan.icon}</span>
+        <h3>{plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p>
+        <strong>{plan.name==="Free"?(lang==="vi"?"Miễn phí":"Free"):(lang==="vi"?"Sắp ra mắt":"Coming soon")}</strong>
+        {plan.name==="Free"?<Link href="/learn/library">{lang==="vi"?"Vào học":"Start learning"} <ArrowRight size={15}/></Link>:<span className="dash-membership-unavailable">{lang==="vi"?"Chưa mở đăng ký":"Not available yet"}</span>}
+       </article>)}
+      </div>
+    </section>
     <section className="dash-bottom-cta"><div className="cta-mascot"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><h2>{t.cta}</h2><p>{t.ctaText}</p></div><Link href="/learn/tutor">{t.begin} <ArrowRight size={16}/></Link></section>
    </div>
   </section>
