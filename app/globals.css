@@ -303,3 +303,15 @@
 .aivanta-photo img{height:100%;width:100%;object-fit:contain;filter:drop-shadow(0 10px 13px #12529d55)}
 .mini-aivanta img,.cta-mascot img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 @media(max-width:560px){.aivanta-photo{width:112px;height:138px}}
+
+/* Brand image fallbacks: keep layout clean until uploaded assets exist */
+.aunora-logo-symbol{position:relative;flex-shrink:0;overflow:hidden}
+.aunora-logo-symbol>.aunora-brand-logo{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:50%;z-index:2}
+.brand-logo-fallback{display:grid;place-items:center;width:100%;height:100%}
+.aivanta-photo{position:relative;display:flex;align-items:center;justify-content:center}
+.aivanta-photo>.aivanta-fallback{position:absolute;inset:0;display:grid;place-items:center;font-size:95px}
+.aivanta-photo>img{position:relative;z-index:1}
+.mini-aivanta,.cta-mascot{position:relative;overflow:hidden}
+.mini-aivanta-fallback{position:absolute;inset:0;display:grid;place-items:center}
+.mini-aivanta>img,.cta-mascot>img{position:relative;z-index:1}
+@media(max-width:560px){.aivanta-photo>.aivanta-fallback{font-size:66px}}
