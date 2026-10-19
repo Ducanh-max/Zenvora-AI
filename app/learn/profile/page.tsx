@@ -29,7 +29,13 @@ export default function ProfilePage() {
 
       setName(user.user_metadata?.display_name || user.user_metadata?.full_name || "");
       setEmail(user.email || "");
-      setPreview(user.user_metadata?.avatar_url || "");
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      const legacyAvatar = user.user_metadata?.avatar_url || "";
+      setPreview(profile?.avatar_url || (legacyAvatar.startsWith("data:") ? "" : legacyAvatar));
     }
 
     void loadProfile();
@@ -108,20 +114,34 @@ export default function ProfilePage() {
         data: {
           display_name: name.trim(),
           full_name: name.trim(),
-          avatar_url: preview || null,
         },
       });
       if (authError) throw authError;
 
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ display_name: name.trim() })
-        .eq("id", user.id);
-
-      if (profileError) {
-        console.warn("Profile table update skipped:", profileError.message);
+      let avatarUrl = preview;
+      if (preview.startsWith("data:image/")) {
+        const imageBlob = await fetch(preview).then((response) => {
+          if (!response.ok) throw new Error("Không thể xử lý ảnh đại diện.");
+          return response.blob();
+        });
+        const avatarPath = `${user.id}/avatar.jpg`;
+        const { error: uploadError } = await supabase.storage
+          .from("avatars")
+          .upload(avatarPath, imageBlob, {
+            contentType: "image/jpeg",
+            upsert: true,
+          });
+        if (uploadError) throw uploadError;
+        avatarUrl = supabase.storage.from("avatars").getPublicUrl(avatarPath).data.publicUrl;
       }
 
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ display_name: name.trim(), avatar_url: avatarUrl || null })
+        .eq("id", user.id);
+      if (profileError) throw profileError;
+
+      setPreview(avatarUrl);
       setMessage("Đã cập nhật hồ sơ của bạn.");
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Không thể lưu hồ sơ. Vui lòng thử lại.");
