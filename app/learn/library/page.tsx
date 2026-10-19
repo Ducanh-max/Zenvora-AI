@@ -39,7 +39,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <span className="lesson-chip">{plan.name}</span>
     </div>
     <section className="library-heading">
-      <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH</div>
+      <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH</div><img className="library-aivanta" src="/brand/aivanta-mascot.webp.png" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Chọn một bài học, ôn từ vựng, luyện câu ví dụ và hoàn thành bài kiểm tra tương tác.</p>
       <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>Cả 5 khóa học đều miễn phí.</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
