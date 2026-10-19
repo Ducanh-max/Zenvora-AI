@@ -31,7 +31,10 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
     const item = words[index];
     combined.push({ q: `Review: what does “${item.word}” mean?`, options: [item.meaning, pick(index, 2)?.meaning || "", pick(index, 4)?.meaning || ""], answer: 0, explain: `“${item.word}” = “${item.meaning}”.` });
   }
-  return combined.slice(0, 50).map(question => {\n    const order = question.options.map((_, index) => index).sort(() => Math.random() - 0.5);\n    return { ...question, options: order.map(index => question.options[index]), answer: order.indexOf(question.answer) };\n  }).sort(() => Math.random() - 0.5);
+  return combined.slice(0, 50).map(question => {
+    const order = question.options.map((_, index) => index).sort(() => Math.random() - 0.5);
+    return { ...question, options: order.map(index => question.options[index]), answer: order.indexOf(question.answer) };
+  }).sort(() => Math.random() - 0.5);
 }
 
 export default function LibraryClient({ lessons, progress, quizSize }: { lessons: LibraryLesson[]; progress: Progress[]; quizSize: number }) {
