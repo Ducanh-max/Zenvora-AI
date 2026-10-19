@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
 
 type Vocabulary = { word: string; meaning: string; pronunciation?: string; example: string };
@@ -45,6 +45,22 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
 
 export default function LibraryClient({ courses, lessons, progress, quizSize, initialCourseSlug }: { courses: LibraryCourse[]; lessons: LibraryLesson[]; progress: Progress[]; quizSize: number; initialCourseSlug?: string }) {
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(() => courses.some(course => course.slug === initialCourseSlug) ? initialCourseSlug! : null);
+  const [isEnglish, setIsEnglish] = useState(false);
+  useEffect(() => {
+    const readLanguage = () => {
+      const htmlLanguage = document.documentElement.lang.toLowerCase();
+      if (htmlLanguage.startsWith("en")) { setIsEnglish(true); return; }
+      if (htmlLanguage.startsWith("vi")) { setIsEnglish(false); return; }
+      try {
+        const languageEntry = Object.entries(localStorage).find(([key]) => /language|locale|lang/i.test(key));
+        const value = String(languageEntry?.[1] || "").toLowerCase();
+        setIsEnglish(value === "en" || value.startsWith("english") || value.startsWith("en-"));
+      } catch { setIsEnglish(false); }
+    };
+    readLanguage();
+    window.addEventListener("storage", readLanguage);
+    return () => window.removeEventListener("storage", readLanguage);
+  }, []);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
   const [mode, setMode] = useState<"learn" | "quiz" | "result">("learn");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -87,17 +103,20 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id).sort((a, b) => a.sort_order - b.sort_order) : [];
   const currentLessonIndex = selected ? courseLessons.findIndex(lesson => lesson.id === selected.id) : -1;
   const nextLesson = currentLessonIndex >= 0 ? courseLessons[currentLessonIndex + 1] || null : null;
-  async function saveAndGoNext() {
+  function goToNextLesson() {
     if (!nextLesson) return;
-    const saved = await saveProgress();
-    if (!saved) return;
     setSelected(nextLesson);
     setMode("learn");
     setQuestionIndex(0);
     setChoice(null);
     setAnswered(false);
     setScore(0);
-    setNotice("Bài trước đã được lưu. Bắt đầu bài học tiếp theo nhé!");
+    setNotice("");
+  }
+  async function saveAndGoNext() {
+    if (!nextLesson) return;
+    const saved = await saveProgress();
+    if (saved) goToNextLesson();
   }
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
@@ -109,7 +128,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         <div className="eyebrow">BÀI HỌC · {selected.sort_order}</div><h2>{selected.title}</h2><p>{selected.summary}</p>
         <h3>Từ vựng trọng tâm</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
         <h3>Ví dụ giao tiếp</h3><div className="library-examples">{(content.examples || []).map((item, index) => <article key={index}><b>{item.english}</b><span>{item.vietnamese}</span></article>)}</div>
-        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, availableQuestionCount)} câu</b><span>{availableQuestionCount ? "Trả lời từng câu để xem giải thích và tổng kết kết quả." : "Bài học này đang được biên tập câu hỏi. Vui lòng quay lại sau."}</span><button className="btn nextbtn" onClick={startQuiz} disabled={availableQuestionCount === 0}>Bắt đầu kiểm tra <ChevronRight size={17}/></button></div>
+        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, availableQuestionCount)} câu</b><span>{availableQuestionCount ? "Trả lời từng câu để xem giải thích và tổng kết kết quả." : "Bài học này đang được biên tập câu hỏi. Vui lòng quay lại sau."}</span><button className="btn nextbtn" onClick={startQuiz} disabled={availableQuestionCount === 0}>{isEnglish ? "Start quiz" : "Bắt đầu kiểm tra"} <ChevronRight size={17}/></button>{nextLesson && <button className="btn nextbtn" onClick={goToNextLesson}>{isEnglish ? "Next" : "Tiếp theo"} <ChevronRight size={17}/></button>}</div>
       </>}
       {mode === "quiz" && question && <>
         <div className="eyebrow">CÂU {questionIndex + 1} / {questions.length}</div><div className="quizprogress"><i style={{ width: ((questionIndex + 1) / questions.length * 100) + "%" }}/></div>
@@ -117,7 +136,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         {answered && <div className={choice === question.answer ? "feedback good" : "feedback bad"}>{choice === question.answer ? <CheckCircle2/> : <XCircle/>}<span><b>{choice === question.answer ? "Chính xác!" : "Chưa chính xác"}</b><br/>{choice !== question.answer && <>Bạn chọn: <b>{question.options[choice ?? 0]}</b>. Đáp án đúng: <b>{question.options[question.answer]}</b>. Lựa chọn của bạn chưa khớp với yêu cầu của câu hỏi.<br/></>}{question.translation && <><b>Dịch nghĩa:</b> {question.translation}<br/></>}<b>Giải thích:</b> {question.explain}{question.optionExplains?.[choice ?? -1] && <><br/><b>Vì sao lựa chọn này sai:</b> {question.optionExplains[choice ?? -1]}</>}</span></div>}
         <button className="btn nextbtn" disabled={choice === null} onClick={answered ? nextQuestion : submitAnswer}>{answered ? questionIndex === questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo" : "Kiểm tra đáp án"}</button>
       </>}
-      {mode === "result" && <div className="lesson-result"><Trophy size={44}/><div className="eyebrow">KẾT QUẢ BÀI KIỂM TRA</div><h2>{selected.title}</h2><strong>{score}/{questions.length}</strong><span>Số câu trả lời đúng</span><p>{Math.round(score / Math.max(questions.length, 1) * 100)}% chính xác</p><button className="btn nextbtn" onClick={saveProgress} disabled={saving}>{saving ? "Đang lưu..." : "Lưu tiến độ"} <ArrowRight size={16}/></button>{nextLesson ? <button className="btn nextbtn" onClick={saveAndGoNext} disabled={saving}>{saving ? "Đang lưu..." : "Lưu & học bài tiếp theo"} <ChevronRight size={17}/></button> : <button className="btn nextbtn" onClick={() => { setSelected(null); setMode("learn"); setNotice(""); }} disabled={saving}>Bạn đã đến bài cuối — quay lại danh sách <ArrowRight size={16}/></button>}<button className="lesson-retry" onClick={startQuiz}><RotateCcw size={14}/>Làm lại bài</button>{notice && <p role="status">{notice}</p>}</div>}
+      {mode === "result" && <div className="lesson-result"><Trophy size={44}/><div className="eyebrow">KẾT QUẢ BÀI KIỂM TRA</div><h2>{selected.title}</h2><strong>{score}/{questions.length}</strong><span>Số câu trả lời đúng</span><p>{Math.round(score / Math.max(questions.length, 1) * 100)}% chính xác</p><button className="btn nextbtn" onClick={saveProgress} disabled={saving}>{saving ? "Đang lưu..." : "Lưu tiến độ"} <ArrowRight size={16}/></button>{nextLesson ? <button className="btn nextbtn" onClick={saveAndGoNext} disabled={saving}>{saving ? (isEnglish ? "Saving..." : "Đang lưu...") : (isEnglish ? "Save & Next" : "Lưu & học bài tiếp theo")} <ChevronRight size={17}/></button> : <button className="btn nextbtn" onClick={() => { setSelected(null); setMode("learn"); setNotice(""); }} disabled={saving}>Bạn đã đến bài cuối — quay lại danh sách <ArrowRight size={16}/></button>}<button className="lesson-retry" onClick={startQuiz}><RotateCcw size={14}/>Làm lại bài</button>{notice && <p role="status">{notice}</p>}</div>}
     </section>;
   }
 
