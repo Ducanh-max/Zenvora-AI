@@ -406,3 +406,24 @@
 .dash-membership-unavailable{background:#e0eaf8;color:#6883a8}
 @media(max-width:1050px){.dash-membership-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.dash-memberships{padding:17px}.dash-membership-grid{gap:10px}.dash-membership-card{padding:14px 12px;min-height:205px}}
+
+/* Refined AUNORA plan cards */
+.dash-memberships{position:relative;padding:34px;background:linear-gradient(160deg,#fff,#f7fbff)}
+.dash-memberships .dash-section-heading h2{font-size:28px}
+.dash-benefits-all{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;margin:0 0 20px;border-radius:30px;background:#eaf3ff;color:#1766dc;font-weight:800;font-size:12px;text-decoration:none}
+.dash-membership-card{position:relative;min-height:355px;border-radius:24px;padding:24px 19px;background:linear-gradient(145deg,#f0f7ff,#fff)}
+.dash-membership-card:nth-child(2){background:linear-gradient(145deg,#eafbf6,#fff);border-color:#c8eee2}
+.dash-membership-card:nth-child(3){background:linear-gradient(145deg,#f1efff,#fff);border-color:#ded7ff}
+.dash-membership-card:nth-child(4){background:linear-gradient(145deg,#fff9e8,#fff);border-color:#f6e8bd}
+.dash-membership-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#e0efff;box-shadow:0 4px 15px #1e76dd1a;font-size:29px}
+.dash-membership-card:nth-child(2) .dash-membership-icon{background:#d4f8ed;color:#0b9c7d}
+.dash-membership-card:nth-child(3) .dash-membership-icon{background:#e7deff;color:#7545df}
+.dash-membership-card:nth-child(4) .dash-membership-icon{background:#fff0c7;color:#d38a06}
+.dash-plan-feature-list{list-style:none;padding:0;margin:14px 0 20px;display:grid;gap:10px}
+.dash-plan-feature-list li{display:flex;align-items:flex-start;gap:9px;color:#315681;font-size:12px;line-height:1.5}
+.dash-plan-feature-list li span{display:grid;place-items:center;flex-shrink:0;width:17px;height:17px;border-radius:50%;background:#d2e6ff;color:#1870df;font-weight:900}
+.dash-plan-benefits{display:inline-flex;align-items:center;gap:7px;margin-top:12px;color:#1769e7;text-decoration:none;font-size:12px;font-weight:800}
+.dash-membership-card:nth-child(2) .dash-plan-benefits{color:#099b78}
+.dash-membership-card:nth-child(3) .dash-plan-benefits{color:#7848dc}
+.dash-membership-card:nth-child(4) .dash-plan-benefits{color:#d68a06}
+@media(max-width:520px){.dash-memberships{padding:17px}.dash-membership-card{min-height:350px;padding:16px 12px}.dash-memberships .dash-section-heading h2{font-size:22px}}
