@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArrowRight, BookOpen, BrainCircuit, MessageCircle, Sparkles, ShieldCheck, Zap, Languages } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, BookOpen, BrainCircuit, MessageCircle, Sparkles, ShieldCheck, Zap, Languages, Volume2, VolumeX, Maximize2 } from "lucide-react";
 
 type Lang = "vi" | "en";
 const words = {
@@ -26,6 +26,10 @@ const words = {
 };
 export default function Home() {
  const [lang,setLang]=useState<Lang>("vi");
+ const [muted,setMuted]=useState(true);
+ const videoRef=useRef<HTMLVideoElement>(null);
+ function toggleSound(){const video=videoRef.current;if(!video)return;video.muted=!video.muted;setMuted(video.muted);}
+ function openFullscreen(){const video=videoRef.current;if(!video)return;void video.requestFullscreen?.();}
  useEffect(()=>{const saved=localStorage.getItem("aunora_language");if(saved==="en"||saved==="vi")setLang(saved);},[]);
  function changeLang(value:Lang){setLang(value);localStorage.setItem("aunora_language",value);}
  const t=words[lang];
@@ -37,11 +41,12 @@ export default function Home() {
  return <main className="marketing-page">
   <nav className="nav wrap"><Link href="/" className="aunora-auth-brand"><span className="aunora-mark"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA" /></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link><div className="navlinks"><Link href="/">{t.homeNav}</Link><Link href="/about">{t.aboutNav}</Link><a href="#features">{t.featuresNav}</a><Link href="/courses">{t.coursesNav}</Link></div><div className="navactions"><div className="marketing-language" role="group" aria-label="Choose language"><Languages size={15}/><button type="button" className={lang==="vi"?"active":""} onClick={()=>changeLang("vi")}>VI</button><button type="button" className={lang==="en"?"active":""} onClick={()=>changeLang("en")}>EN</button></div><Link href="/login">{t.login}</Link><Link className="btn small" href="/register">{t.signup} <ArrowRight size={16}/></Link></div></nav>
   <section className="hero wrap"><div><div className="eyebrow"><Sparkles size={15}/> {t.kicker}</div><h1>{t.title1}<br/><em>{t.title2}</em></h1><p className="lead">{t.lead}</p><div className="actions"><Link className="btn" href="/register">{t.explore} <ArrowRight size={18}/></Link><Link className="plain" href="/courses">{t.viewCourses}</Link></div><div className="trust"><span><ShieldCheck size={16}/> {t.trust1}</span><span><Zap size={16}/> {t.trust2}</span></div></div>
-  <div className="visual landing-aivanta-visual">
-    <div className="landing-aivanta-glow"/>
-    <div className="landing-aivanta-orbit"/>
-    <img className="landing-aivanta-image" src="/brand/aivanta-mascot.webp.png" alt="Aivanta - gia sư AI đồng hành cùng bạn" />
-    <div className="landing-aivanta-note"><span>✦ AUNORA AI TUTOR</span><b>{lang==="vi"?"Xin chào! Mình là Aivanta.":"Hi! I'm Aivanta."}</b><p>{lang==="vi"?"Cùng học tiếng Anh thật vui nhé!":"Let's make learning English fun!"}</p><Link href="/register">{lang==="vi"?"Học cùng mình":"Learn with me"} <ArrowRight size={15}/></Link></div>
+  <div className="visual landing-video-visual">
+    <div className="landing-video-frame">
+      <video ref={videoRef} className="landing-intro-video" src="/videos/aunora-intro.mp4.mp4" poster="/brand/aivanta-mascot.webp.png" autoPlay muted loop playsInline preload="metadata" aria-label={lang==="vi"?"Video giới thiệu AUNORA và Aivanta":"AUNORA and Aivanta introduction video"} />
+      <div className="landing-video-controls"><span>✦ AUNORA · AIVANTA</span><div><button type="button" onClick={toggleSound} aria-label={muted?(lang==="vi"?"Bật tiếng":"Unmute"):(lang==="vi"?"Tắt tiếng":"Mute")}>{muted?<VolumeX size={19}/>:<Volume2 size={19}/>}</button><button type="button" onClick={openFullscreen} aria-label={lang==="vi"?"Xem toàn màn hình":"Fullscreen"}><Maximize2 size={19}/></button></div></div>
+    </div>
+    <p className="landing-video-caption">{lang==="vi"?"Gặp gỡ Aivanta – người bạn đồng hành cùng bạn trên hành trình học tiếng Anh.":"Meet Aivanta – your companion on the journey to better English."}</p>
    </div></section>
   <section id="features" className="features wrap"><div className="center"><div className="eyebrow">{t.featureEyebrow}</div><h2>{t.featureTitle} <em>{t.featureAccent}</em></h2><p>{t.featureLead}</p></div><div className="grid">{features.map(({icon:Icon,title,text})=><article key={title}><div className="icon"><Icon/></div><h3>{title}</h3><p>{text}</p></article>)}</div></section>
   <section className="courses"><div className="wrap courseinner"><div><div className="eyebrow">{t.coursesNav.toUpperCase()}</div><h2>{lang==="vi"?"Bắt đầu từ nền tảng,":"Start with the basics,"}<br/><em>{lang==="vi"?"tiến xa hơn mỗi ngày.":"go further every day."}</em></h2><p>{lang==="vi"?"Khám phá 5 khóa học được thiết kế theo lộ trình rõ ràng.":"Explore five courses designed around a clear learning path."}</p><Link className="btn" href="/courses">{t.viewCourses} <ArrowRight size={16}/></Link></div><article className="coursecard"><div className="coursehead"><b>{lang==="vi"?"MIỄN PHÍ":"FREE"}</b><span>01 / 05</span></div><div className="letter">A</div><h3>English Starter</h3><p>{lang==="vi"?"Xây dựng nền tảng từ vựng, câu giao tiếp và ngữ pháp cơ bản.":"Build your foundation in vocabulary, everyday phrases, and basic grammar."}</p><div className="meta">🌱 {lang==="vi"?"Cơ bản":"Beginner"} <span>12 {lang==="vi"?"bài học":"lessons"}</span></div><Link href="/courses" className="btn full">{t.viewCourses} <ArrowRight size={16}/></Link></article></div></section>
