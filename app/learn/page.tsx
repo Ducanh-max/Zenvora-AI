@@ -11,7 +11,7 @@ const copy = {
   space:"KHÔNG GIAN HỌC TẬP", rewards:"WORD REWARDS", keep:"Tiếp tục học để mở khóa phần thưởng!", level:"CẤP ĐỘ",
   journey:"HÀNH TRÌNH HỌC TẬP CỦA BẠN", dashboard:"Bảng điều khiển học tập", hello:"Chào mừng đến với", lead:"Tiến bộ từng ngày — bắt đầu hành trình tiếng Anh của bạn ngay hôm nay.",
   lessons:"Bài học", topics:"Học theo chủ đề", practiceCard:"Luyện tập", quizzes:"Câu hỏi tương tác", assistant:"Gia sư AI", support:"Trợ lý học tập",
-  courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"3 bài học",
+  courses:"Khóa học của bạn", free:"MIỄN PHÍ", soon:"SẮP MỞ", enter:"Vào học", locked:"Chưa mở khóa", lessonsCount:"12 bài học hiện có",
   demo:"Tài khoản và dữ liệu học tập của bạn được đồng bộ an toàn qua Supabase.", account:"Người dùng", levelUnknown:"Cấp độ: Chưa xác định", logout:"Đăng xuất", confirmTitle:"Bạn có chắc chắn muốn đăng xuất không?", confirmBody:"Bạn sẽ được đưa về trang đăng nhập.", cancel:"Ở lại", confirm:"Đăng xuất", menu:"Mở menu", demoAccount:"Tài khoản",
   descriptions:["500 bài học, luyện nói, 15 câu kiểm tra mỗi bài và 40 năng lượng Sói.","800 bài học, luyện nói, 50 câu kiểm tra mỗi bài và 100 năng lượng Sói.","1.400 bài học, luyện nói, 50 câu kiểm tra và năng lượng không giới hạn.","2.100 bài học, luyện thi IELTS/TOEFL và gọi thoại cùng mascot Sói."],
   levels:["Miễn phí","49.000đ/tháng","99.000đ/tháng","149.000đ/tháng"]
