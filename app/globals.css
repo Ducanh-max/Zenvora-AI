@@ -391,3 +391,18 @@
 .landing-video-caption{margin:0;text-align:center;color:#acd9f6;font-size:12px;line-height:1.6}
 @media(max-width:800px){.landing-video-visual{min-height:unset;padding:25px 0 10px}.landing-video-frame{border-radius:16px}}
 @media(max-width:480px){.landing-video-controls{padding:14px 9px 7px}.landing-video-controls>span{font-size:8px}.landing-video-controls button{width:31px;height:31px}}
+
+/* Learning plans overview — informational, no paid checkout */
+.dash-memberships{margin:24px 0;padding:27px;border:1px solid #d3e5ff;border-radius:24px;background:#fff;box-shadow:0 10px 35px #133a7b0a}
+.dash-memberships-intro{color:#5875a4;font-size:13px;line-height:1.65;margin:12px 0 21px}
+.dash-membership-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.dash-membership-card{display:flex;flex-direction:column;align-items:flex-start;min-height:220px;padding:20px 17px;border:1px solid #d6e7fc;border-radius:19px;background:linear-gradient(145deg,#f9fcff,#edf5ff)}
+.dash-membership-card.featured{border-color:#73a7ff;background:linear-gradient(145deg,#e7f3ff,#eae9ff)}
+.dash-membership-icon{font-size:24px;color:#2974e3}
+.dash-membership-card h3{margin:10px 0 5px;color:#153c7c;font-size:20px}
+.dash-membership-card p{margin:0 0 16px;color:#617da5;font-size:12px}
+.dash-membership-card strong{margin-top:auto;color:#153c7c;font-size:17px}
+.dash-membership-card a,.dash-membership-unavailable{display:inline-flex;align-items:center;gap:7px;margin-top:13px;padding:9px 12px;border-radius:10px;background:#1d6de6;color:white;text-decoration:none;font-size:12px;font-weight:800}
+.dash-membership-unavailable{background:#e0eaf8;color:#6883a8}
+@media(max-width:1050px){.dash-membership-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.dash-memberships{padding:17px}.dash-membership-grid{gap:10px}.dash-membership-card{padding:14px 12px;min-height:205px}}
