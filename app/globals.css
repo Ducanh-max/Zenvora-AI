@@ -441,3 +441,8 @@
 .dash-plan-detail-content ul{margin:10px 0 0;padding-left:18px}
 .dash-membership-card .dash-plan-feature-list li,.dash-membership-card>p{color:#274a76!important}
 .dash-membership-card .dash-membership-unavailable{color:#3f5d85!important;background:#dce8f6}
+
+/* Uniform, readable plan benefits buttons based on Free */
+.dash-membership-card .dash-plan-link{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:47px;box-sizing:border-box;padding:11px 13px;margin-top:15px;border:0;border-radius:12px;background:#1d6de6!important;color:#fff!important;text-decoration:none;font-size:13px;font-weight:800;line-height:1.4;box-shadow:0 5px 12px #1c64d31b}
+.dash-membership-card .dash-plan-link:hover{background:#1455bb!important;color:#fff!important}
+.dash-membership-card .dash-plan-link:focus-visible{outline:3px solid #32c8ff;outline-offset:3px}
