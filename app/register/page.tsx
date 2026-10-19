@@ -43,14 +43,14 @@ export default function RegisterPage() {
   }
 
   return <main className="authpage">
-    <Link href="/" className="aunora-auth-brand"><span className="aunora-mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 8 19 13 24 9 29 13 41 8 38 29 31 39 24 34 17 39 10 29Z" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round"/><path d="m16 21 5 2m11-2-5 2m-3 2v5m-6 1 6-3 6 3" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
-    <section className="authcard"><div className="eyebrow">BẮT ĐẦU MIỄN PHÍ</div><h1>Tạo tài khoản<br/><em>AUNORA.</em></h1><p>Mỗi ngày một bước nhỏ, tiếng Anh tiến bộ hơn.</p>
+    <Link href="/" className="aunora-auth-brand"><span className="aunora-mark auth-brand-image"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA" /></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
+    <div className="auth-layout"><section className="authcard"><div className="eyebrow">BẮT ĐẦU MIỄN PHÍ</div><h1>Tạo tài khoản<br/><em>AUNORA.</em></h1><p>Mỗi ngày một bước nhỏ, tiếng Anh tiến bộ hơn.</p>
       <form onSubmit={submit}><label htmlFor="register-name">Họ và tên</label><input id="register-name" autoComplete="name" required maxLength={80} value={name} onChange={e=>setName(e.target.value)} placeholder="Tên của bạn"/>
         <label htmlFor="register-email">Email</label><input id="register-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/>
         <label htmlFor="register-password">Mật khẩu</label><input id="register-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Ít nhất 8 ký tự"/>
         {error&&<div className="formerror" role="alert">{error}</div>}{notice&&<div className="auth-notice" role="status">{notice}</div>}
         <button className="btn authsubmit" disabled={busy}>{busy?"Đang tạo tài khoản...":"Tạo tài khoản"}</button>
       </form><div className="authswitch">Đã có tài khoản? <Link href="/login">Đăng nhập</Link></div><p className="demo-note">Tài khoản được lưu trực tuyến và xác thực qua Supabase.</p>
-    </section>
+    </section><aside className="auth-mascot-panel"><div className="auth-mascot-glow"/><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta - gia sư AI của AUNORA"/><div className="auth-mascot-message"><span>✦ AUNORA AI TUTOR</span><strong>Xin chào, mình là Aivanta!</strong><p>Cùng học tiếng Anh mỗi ngày nhé! 💙</p></div></aside></div>
   </main>;
 }
