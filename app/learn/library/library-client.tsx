@@ -15,16 +15,16 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
   return base
     .filter(question =>
       Array.isArray(question.options) &&
-      question.options.length === 4 &&
+      (question.options.length === 3 || question.options.length === 4) &&
       question.options.every(option => typeof option === "string" && option.trim().length > 0) &&
-      new Set(question.options.map(option => option.trim().toLowerCase())).size === 4 &&
+      new Set(question.options.map(option => option.trim().toLowerCase())).size === question.options.length &&
       Number.isInteger(question.answer) &&
       question.answer >= 0 &&
-      question.answer < 4
+      question.answer < question.options.length
     )
     .map(question => {
       // "All of the above" depends on the other choices, so keep it in D.
-      const hasAllAbove = question.options[3].trim().toLowerCase() === "all of the above";
+      const hasAllAbove = question.options.length === 4 && question.options[3].trim().toLowerCase() === "all of the above";
       if (hasAllAbove) return question;
       const order = question.options.map((_, index) => index);
       for (let i = order.length - 1; i > 0; i--) {
