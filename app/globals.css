@@ -378,3 +378,16 @@
 .tutor-brand-icon,.tutor-avatar,.message-avatar{overflow:hidden}
 .tutor-brand-icon img,.tutor-avatar img,.message-avatar img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}
 @media(max-width:650px){.library-heading{padding-right:0;padding-bottom:110px}.library-aivanta{width:120px;max-height:120px}.tutor-welcome{padding-right:0;padding-bottom:110px}.tutor-welcome-mascot{width:115px;height:115px}}
+
+/* AUNORA intro video on the public homepage */
+.landing-video-visual{display:flex;flex-direction:column;align-items:stretch;justify-content:center;min-height:440px;gap:14px}
+.landing-video-frame{position:relative;overflow:hidden;width:100%;aspect-ratio:16/9;border:1px solid #70cfff77;border-radius:22px;background:#0a1b38;box-shadow:0 24px 70px #010c23a0,0 0 35px #23b5f422}
+.landing-intro-video{display:block;width:100%;height:100%;object-fit:contain;background:#091a38}
+.landing-video-controls{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 15px 12px;background:linear-gradient(transparent,#07172bd9);color:#e6f7ff}
+.landing-video-controls>span{font-size:10px;font-weight:900;letter-spacing:1.2px}
+.landing-video-controls>div{display:flex;gap:8px}
+.landing-video-controls button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #d3f3ff66;border-radius:10px;background:#143760bd;color:#fff;cursor:pointer}
+.landing-video-controls button:hover{background:#1b71b7}
+.landing-video-caption{margin:0;text-align:center;color:#acd9f6;font-size:12px;line-height:1.6}
+@media(max-width:800px){.landing-video-visual{min-height:unset;padding:25px 0 10px}.landing-video-frame{border-radius:16px}}
+@media(max-width:480px){.landing-video-controls{padding:14px 9px 7px}.landing-video-controls>span{font-size:8px}.landing-video-controls button{width:31px;height:31px}}
