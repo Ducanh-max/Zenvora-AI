@@ -315,3 +315,28 @@
 .mini-aivanta-fallback{position:absolute;inset:0;display:grid;place-items:center}
 .mini-aivanta>img,.cta-mascot>img{position:relative;z-index:1}
 @media(max-width:560px){.aivanta-photo>.aivanta-fallback{font-size:66px}}
+
+/* AUNORA public landing: official logo + Aivanta, no fictional progress */
+.marketing-page{background:radial-gradient(ellipse at 83% 28%,#203e74 0,transparent 42%),linear-gradient(145deg,#0a1632,#10264e 75%,#09172e);color:#f5faff}
+.marketing-page .aunora-mark{width:55px;height:55px;overflow:hidden;padding:0;border:2px solid #59d6ff;border-radius:50%;background:#0b3477;box-shadow:0 0 0 4px #2e9cf52b}
+.marketing-page .aunora-mark img{width:100%;height:100%;object-fit:cover}
+.marketing-page .aunora-wordmark b{color:#f5faff}
+.marketing-page .nav{border-bottom-color:#ffffff21}
+.marketing-page .hero{min-height:660px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px}
+.marketing-page .hero h1 em,.marketing-page h2 em{color:#62cfff}
+.marketing-page .btn{background:linear-gradient(100deg,#32c8f5,#6d8eff);color:#071f48!important;box-shadow:0 12px 30px #1686f52c}
+.marketing-page .eyebrow{color:#64d4ff}
+.landing-aivanta-visual{min-height:530px;isolation:isolate}
+.landing-aivanta-glow{position:absolute;z-index:-2;width:min(460px,95%);height:430px;border-radius:50%;background:radial-gradient(circle,#5cbeff85 0,#2457b758 40%,transparent 72%);filter:blur(12px)}
+.landing-aivanta-orbit{position:absolute;z-index:-1;width:min(480px,98%);height:245px;border:3px solid #3de0f6b0;border-radius:50%;transform:rotate(-21deg);box-shadow:0 0 30px #3de0f655}
+.landing-aivanta-image{position:relative;z-index:1;display:block;max-width:95%;width:auto;height:490px;object-fit:contain;filter:drop-shadow(0 18px 35px #040c26aa)}
+.landing-aivanta-note{position:absolute;z-index:2;right:0;bottom:8px;width:min(265px,65%);padding:18px;border:1px solid #a9e9ff77;border-radius:18px;background:#122c5bea;box-shadow:0 16px 40px #07132970;backdrop-filter:blur(12px)}
+.landing-aivanta-note span{display:block;color:#69d9ff;font-size:10px;font-weight:900;letter-spacing:1.1px}
+.landing-aivanta-note b{display:block;margin-top:8px;color:white;font:800 16px Manrope}
+.landing-aivanta-note p{margin:7px 0 12px;color:#c4e2ff;font-size:12px;line-height:1.5}
+.landing-aivanta-note a{display:inline-flex;align-items:center;gap:6px;color:#71e3ff;text-decoration:none;font-size:12px;font-weight:800}
+.landing-footer-logo{width:34px;height:34px;object-fit:cover;border-radius:50%;vertical-align:middle}
+.marketing-page .features article{background:#142c50;border-color:#365c86}
+.marketing-page .courses{background:#0d1d3c}
+@media(max-width:800px){.marketing-page .hero{grid-template-columns:1fr;gap:0;padding-top:45px}.landing-aivanta-visual{min-height:450px}.landing-aivanta-image{height:420px}.landing-aivanta-note{right:5%;bottom:0}.marketing-page .navlinks{display:none}}
+@media(max-width:480px){.landing-aivanta-visual{min-height:370px}.landing-aivanta-image{height:350px}.landing-aivanta-note{padding:12px;width:55%}.landing-aivanta-note b{font-size:12px}.landing-aivanta-note p{font-size:10px}.marketing-page .aunora-mark{width:42px;height:42px}}
