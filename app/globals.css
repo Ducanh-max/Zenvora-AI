@@ -491,3 +491,18 @@
 .aunora-plan-notice p{margin:0;font-size:13px;line-height:1.7}
 @media(max-width:750px){.aunora-plan-hero{grid-template-columns:1fr}.aunora-plan-hero-art{min-height:240px}.aunora-plan-art-symbol{width:155px;height:155px;font-size:85px}.aunora-plan-orbit{width:230px;height:230px}.aunora-plan-orbit.orbit-two{width:180px;height:180px}.aunora-plan-art-label{bottom:20px;right:10%;font-size:12px}.aunora-plan-benefit-grid{grid-template-columns:1fr}}
 @media(max-width:450px){.aunora-plan-page{padding:17px 12px 45px}.aunora-plan-hero{margin-top:20px;border-radius:22px}.aunora-plan-hero-copy{padding:27px}.aunora-plan-benefit{padding:17px;min-height:95px}.aunora-plan-benefit h3{font-size:16px}.aunora-plan-nav a,.aunora-plan-footer a{font-size:12px}}
+
+/* Audience and recommended English level for AUNORA plans */
+.aunora-plan-fit{padding:20px 0 30px}
+.aunora-plan-fit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.aunora-plan-fit-card{padding:27px;border:1px solid #d6e5f8;border-radius:22px;background:linear-gradient(145deg,#fff,var(--plan-soft));box-shadow:0 10px 25px #19498110}
+.aunora-plan-fit-icon{display:grid;place-items:center;width:47px;height:47px;margin-bottom:19px;border-radius:15px;background:#fff;color:var(--plan-accent);font-size:28px;font-weight:900}
+.aunora-plan-fit-card>span{font-size:11px;font-weight:900;letter-spacing:1.5px;color:var(--plan-accent)}
+.aunora-plan-fit-card h3{margin:9px 0 12px;color:#173b70;font-size:22px}
+.aunora-plan-fit-card p,.aunora-plan-fit-card li{font-size:14px;line-height:1.75;color:#3e618b}
+.aunora-plan-fit-card ul{padding:0;margin:0;list-style:none;display:grid;gap:10px}
+.aunora-plan-fit-reason{margin-top:17px;padding:22px 25px;border-radius:19px;background:#142e5b;color:#fff}
+.aunora-plan-fit-reason strong{font-size:16px;color:#d5e9ff}
+.aunora-plan-fit-reason p{margin:10px 0 0;font-size:14px;line-height:1.8;color:#d1e3fb}
+.aunora-plan-fit-disclaimer{font-size:12px;color:#6c84a5;margin-top:15px}
+@media(max-width:750px){.aunora-plan-fit-grid{grid-template-columns:1fr}.aunora-plan-fit-card{padding:20px}}
