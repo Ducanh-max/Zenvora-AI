@@ -2,12 +2,12 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound, Bell, Compass, ClipboardCheck, Flame, Star, Target, ChevronDown } from "lucide-react";
+import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound, Bell, Gamepad2, Compass, ClipboardCheck, Flame, Star, Target, ChevronDown } from "lucide-react";
 
 type Lang = "vi" | "en";
 const copy = {
  vi: {
-  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển",
+  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển", entertainment:"Giải trí",
   space:"KHÔNG GIAN HỌC TẬP", journey:"HÀNH TRÌNH CỦA BẠN", dashboard:"Bảng điều khiển",
   hello:"Chào mừng trở lại!", lead:"Cùng AUNORA và AI Tutor, chinh phục tiếng Anh mỗi ngày!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"Mình là Aivanta!", tutorText:"Gia sư AI đồng hành cùng bạn trên hành trình học tiếng Anh. Cùng bắt đầu nhé!",
@@ -22,7 +22,7 @@ const copy = {
   account:"Tài khoản", language:"Ngôn ngữ", menu:"Mở menu", courseDescriptions:["Nền tảng tiếng Anh cho người mới bắt đầu.","Giao tiếp tự nhiên trong các tình huống hằng ngày.","Tiếng Anh thực tế khi đi du lịch.","Nắm vững ngữ pháp qua ví dụ và bài tập.","Tự tin trò chuyện và bày tỏ ý kiến."]
  },
  en: {
-  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary",
+  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary", entertainment:"Fun Zone",
   space:"YOUR LEARNING SPACE", journey:"YOUR JOURNEY", dashboard:"Learning dashboard",
   hello:"Welcome back!", lead:"Learn English every day with AUNORA and your AI Tutor!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"I'm Aivanta!", tutorText:"Your AI tutor and learning companion. Let's make your English journey brighter!",
@@ -46,7 +46,8 @@ const menuItems=[
  {key:"practice" as const,href:"/learn/library",icon:Dumbbell},
  {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
  {key:"speaking" as const,href:"/learn/tutor",icon:Mic2},
- {key:"dictionary" as const,href:"/learn/library",icon:BookText}
+ {key:"dictionary" as const,href:"/learn/library",icon:BookText},
+ {key:"entertainment" as const,href:"/learn/fun",icon:Gamepad2}
 ];
 export default function LearnPage(){
  const [profile,setProfile]=useState<{name:string;email:string;avatar:string}|null>(null);
