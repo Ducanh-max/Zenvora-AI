@@ -100,7 +100,7 @@ export default function LearnPage(){
     <section className="dash-memberships" id="memberships">
       <div className="dash-section-heading"><div><span>{lang==="vi"?"CHỌN GÓI HỌC PHÙ HỢP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Khám phá gói học phù hợp với bạn":"Find your ideal learning plan"}</h2></div></div>
       <p className="dash-memberships-intro">{lang==="vi"?"Xem đặc quyền của từng gói và chọn lộ trình phù hợp. Hiện tại cả 5 khóa học vẫn miễn phí; các gói nâng cấp chưa mở bán.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
-      <a className="dash-benefits-all" href="#plan-benefits">{lang==="vi"?"Xem tất cả đặc quyền":"View all benefits"} <ArrowRight size={16}/></a>
+      <a className="dash-benefits-all" href="/learn/plans">{lang==="vi"?"Xem tất cả đặc quyền":"View all benefits"} <ArrowRight size={16}/></a>
       <div className="dash-membership-grid" id="plan-benefits">
        {[
         {name:"Free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start your journey",featured:false,featuresVi:["Truy cập 5 khóa học hiện tại","Bài học, luyện tập và kiểm tra","Sử dụng AI Tutor","Theo dõi tiến trình"],featuresEn:["Access 5 current courses","Lessons, practice and quizzes","Use AI Tutor","Track your progress"]},
@@ -112,7 +112,7 @@ export default function LearnPage(){
         <h3>{plan.name==="Free"?(lang==="vi"?"Gói Miễn Phí":"Free Plan"):(lang==="vi"?"Gói ":"Plan ")+plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p><ul className="dash-plan-feature-list">{(lang==="vi"?plan.featuresVi:plan.featuresEn).map(feature=><li key={feature}><span>✓</span>{feature}</li>)}</ul>
         <strong>{plan.name==="Free"?(lang==="vi"?"Miễn phí":"Free"):(lang==="vi"?"Sắp ra mắt":"Coming soon")}</strong>
         {plan.name==="Free"?<Link href="/learn/library">{lang==="vi"?"Vào học":"Start learning"} <ArrowRight size={15}/></Link>:<span className="dash-membership-unavailable">{lang==="vi"?"Chưa mở đăng ký":"Not available yet"}</span>}
-        <details className="dash-plan-details"><summary>{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></summary><div className="dash-plan-detail-content"><b>{lang==="vi"?"Đặc quyền của gói ":"Benefits of "}{plan.name}</b><p>{plan.name==="Free"?(lang==="vi"?"Bạn có thể học ngay với 5 khóa học đang mở và các công cụ học tập hiện có.":"Start now with five available courses and current learning tools."):(lang==="vi"?"Đây là các đặc quyền dự kiến. Gói này chưa mở đăng ký, chưa có giá chính thức và chưa thay đổi quyền truy cập của bạn.":"These benefits are planned. This plan is not available to subscribe to and has no official price yet.")}</p><ul>{(lang==="vi"?plan.featuresVi:plan.featuresEn).map(feature=><li key={feature}>✓ {feature}</li>)}</ul></div></details>
+        <Link className="dash-plan-link" href={`/learn/plans/${plan.name.toLowerCase()}`}>{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></Link>
        </article>)}
       </div>
     </section>
