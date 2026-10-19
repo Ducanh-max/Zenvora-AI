@@ -16,21 +16,17 @@ export default function CoursesPage(){
  useEffect(()=>{try{const l=localStorage.getItem("aunora_language");if(l==="en"||l==="vi")setLang(l);setSelected(localStorage.getItem("aunora_selected_plan")||"");}catch{}},[]);
  const t=words[lang];
  async function pick(id:string){
-  setCheckoutError(""); setNotice("");
-  if(id==="starter"){try{localStorage.setItem("aunora_selected_plan",id);}catch{}setSelected(id);window.location.assign("/learn");return;}
-  setNotice(lang==="vi"?"Các gói thành viên trả phí đang tạm đóng. Bạn có thể học thử cả 5 khóa học miễn phí trong giai đoạn hoàn thiện AUNORA.":"Paid memberships are temporarily unavailable. You can explore all five courses for free while AUNORA is being completed.");
-  return;
-  setBusyPlan(id);
-  try{
-   const response=await fetch("/api/payments/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({planId:id})});
-   const result=await response.json();
-   if(response.status===401){window.location.assign("/login?next=%2Fcourses");return;}
-   if(!response.ok||!result.checkoutUrl)throw new Error(result.error||"Không thể tạo thanh toán.");
+  setCheckoutError("");
+  setNotice("");
+  if(id==="starter"){
    try{localStorage.setItem("aunora_selected_plan",id);}catch{}
-   window.location.assign(result.checkoutUrl);
-  }catch(error){setCheckoutError(error instanceof Error?error.message:"Không thể kết nối cổng thanh toán.");}
-  finally{setBusyPlan("");}
+   setSelected(id);
+   window.location.assign("/learn");
+   return;
+  }
+  setNotice(lang==="vi"?"Các gói thành viên trả phí đang tạm đóng. Bạn có thể học thử cả 5 khóa học miễn phí trong giai đoạn hoàn thiện AUNORA.":"Paid memberships are temporarily unavailable. You can explore all five courses for free while AUNORA is being completed.");
  }
+
  return <main className="marketing-page plan-page">
   <nav className="nav wrap"><Link href="/learn" className="aunora-auth-brand"><span className="aunora-mark"><BookOpen/></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link><div className="navactions"><Link href="/learn">{lang==="vi"?"Không gian học tập":"Learning space"}</Link><div className="marketing-language"><Languages size={15}/><button className={lang==="vi"?"active":""} onClick={()=>{setLang("vi");localStorage.setItem("aunora_language","vi");}}>VI</button><button className={lang==="en"?"active":""} onClick={()=>{setLang("en");localStorage.setItem("aunora_language","en");}}>EN</button></div></div></nav>
   <section className="plan-wrap"><Link href="/learn" className="catalog-back"><ArrowLeft size={16}/>{t.back}</Link><div className="eyebrow"><Sparkles size={14}/>{t.eyebrow}</div><h1>{t.title} <em>{t.accent}</em></h1><p className="plan-lead">{t.lead}</p>
