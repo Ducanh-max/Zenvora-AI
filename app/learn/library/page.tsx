@@ -42,7 +42,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH</div>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Chọn một bài học, ôn từ vựng, luyện câu ví dụ và hoàn thành bài kiểm tra tương tác.</p>
-      <div className="library-summary"><b>{lessons?.length || 0} bài học đã xuất bản</b><span>Gói hiện tại cho phép tối đa {plan.lessonLimit.toLocaleString("vi-VN")} bài học khi thư viện được mở rộng.</span><span>{plan.quizSize} câu kiểm tra mỗi bài theo quyền lợi gói.</span></div>
+      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>Đã có nội dung thực tế cho cả 5 khóa học.</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
       <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={15} initialCourseSlug={params?.course} />}
