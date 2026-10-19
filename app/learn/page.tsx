@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, LockKeyhole, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound } from "lucide-react";
+import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound } from "lucide-react";
 
 type Lang = "vi" | "en";
 const copy = {
