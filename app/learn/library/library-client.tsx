@@ -6,7 +6,8 @@ import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw,
 type Vocabulary = { word: string; meaning: string; pronunciation?: string; example: string };
 type Example = { english: string; vietnamese: string };
 type Question = { q: string; options: string[]; answer: number; explain: string };
-export type LibraryLesson = { id: string; slug: string; title: string; summary: string; sort_order: number; content: { vocabulary?: Vocabulary[]; examples?: Example[]; questions?: Question[] } };
+export type LibraryCourse = { id: string; slug: string; title: string; level: string; description: string; is_free: boolean; sort_order: number };
+export type LibraryLesson = { id: string; course_id: string; slug: string; title: string; summary: string; sort_order: number; content: { vocabulary?: Vocabulary[]; examples?: Example[]; questions?: Question[] } };
 type Progress = { lesson_id: string; completed: boolean; score: number; total_questions: number };
 
 function buildQuestionBank(lesson: LibraryLesson): Question[] {
@@ -37,7 +38,8 @@ function buildQuestionBank(lesson: LibraryLesson): Question[] {
   }).sort(() => Math.random() - 0.5);
 }
 
-export default function LibraryClient({ lessons, progress, quizSize }: { lessons: LibraryLesson[]; progress: Progress[]; quizSize: number }) {
+export default function LibraryClient({ courses, lessons, progress, quizSize, initialCourseSlug }: { courses: LibraryCourse[]; lessons: LibraryLesson[]; progress: Progress[]; quizSize: number; initialCourseSlug?: string }) {
+  const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(() => courses.some(course => course.slug === initialCourseSlug) ? initialCourseSlug! : null);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
   const [mode, setMode] = useState<"learn" | "quiz" | "result">("learn");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -64,7 +66,7 @@ export default function LibraryClient({ lessons, progress, quizSize }: { lessons
     if (!selected) return;
     setSaving(true); setNotice("");
     try {
-      const response = await fetch("/api/lesson-progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonId: selected.slug, courseId: "sprout", score, totalQuestions: questions.length }) });
+      const response = await fetch("/api/lesson-progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonId: selected.slug, courseId: selectedCourseSlug || "english-starter", score, totalQuestions: questions.length }) });
       if (!response.ok) throw new Error("Không thể đồng bộ tiến độ. Hãy thử lại.");
       setDone(previous => previous.includes(selected.slug) ? previous : [...previous, selected.slug]);
       setNotice("Đã lưu kết quả học tập của bạn.");
@@ -72,6 +74,9 @@ export default function LibraryClient({ lessons, progress, quizSize }: { lessons
     finally { setSaving(false); }
   }
   function resetLesson() { setSelected(null); setMode("learn"); setNotice(""); }
+
+  const activeCourse = courses.find(course => course.slug === selectedCourseSlug) || null;
+  const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id) : [];
 
   if (selected) {
     const content = selected.content || {};
@@ -93,7 +98,23 @@ export default function LibraryClient({ lessons, progress, quizSize }: { lessons
     </section>;
   }
 
-  return <section className="library-grid">{lessons.map((lesson, index) => {
+  if (activeCourse) {
+    return <section className="library-course-view">
+      <button className="library-back" onClick={() => setSelectedCourseSlug(null)}><ArrowLeft size={16}/> Tất cả khóa học</button>
+      <div className="library-course-intro"><span className="eyebrow">{activeCourse.level} · {activeCourse.is_free ? "MIỄN PHÍ" : "MỞ THỬ NGHIỆM"}</span><h2>{activeCourse.title}</h2><p>{activeCourse.description}</p><b>{courseLessons.length} bài học · {courseLessons.reduce((sum, lesson) => sum + (lesson.content.vocabulary || []).length, 0)} từ vựng</b></div>
+      <div className="library-grid">{courseLessons.map((lesson, index) => {
+        const complete = done.includes(lesson.slug);
+        const questionCount = (lesson.content.questions || []).length || buildQuestionBank(lesson).length;
+        return <article className="library-card" key={lesson.id}><div className="library-card-top"><span>{complete ? "ĐÃ HOÀN THÀNH" : `BÀI ${String(index + 1).padStart(2, "0")}`}</span><BookOpen size={18}/></div><h2>{lesson.title}</h2><p>{lesson.summary}</p><div className="library-card-meta"><span>{(lesson.content.vocabulary || []).length} từ vựng</span><span>{Math.min(quizSize, questionCount)} câu kiểm tra</span></div><button className="btn nextbtn" onClick={() => { setSelected(lesson); setMode("learn"); }}>{complete ? "Ôn tập lại" : "Vào học"} <ArrowRight size={16}/></button></article>;
+      })}</div>
+    </section>;
+  }
+
+  return <section className="library-grid">{courses.map(course => {
+    const courseLessonsForCard = lessons.filter(lesson => lesson.course_id === course.id);
+    const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
+    return <article className="library-card library-course-card" key={course.id}><div className="library-card-top"><span>{course.is_free ? "KHÓA HỌC MIỄN PHÍ" : "ĐANG MỞ THỬ NGHIỆM"}</span><BookOpen size={18}/></div><h2>{course.title}</h2><p>{course.description}</p><div className="library-card-meta"><span>{course.level}</span><span>{courseLessonsForCard.length} bài học</span><span>{completeCount}/{courseLessonsForCard.length} hoàn thành</span></div><button className="btn nextbtn" onClick={() => setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={16}/></button></article>;
+  })}</section>;
     const complete = done.includes(lesson.slug);
     const questionCount = buildQuestionBank(lesson).slice(0, quizSize).length;
     return <article className="library-card" key={lesson.id}><div className="library-card-top"><span>{complete ? "ĐÃ HOÀN THÀNH" : `BÀI ${String(index + 1).padStart(2, "0")}`}</span><BookOpen size={18}/></div><h2>{lesson.title}</h2><p>{lesson.summary}</p><div className="library-card-meta"><span>{(lesson.content.vocabulary || []).length} từ vựng</span><span>{questionCount} câu kiểm tra</span></div><button className="btn nextbtn" onClick={() => { setSelected(lesson); setMode("learn"); }}>{complete ? "Ôn tập lại" : "Vào học"} <ArrowRight size={16}/></button></article>;
