@@ -11,31 +11,29 @@ export type LibraryLesson = { id: string; course_id: string; slug: string; title
 type Progress = { lesson_id: string; completed: boolean; score: number; total_questions: number };
 
 function buildQuestionBank(lesson: LibraryLesson): Question[] {
-  const content = lesson.content || {};
-  const base = Array.isArray(content.questions) ? content.questions : [];
-  const words = content.vocabulary || [];
-  const generated: Question[] = [];
-  const pick = (index: number, offset: number) => words[(index + offset) % Math.max(words.length, 1)];
-  words.forEach((item, index) => {
-    const wrong = [pick(index, 1), pick(index, 3)];
-    generated.push({ q: `Which English phrase means “${item.meaning}”?`, options: [item.word, wrong[0]?.word || "", wrong[1]?.word || ""], answer: 0, explain: `“${item.word}” có nghĩa là “${item.meaning}”.` });
-    generated.push({ q: `Choose the correct meaning of “${item.word}”.`, options: [item.meaning, wrong[0]?.meaning || "", wrong[1]?.meaning || ""], answer: 0, explain: `Hãy ghi nhớ: ${item.word} = ${item.meaning}.` });
-    generated.push({ q: `Which sentence uses “${item.word}” correctly?`, options: [item.example, wrong[0]?.example || "", wrong[1]?.example || ""], answer: 0, explain: `Ví dụ đúng: ${item.example}` });
-    const wordStart = item.example.toLowerCase().indexOf(item.word.toLowerCase());
-    const blank = wordStart >= 0 ? item.example.slice(0, wordStart) + "_____" + item.example.slice(wordStart + item.word.length) : item.example;
-    generated.push({ q: `Complete the example: “${blank}”`, options: [item.word, wrong[0]?.word || "", wrong[1]?.word || ""], answer: 0, explain: `Câu hoàn chỉnh: ${item.example}` });
-    generated.push({ q: `Select the matching vocabulary for “${item.meaning}”.`, options: [item.word, wrong[1]?.word || "", wrong[0]?.word || ""], answer: 0, explain: `Đáp án: ${item.word}.` });
-  });
-  const combined = [...base, ...generated];
-  while (combined.length < 50 && words.length) {
-    const index = combined.length % words.length;
-    const item = words[index];
-    combined.push({ q: `Review: what does “${item.word}” mean?`, options: [item.meaning, pick(index, 2)?.meaning || "", pick(index, 4)?.meaning || ""], answer: 0, explain: `“${item.word}” = “${item.meaning}”.` });
-  }
-  return combined.slice(0, 50).map(question => {
-    const order = question.options.map((_, index) => index).sort(() => Math.random() - 0.5);
-    return { ...question, options: order.map(index => question.options[index]), answer: order.indexOf(question.answer) };
-  }).sort(() => Math.random() - 0.5);
+  const base = Array.isArray(lesson.content?.questions) ? lesson.content.questions : [];
+  return base
+    .filter(question =>
+      Array.isArray(question.options) &&
+      question.options.length >= 2 &&
+      new Set(question.options).size === question.options.length &&
+      Number.isInteger(question.answer) &&
+      question.answer >= 0 &&
+      question.answer < question.options.length
+    )
+    .map(question => {
+      const order = question.options.map((_, index) => index);
+      for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+      }
+      return {
+        ...question,
+        options: order.map(index => question.options[index]),
+        answer: order.indexOf(question.answer),
+      };
+    })
+    .sort(() => Math.random() - 0.5);
 }
 
 export default function LibraryClient({ courses, lessons, progress, quizSize, initialCourseSlug }: { courses: LibraryCourse[]; lessons: LibraryLesson[]; progress: Progress[]; quizSize: number; initialCourseSlug?: string }) {
@@ -86,7 +84,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         <div className="eyebrow">BÀI HỌC · {selected.sort_order}</div><h2>{selected.title}</h2><p>{selected.summary}</p>
         <h3>Từ vựng trọng tâm</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
         <h3>Ví dụ giao tiếp</h3><div className="library-examples">{(content.examples || []).map((item, index) => <article key={index}><b>{item.english}</b><span>{item.vietnamese}</span></article>)}</div>
-        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {quizSize} câu</b><span>Trả lời từng câu để xem giải thích và tổng kết kết quả.</span><button className="btn nextbtn" onClick={startQuiz}>Bắt đầu kiểm tra <ChevronRight size={17}/></button></div>
+        <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, (content.questions || []).length)} câu</b><span>Trả lời từng câu để xem giải thích và tổng kết kết quả.</span><button className="btn nextbtn" onClick={startQuiz}>Bắt đầu kiểm tra <ChevronRight size={17}/></button></div>
       </>}
       {mode === "quiz" && question && <>
         <div className="eyebrow">CÂU {questionIndex + 1} / {questions.length}</div><div className="quizprogress"><i style={{ width: ((questionIndex + 1) / questions.length * 100) + "%" }}/></div>
