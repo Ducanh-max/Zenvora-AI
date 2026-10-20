@@ -1,3 +1,4 @@
+import AdminMemberships from "./admin-memberships";
 import Link from "next/link";
 import { Activity, ArrowLeft, BookOpen, GraduationCap, Layers3, ShieldCheck, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -70,12 +71,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <section id="users" className="admin-section">
-        <div className="admin-section-heading"><div><span className="admin-eyebrow">CỘNG ĐỒNG</span><h2>Người dùng gần đây</h2><p>Thông tin lấy từ bảng hồ sơ và thống kê học tập.</p></div></div>
-        <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Người dùng</th><th>Ngày tham gia</th><th>XP</th><th>Chuỗi ngày</th><th>Thời gian học</th></tr></thead><tbody>
-          {profiles.length ? profiles.map((profile) => { const s = statsByUser.get(profile.id) as { xp?: number; streak_days?: number; minutes_learned?: number } | undefined; return <tr key={profile.id}><td><b>{profile.display_name || "Chưa đặt tên"}</b><small>{profile.id.slice(0,8)}…</small></td><td>{new Date(profile.created_at).toLocaleDateString("vi-VN")}</td><td>{s?.xp ?? 0}</td><td>{s?.streak_days ?? 0} ngày</td><td>{s?.minutes_learned ?? 0} phút</td></tr>; }) : <tr><td colSpan={5} className="admin-empty">Chưa có hồ sơ người dùng.</td></tr>}
-        </tbody></table></div>
-      </section>
+      <section id="users" className="admin-section"><div className="admin-section-heading"><div><span className="admin-eyebrow">CỘNG ĐỒNG · GÓI HỌC</span><h2>Danh sách người dùng & tặng gói 🎁</h2><p>Tìm kiếm người dùng và cấp quyền sử dụng gói Explorer, Achiever hoặc Mastery.</p></div></div><AdminMemberships/></section>
 
       <section id="courses" className="admin-section">
         <div className="admin-section-heading"><div><span className="admin-eyebrow">NỘI DUNG HỌC TẬP</span><h2>Quản lý khóa học</h2><p>Thêm mới hoặc chỉnh sửa khóa học đang có trong cơ sở dữ liệu.</p></div></div>
