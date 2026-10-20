@@ -152,9 +152,19 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     </section>;
   }
 
-  return <section className="library-grid">{courses.map(course => {
+  const coursePictures = ["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
+  const courseNames = ["English Starter","Everyday English","English for Travel","Grammar in Action","Confident Conversations"];
+  const courseSummaries = ["Xây nền tảng từ vựng và câu giao tiếp hằng ngày.","Giao tiếp tự nhiên trong những tình huống quen thuộc hằng ngày.","Tự tin sử dụng tiếng Anh tại sân bay, khách sạn và khi khám phá địa điểm mới.","Hiểu và vận dụng ngữ pháp qua ví dụ, hội thoại và tình huống thực tế.","Diễn đạt ý kiến, cảm xúc và xử lý các cuộc trò chuyện dài hơn."];
+  return <section className="aunora-library-showcase">{courses.map((course,index) => {
     const courseLessonsForCard = lessons.filter(lesson => lesson.course_id === course.id);
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
-    return <article className="library-card library-course-card" key={course.id}><div className="library-card-top"><span>{course.is_free ? "KHÓA HỌC MIỄN PHÍ" : "ĐANG MỞ THỬ NGHIỆM"}</span><BookOpen size={18}/></div><h2>{course.title}</h2><p>{course.description}</p><div className="library-card-meta"><span>{course.level}</span><span>{courseLessonsForCard.length} bài học</span><span>{completeCount}/{courseLessonsForCard.length} hoàn thành</span></div><button className="btn nextbtn" onClick={() => setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={16}/></button></article>;
+    const feature = index < 3;
+    return <article className={`als-card als-card-${index} ${feature?"als-feature":"als-wide"}`} key={course.id}>
+      <div className="als-art"><img src={"/images/aunora/"+coursePictures[index%coursePictures.length]} alt={courseNames[index]||course.title}/>{index===0&&<span className="als-free">🌱 Miễn phí</span>}</div>
+      <div className="als-info"><div className="als-info-top"><h2>{courseNames[index]||course.title}</h2><span className="als-symbol">{["🌱","♧","✈","▤","☏"][index%5]}</span></div>
+      <p>{courseSummaries[index]||course.description}</p>
+      <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>
+      <button type="button" onClick={()=>setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={17}/></button></div>
+    </article>;
   })}</section>;
 }
