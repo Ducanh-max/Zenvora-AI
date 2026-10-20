@@ -519,31 +519,20 @@
 .aunora-dashboard .ah-dashboard-content{padding:26px 30px 0}
 @media(max-width:700px){.aunora-dashboard .ah-dashboard-content{padding:20px 13px 0}}
 
-/* User-supplied illustrated AUNORA sidebar reference */
-@media(min-width:701px){.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b430a,#071b4333),url("/brand/aunora-sidebar.png.png");background-position:center;background-size:cover;background-repeat:no-repeat}.aunora-dashboard .side-bottom{background:linear-gradient(180deg,#071b4350,#071b43bb);border-radius:12px}.aunora-dashboard .side-caption{color:#a7c5f8}}
-.ah-home-illustrated .ah-hero{background-color:#b7dcff}
-
-/* AUNORA original sidebar fantasy illustration */
-.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#091e4c22,#071d47aa),url("/images/aunora/aunora-sidebar.png.png")!important;background-position:center center!important;background-size:cover!important;background-repeat:no-repeat!important}
-.aunora-dashboard .side-bottom{background:linear-gradient(180deg,transparent,#091d48b8)!important}
-
-/* Actual uploaded sidebar filename includes double .png suffix */
-.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#091e4c22,#071d47aa),url("/images/aunora/aunora-sidebar.png.png")!important}
-
-/* Fix: uploaded sidebar artwork already contains baked-in menu labels.
-   Do not render it behind live navigation, which doubles all text/icons. */
-.aunora-dashboard .aunora-side{background-image:radial-gradient(ellipse at 95% 80%,#1b4f9d88,transparent 46%),linear-gradient(180deg,#0c2b63 0%,#0c2455 48%,#091b42 100%)!important;background-color:#0c2455!important}
-.aunora-dashboard .side-bottom{background:linear-gradient(180deg,#102b5cdd,#091c44f2)!important}
-.aunora-dashboard .side-nav{position:relative;z-index:1}
-
-/* AUNORA custom sidebar fantasy illustration */
-.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b49e8 0%,#0b2455da 53%,#0b2355a0 100%),url("/images/aunora/aunora-sidebar.png.png");background-position:center center;background-size:cover;background-repeat:no-repeat}
-
-/* AUNORA artwork integration — show only the scenic lower portion of the uploaded
-   sidebar screenshot; its upper half contains baked-in menu text. */
-@media(min-width:701px){
- .aunora-dashboard .aunora-side{background:#0a2355!important;isolation:isolate;overflow:hidden}
- .aunora-dashboard .aunora-side::before{content:"";position:absolute;pointer-events:none;z-index:-1;left:0;right:0;bottom:0;height:53%;background-image:linear-gradient(180deg,#0a2355 0%,#0a2355d9 12%,#0a23555e 58%,#071e48ad 100%),url("/images/aunora/aunora-sidebar.png.png");background-size:100% 100%,100% auto;background-position:center,center bottom;background-repeat:no-repeat}
- .aunora-dashboard .aunora-logo-lockup,.aunora-dashboard .side-caption,.aunora-dashboard .side-nav,.aunora-dashboard .side-bottom{position:relative;z-index:1}
- .aunora-dashboard .side-bottom{background:#09204f8c!important}
-}
+/* Sidebar fix: the uploaded sidebar PNG is a screenshot containing baked-in menu,
+   account and VI/EN labels. Using it as a background duplicates the live UI.
+   Draw a clean scenic-inspired background in CSS instead. */
+.aunora-dashboard .aunora-side{background:radial-gradient(ellipse at 88% 76%,#1c56a077,transparent 40%),linear-gradient(180deg,#0b2b63 0%,#0a2454 55%,#06183a 100%)!important;background-image:radial-gradient(ellipse at 88% 76%,#1c56a077,transparent 40%),linear-gradient(180deg,#0b2b63 0%,#0a2454 55%,#06183a 100%)!important;overflow:hidden;isolation:isolate;padding:20px 16px 12px;box-sizing:border-box}
+.aunora-dashboard .aunora-side::before{content:none!important}
+.aunora-dashboard .aunora-logo-lockup{padding-bottom:17px;flex-shrink:0}
+.aunora-dashboard .side-caption{margin-bottom:9px;flex-shrink:0}
+.aunora-dashboard .side-nav{display:flex;flex-direction:column;gap:4px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:#5274ac transparent;padding:0 3px 8px 0}
+.aunora-dashboard .side-nav a{min-height:44px;flex-shrink:0;padding:0 12px;position:relative;z-index:1}
+.aunora-dashboard .side-bottom{margin-top:8px;flex-shrink:0;background:#071c43a8!important;position:relative;z-index:2;border-radius:12px;padding:0 5px 5px}
+.aunora-dashboard .side-account{padding:9px 3px}
+.aunora-dashboard .side-language{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid #45639b;border-radius:11px;margin-top:4px;color:#b4ccf6;font-size:10px}
+.aunora-dashboard .side-language>span{flex:1;min-width:0}
+.aunora-dashboard .side-language>div{display:flex;gap:3px;flex-shrink:0}
+.aunora-dashboard .side-language button{min-width:36px;padding:8px 9px;font-size:11px}
+.aunora-dashboard .ah-dashboard-content{padding:26px 30px 0}
+@media(max-width:700px){.aunora-dashboard .ah-dashboard-content{padding:20px 13px 0}}
