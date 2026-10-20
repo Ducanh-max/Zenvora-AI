@@ -40,8 +40,8 @@ export default function CoursesPage() {
       <Link href="/learn" className="catalog-back"><ArrowLeft size={16}/>{vi ? "Về bảng điều khiển" : "Back to dashboard"}</Link>
       <div className="eyebrow"><Sparkles size={14}/>{vi ? "AUNORA · HỌC TẬP MIỄN PHÍ" : "AUNORA · FREE LEARNING"}</div>
       <h1>{vi ? <>Mở khóa tri thức, <em>không mất phí.</em></> : <>Unlock knowledge, <em>at no cost.</em></>}</h1>
-      <p className="plan-lead">{vi ? "Toàn bộ 5 khóa học và 500 bài học theo lộ trình đều miễn phí cho mọi người học." : "All five courses and the complete 500-lesson learning path are free for every learner."}</p>
-      <div className="library-summary"><b>{vi ? "5 khóa học · 500 bài học" : "5 courses · 500 lessons"}</b><span>{vi ? "Không cần đăng ký gói trả phí." : "No paid membership required."}</span></div>
+      <p className="plan-lead">{vi ? "Toàn bộ 5 khóa học và 117 bài học theo lộ trình đều miễn phí cho mọi người học." : "All five courses and the complete 117-lesson learning path are free for every learner."}</p>
+      <div className="library-summary"><b>{vi ? "5 khóa học · 117 bài học" : "5 courses · 117 lessons"}</b><span>{vi ? "Không cần đăng ký gói trả phí." : "No paid membership required."}</span></div>
       <div className="plan-grid">{courses.map(([number, title, description]) => <article className={"plan-card " + ["sprout","explorer","achiever","elite","sprout"][Number(number)-1]} key={number}>
         <div className="plan-card-top"><span>{vi ? "KHÓA HỌC MIỄN PHÍ" : "FREE COURSE"}</span><span>{number}</span></div>
         <div className="plan-icon"><BookOpen /></div><h2>{title}</h2><p className="plan-desc">{description}</p>
@@ -50,7 +50,7 @@ export default function CoursesPage() {
         <div className="plan-level">{vi ? "LỘ TRÌNH AUNORA" : "AUNORA LEARNING PATH"}<b>{vi ? "Mở cho tất cả" : "Open to everyone"}</b></div>
         <Link className="plan-cta" href={"/learn/library?course=" + ["english-starter","everyday-english","english-for-travel","grammar-in-action","confident-conversations"][Number(number)-1]}>{vi ? "Vào học miễn phí" : "Start learning free"} <ArrowRight size={16}/></Link>
       </article>)}</div>
-      <p className="plan-footnote">{vi ? "AUNORA cam kết giữ miễn phí toàn bộ 5 khóa học trong lộ trình 500 bài. Các tính năng AI có thể được mở rộng dần khi hệ thống hoàn thiện." : "AUNORA keeps all five courses in the 500-lesson path free. AI features may be expanded as the platform develops."}</p>
+      <p className="plan-footnote">{vi ? "AUNORA cam kết giữ miễn phí toàn bộ 5 khóa học trong lộ trình 117 bài. Các tính năng AI có thể được mở rộng dần khi hệ thống hoàn thiện." : "AUNORA keeps all five courses in the 117-lesson path free. AI features may be expanded as the platform develops."}</p>
     </section>
     <footer className="wrap footer"><span><b>AUNORA</b> · LEARN • GROW • GLOW</span><small>© 2026 AUNORA</small></footer>
   </main>;
