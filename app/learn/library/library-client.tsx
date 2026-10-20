@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import LessonTutor from "./lesson-tutor";
+import LessonPractice from "./lesson-practice";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
 
@@ -128,6 +129,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <button className="library-back" onClick={resetLesson}><ArrowLeft size={16}/> Tất cả bài học</button>
       {mode === "learn" && <>
         <div className="eyebrow">BÀI HỌC · {selected.sort_order}</div><h2>{selected.title}</h2><p>{selected.summary}</p>
+        <LessonPractice key={selected.id} lessonId={selected.id} title={selected.title} words={content.vocabulary||[]}/>
         <div style={{padding:"16px",margin:"16px 0",borderRadius:14,background:"#eaf3ff",color:"#153c78"}}><strong>🐉 AI Tutor Aivanta đồng hành cùng bạn</strong><p>Hỏi AI về 5 từ mới, luyện hội thoại và nhờ sửa câu tiếng Anh của bài này.</p><Link href={"/learn/tutor?lesson="+encodeURIComponent(selected.title)+"&words="+encodeURIComponent((content.vocabulary||[]).map(v=>v.word).join(", "))} style={{display:"inline-block",background:"#2468e8",color:"white",padding:"10px 15px",borderRadius:10,textDecoration:"none",fontWeight:700}}>💬 Luyện bài này với AI Tutor →</Link></div><h3>Từ vựng trọng tâm (5 từ)</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
         <h3>Ví dụ giao tiếp</h3><div className="library-examples">{(content.examples || []).map((item, index) => <article key={index}><b>{item.english}</b><span>{item.vietnamese}</span></article>)}</div>
         {content.grammar && <div style={{background:"#f1f6ff",borderRadius:14,padding:18,marginTop:20}}><h3>📘 Ngữ pháp ứng dụng</h3><b>{content.grammar.title}</b><p>{content.grammar.explanation}</p>{(content.grammar.examples||[]).map((e,i)=><p key={i}><strong>{e.english}</strong><br/>{e.vietnamese}</p>)}</div>}
