@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import LearningPath from "./learning-path";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound, Bell, Gamepad2, Compass, ClipboardCheck, Flame, Star, Target, ChevronDown } from "lucide-react";
@@ -84,20 +85,7 @@ export default function LearnPage(){
   <section className="aunora-dash-main">
    <header className="dash-topbar"><button className="dash-mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div className="dash-breadcrumb"><span>{t.journey}</span><b>{t.dashboard}</b></div><div className="dash-top-actions"><button className="dash-notification" aria-label="Notifications"><Bell size={20}/><i/></button><Link href="/learn/profile" className="dash-profile">{profile?.avatar?<img src={profile.avatar} alt=""/>:<span className="dash-avatar-fallback">{(profile?.name||"A").slice(0,1).toUpperCase()}</span>}<b>{profile?.name||t.account}</b><ChevronDown size={15}/></Link></div></header>
    <div className="dash-content">
-    <div className="dash-welcome"><div><span className="dash-eyebrow"><Sparkles size={14}/> AUNORA · LEARN • GROW • GLOW</span><h1>{t.hello} <span>👋</span></h1><p>{t.lead}</p></div><div className="dash-date-pill"><Star size={15}/> {t.encouragement}</div></div>
-    <section className="dash-hero">
-     <div className="dash-hero-copy"><span>{t.heroQuote}</span><h2>{lang==="vi"?"Mỗi bước nhỏ, một tương lai tự tin hơn.":"Every small step builds a brighter future."}</h2><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={16}/></Link></div>
-     <div className="aivanta-hero" aria-label="Aivanta, AI English tutor"><div className="aivanta-orbit orbit-one"/><div className="aivanta-orbit orbit-two"/><div className="aivanta-avatar aivanta-photo"><span className="aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div className="aivanta-bubble"><b>{t.tutorTitle}</b><span>{lang==="vi"?"Cùng học tiếng Anh nhé!":"Let's learn English together!"}</span><small>✦ Aivanta · AI Tutor</small></div><div className="aivanta-spark spark-a">✦</div><div className="aivanta-spark spark-b">✧</div></div>
-    </section>
-    <section className="dash-shortcuts">
-     <article className="shortcut-card shortcut-blue"><div className="shortcut-icon"><BookOpen/></div><h3>{t.courses}</h3><p>{t.coursesText}</p><Link href="/learn/library">{t.explore} <ArrowRight size={15}/></Link></article>
-     <article className="shortcut-card shortcut-mint"><div className="shortcut-icon"><Target/></div><h3>{t.practiceTitle}</h3><p>{t.practiceText}</p><Link href="/learn/library">{t.start} <ArrowRight size={15}/></Link></article>
-     <article className="shortcut-card shortcut-violet"><div className="shortcut-icon"><ClipboardCheck/></div><h3>{t.tests}</h3><p>{t.testsText}</p><Link href="/learn/library">{t.testNow} <ArrowRight size={15}/></Link></article>
-     <article className="shortcut-card shortcut-cyan"><div className="shortcut-icon"><MessageCircle/></div><h3>{t.chat}</h3><p>{t.chatText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={15}/></Link></article>
-    </section>
-    <div className="dash-lower-grid"><section className="dash-courses" id="courses"><div className="dash-section-heading"><div><span>{t.space}</span><h2>{t.yourCourses}</h2></div><Link href="/learn/library">{t.seeAll} <ArrowRight size={15}/></Link></div><div className="dash-course-grid">{courseNames.map((name,i)=><Link key={name} href={`/learn/library?course=${courseSlugs[i]}`} className={`dash-course-card course-tone-${i}`}><div className="dash-course-art"><span>{["A","Hi","✈","文","✦"][i]}</span><small>{courseLevels[i]}</small></div><div className="dash-course-info"><b>{name}</b><span>{courseLevels[i]} · {i===0?t.free:(lang==="vi"?"Khóa học":"Course")}</span></div><div className="dash-course-link">{t.enter} <ArrowRight size={14}/></div></Link>)}</div></section>
-     <aside className="dash-side-column"><section className="dash-aivanta-card"><div className="mini-aivanta"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><b>{t.tutorTitle}</b><p>{t.tutorText}</p><Link href="/learn/tutor">{t.chatNow} <ArrowRight size={14}/></Link></div></section><section className="dash-quote-card"><div className="quote-stars">✦ ✧ ✦</div><p>{t.quote}</p><small>— Aivanta</small></section></aside>
-    </div>
+    <LearningPath lang={lang}/>
     <section className="dash-memberships" id="memberships">
       <div className="dash-section-heading"><div><span>{lang==="vi"?"CHỌN GÓI HỌC PHÙ HỢP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Khám phá gói học phù hợp với bạn":"Find your ideal learning plan"}</h2></div></div>
       <p className="dash-memberships-intro">{lang==="vi"?"Xem đặc quyền của từng gói và chọn lộ trình phù hợp. Bảng giá và quyền lợi dự kiến theo từng gói. Thanh toán chưa mở.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
