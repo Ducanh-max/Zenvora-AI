@@ -6,7 +6,7 @@ import {createClient} from "@/lib/supabase/client";
 type Item={en:string;vi:string};
 const base:Item[]=[{en:"apple",vi:"quả táo"},{en:"school",vi:"trường học"},{en:"happy",vi:"vui vẻ"},{en:"water",vi:"nước"},{en:"friend",vi:"bạn bè"},{en:"book",vi:"quyển sách"},{en:"sun",vi:"mặt trời"},{en:"cat",vi:"con mèo"},{en:"dog",vi:"con chó"},{en:"house",vi:"ngôi nhà"},{en:"flower",vi:"bông hoa"},{en:"car",vi:"xe hơi"}];
 const pick=<T,>(a:T[]):T=>a[Math.floor(Math.random()*a.length)];
-const normalize=(s:string)=>s.trim().toLocaleLowerCase("vi-VN").normalize("NFC").replace(/\\s+/g," ");
+const normalize=(s:string)=>s.trim().toLocaleLowerCase("vi-VN").normalize("NFC").replace(/\s+/g," ");
 export default function VocabularyTranslation(){
  const [difficulty,setDifficulty]=useState<"easy"|"hard">("easy");
  const [seconds,setSeconds]=useState(20);
