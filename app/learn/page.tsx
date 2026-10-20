@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import LearningPath from "./learning-path";
+import HomeOverview from "./home-overview";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, LogOut, ArrowRight, Menu, Trophy, Sparkles, Languages, UserRound, Bell, Gamepad2, Compass, ClipboardCheck, Flame, Star, Target, ChevronDown } from "lucide-react";
@@ -77,18 +77,17 @@ export default function LearnPage(){
  return <main className="aunora-dashboard">
   <aside className={`aunora-side ${mobileOpen?"is-open":""}`}>
    <Link href="/learn" className="aunora-logo-lockup"><span className="aunora-logo-symbol"><img className="aunora-brand-logo" src="/brand/aunora-logo.webp.png" alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/><span className="brand-logo-fallback">A</span></span><span><b>AUNORA</b><small>HỌC TIẾNG ANH CÙNG AI</small></span></Link>
-   <div className="side-language"><Languages size={17}/><span>{t.language}</span><div><button className={lang==="vi"?"chosen":""} onClick={()=>changeLang("vi")}>VI</button><button className={lang==="en"?"chosen":""} onClick={()=>changeLang("en")}>EN</button></div></div>
    <div className="side-caption">{t.space}</div>
    <nav className="side-nav">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={item.active?"current":""}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<i>AI</i>}</Link>)}</nav>
    <div className="side-bottom"><div className="side-account"><Link href="/learn/profile" className="side-user-avatar">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:<UserRound size={19}/>}</Link><div><b>{profile?.name||t.account}</b><Link href="/learn/profile">{t.profile}</Link></div><button onClick={()=>setShowLogoutConfirm(true)} aria-label={t.logout} title={t.logout}><LogOut size={17}/></button></div>
-    
+    <div className="side-language"><Languages size={17}/><span>{t.language}</span><div><button className={lang==="vi"?"chosen":""} onClick={()=>changeLang("vi")}>VI</button><button className={lang==="en"?"chosen":""} onClick={()=>changeLang("en")}>EN</button></div></div>
    </div>
   </aside>
   <section className="aunora-dash-main">
    <header className="dash-topbar"><button className="dash-mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div className="dash-breadcrumb"><span>{t.journey}</span><b>{t.dashboard}</b></div><div className="dash-top-actions"><button className="dash-notification" aria-label="Notifications"><Bell size={20}/><i/></button><Link href="/learn/profile" className="dash-profile">{profile?.avatar?<img src={profile.avatar} alt=""/>:<span className="dash-avatar-fallback">{(profile?.name||"A").slice(0,1).toUpperCase()}</span>}<b>{profile?.name||t.account}</b><ChevronDown size={15}/></Link></div></header>
-   <div className="dash-content">
-    <LearningPath lang={lang}/>
-    <section className="dash-bottom-cta"><div className="cta-mascot"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><h2>{t.cta}</h2><p>{t.ctaText}</p></div><Link href="/learn/tutor">{t.begin} <ArrowRight size={16}/></Link></section>
+   <div className="dash-content ah-dashboard-content">
+    <HomeOverview lang={lang} name={profile?.name||""}/>
+    {false&&<section className="dash-bottom-cta"><div className="cta-mascot"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><h2>{t.cta}</h2><p>{t.ctaText}</p></div><Link href="/learn/tutor">{t.begin} <ArrowRight size={16}/></Link></section>}
    </div>
   </section>
   {showLogoutConfirm&&<div className="logout-modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogoutConfirm(false);}}><section className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-title"><div className="logout-modal-icon"><LogOut size={22}/></div><h2 id="logout-title">{t.confirmTitle}</h2><p>{t.confirmBody}</p><div className="logout-modal-actions"><button type="button" className="logout-cancel" onClick={()=>setShowLogoutConfirm(false)}>{t.cancel}</button><button type="button" className="logout-confirm" onClick={logout}>{t.confirm}</button></div></section></div>}
