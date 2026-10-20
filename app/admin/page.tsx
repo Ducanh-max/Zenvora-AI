@@ -1,6 +1,6 @@
 import AdminMemberships from "./admin-memberships";
 import Link from "next/link";
-import { Activity, ArrowLeft, BookOpen, GraduationCap, Layers3, ShieldCheck, Users } from "lucide-react";
+import { Activity, ArrowLeft, BookOpen, GraduationCap, Layers3, ShieldCheck, Users, Trophy } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { createCourse, createLesson, deleteCourse, deleteLesson, updateCourse, updateLesson } from "./actions";
@@ -56,6 +56,7 @@ export default async function AdminPage() {
       <a href="#users" className="admin-side-link"><Users size={17}/> Người dùng</a>
       <a href="#courses" className="admin-side-link"><BookOpen size={17}/> Khóa học</a>
       <a href="#lessons" className="admin-side-link"><GraduationCap size={17}/> Bài học</a>
+      <Link href="/admin/scores" className="admin-side-link"><Trophy size={17}/> Sửa điểm bảng xếp hạng</Link>
       <div className="admin-aivanta"><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta"/><p><b>Aivanta</b><br/>Trợ lý đồng hành cùng AUNORA</p></div><div className="admin-sidebar-bottom"><span className="admin-secure"><ShieldCheck size={15}/> Admin access</span><Link href="/learn"><ArrowLeft size={15}/> Về ứng dụng</Link></div>
     </aside>
     <div className="admin-content">
@@ -70,6 +71,8 @@ export default async function AdminPage() {
           <StatCard icon={Layers3} label="Lượt đăng ký" value={enrollmentCount.count ?? 0} note="Ghi danh khóa học"/>
         </div>
       </section>
+
+      <section className="admin-section"><div className="admin-section-heading"><div><span className="admin-eyebrow">TRÒ CHƠI · BẢNG XẾP HẠNG</span><h2>🏆 Quản lý điểm người chơi</h2><p>Chỉnh sửa điểm riêng cho từng người chơi, từng trò chơi và từng chế độ Dễ / Khó.</p></div><Link href="/admin/scores" className="admin-primary" style={{textDecoration:"none",display:"inline-flex",alignItems:"center",gap:8}}>Mở quản lý điểm →</Link></div></section>
 
       <section id="users" className="admin-section"><div className="admin-section-heading"><div><span className="admin-eyebrow">CỘNG ĐỒNG · GÓI HỌC</span><h2>Danh sách người dùng & tặng gói 🎁</h2><p>Tìm kiếm người dùng và cấp quyền sử dụng gói Explorer, Achiever hoặc Mastery.</p></div></div><AdminMemberships/></section>
 
