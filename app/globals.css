@@ -520,11 +520,11 @@
 @media(max-width:700px){.aunora-dashboard .ah-dashboard-content{padding:20px 13px 0}}
 
 /* User-supplied illustrated AUNORA sidebar reference */
-@media(min-width:701px){.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b430a,#071b4333),url("/brand/aunora-sidebar.png");background-position:center;background-size:cover;background-repeat:no-repeat}.aunora-dashboard .side-bottom{background:linear-gradient(180deg,#071b4350,#071b43bb);border-radius:12px}.aunora-dashboard .side-caption{color:#a7c5f8}}
+@media(min-width:701px){.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b430a,#071b4333),url("/brand/aunora-sidebar.png.png");background-position:center;background-size:cover;background-repeat:no-repeat}.aunora-dashboard .side-bottom{background:linear-gradient(180deg,#071b4350,#071b43bb);border-radius:12px}.aunora-dashboard .side-caption{color:#a7c5f8}}
 .ah-home-illustrated .ah-hero{background-color:#b7dcff}
 
 /* AUNORA original sidebar fantasy illustration */
-.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#091e4c22,#071d47aa),url("/images/aunora/aunora-sidebar.png")!important;background-position:center center!important;background-size:cover!important;background-repeat:no-repeat!important}
+.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#091e4c22,#071d47aa),url("/images/aunora/aunora-sidebar.png.png")!important;background-position:center center!important;background-size:cover!important;background-repeat:no-repeat!important}
 .aunora-dashboard .side-bottom{background:linear-gradient(180deg,transparent,#091d48b8)!important}
 
 /* Actual uploaded sidebar filename includes double .png suffix */
@@ -537,4 +537,4 @@
 .aunora-dashboard .side-nav{position:relative;z-index:1}
 
 /* AUNORA custom sidebar fantasy illustration */
-.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b49e8 0%,#0b2455da 53%,#0b2355a0 100%),url("/images/aunora/aunora-sidebar.png");background-position:center center;background-size:cover;background-repeat:no-repeat}
+.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#071b49e8 0%,#0b2455da 53%,#0b2355a0 100%),url("/images/aunora/aunora-sidebar.png.png");background-position:center center;background-size:cover;background-repeat:no-repeat}
