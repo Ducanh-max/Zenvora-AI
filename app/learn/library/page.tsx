@@ -7,7 +7,7 @@ import LibraryClient, { type LibraryLesson } from "./library-client";
 export const dynamic = "force-dynamic";
 
 const planLimits: Record<string, { name: string; lessonLimit: number; quizSize: number }> = {
-  starter: { name: "Aunora Sprout", lessonLimit: 500, quizSize: 15 },
+  starter: { name: "Aunora Sprout", lessonLimit: 117, quizSize: 15 },
   plus: { name: "Aunora Explorer", lessonLimit: 800, quizSize: 50 },
   pro: { name: "Aunora Achiever", lessonLimit: 1400, quizSize: 50 },
   elite: { name: "Aunora Mastery", lessonLimit: 2100, quizSize: 50 },
@@ -21,7 +21,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
 
   const [{ data: courses, error: coursesError }, { data: lessons, error: lessonsError }, { data: entitlement }] = await Promise.all([
     supabase.from("zenvora_courses").select("id,slug,title,level,description,is_free,sort_order").order("sort_order", { ascending: true }),
-    supabase.from("zenvora_lessons").select("id,course_id,slug,title,summary,content,sort_order").order("sort_order", { ascending: true }),
+    supabase.from("zenvora_lessons").select("id,course_id,slug,title,summary,content,sort_order").eq("is_published",true).order("sort_order", { ascending: true }),
     supabase.from("aunora_user_entitlements").select("plan_id,active_until").eq("user_id", user.id).maybeSingle(),
   ]);
 
@@ -42,7 +42,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH CỦA BẠN</div><img className="library-aivanta" src="/brand/aivanta-mascot.webp.png" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Chọn một khóa học phù hợp với mục tiêu của bạn. Mỗi khóa học đều có bài học, luyện tập, bài kiểm tra và AI Tutor đồng hành cùng bạn.</p>
-      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>1 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
+      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>5 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
       <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
