@@ -1,0 +1,28 @@
+"use client";
+import {useEffect,useMemo,useState} from "react";
+import {Volume2,CheckCircle2,ArrowRight} from "lucide-react";
+type Word={word:string;meaning:string;example:string};
+export default function LessonPractice({lessonId,title,words}:{lessonId:string;title:string;words:Word[]}){
+ const [index,setIndex]=useState(0);const [choice,setChoice]=useState<number|null>(null);const [checked,setChecked]=useState(false);const [correct,setCorrect]=useState(0);
+ const bank=useMemo(()=>words.filter(w=>w.word&&w.meaning).slice(0,5).map((w,i,all)=>{
+  const distractors=all.filter((_,j)=>j!==i).slice(0,3).map(x=>x.meaning);
+  const options=[w.meaning,...distractors];
+  const rotation=i%options.length;const shuffled=[...options.slice(rotation),...options.slice(0,rotation)];
+  return {word:w.word,example:w.example,options:shuffled,answer:shuffled.indexOf(w.meaning),meaning:w.meaning};
+ }),[words]);
+ useEffect(()=>{setIndex(0);setChoice(null);setChecked(false);setCorrect(0);},[lessonId]);
+ if(!bank.length)return null;
+ const current=bank[index];const finished=index>=bank.length;
+ function speak(value:string){if("speechSynthesis" in window){window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(value);u.lang="en-US";window.speechSynthesis.speak(u);}}
+ return <section style={{margin:"22px 0",borderRadius:22,padding:"clamp(18px,4vw,34px)",background:"white",border:"1px solid #dbe5fa",boxShadow:"0 12px 32px rgba(36,82,170,.09)",color:"#0b236b"}}>
+  <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}><div><span style={{fontWeight:800,color:"#2464db"}}>📖 BÀI HỌC TƯƠNG TÁC</span><h2 style={{margin:"6px 0",fontSize:"clamp(22px,3vw,30px)"}}>{title}</h2></div><span style={{fontWeight:750,color:"#5470a8"}}>📚 {Math.min(index+1,bank.length)} / {bank.length}</span></div>
+  <div style={{display:"flex",gap:5,margin:"20px 0 30px"}}>{bank.map((_,i)=><div key={i} style={{height:9,flex:1,borderRadius:9,background:i<index?"#21c45e":i===index?"#2167ff":"#e8eefb"}}/>)}</div>
+  {finished?<div style={{textAlign:"center",padding:"25px 10px"}}><span style={{fontSize:50}}>🎉</span><h2>Hoàn thành phần luyện tập!</h2><p>Bạn đã trả lời đúng {correct}/{bank.length} câu. Tiếp tục học từ vựng và trò chuyện với Aivanta ở bên dưới nhé.</p><button type="button" onClick={()=>{setIndex(0);setChoice(null);setChecked(false);setCorrect(0);}} style={{background:"#2167ff",color:"white",padding:"12px 22px",border:0,borderRadius:12,fontWeight:700,cursor:"pointer"}}>Luyện lại</button></div>:<>
+   <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:18}}><button type="button" onClick={()=>speak(current.word)} aria-label={"Nghe phát âm "+current.word} style={{width:64,height:64,border:0,borderRadius:"50%",background:"#2167ff",color:"white",display:"grid",placeItems:"center",cursor:"pointer"}}><Volume2 size={28}/></button><div><h3 style={{margin:0,fontSize:22}}>Nghe và chọn đáp án đúng</h3><p style={{margin:"5px 0",color:"#5d75ab"}}>Chọn nghĩa tiếng Việt phù hợp với từ bạn nghe được.</p></div></div>
+   <div style={{textAlign:"center",fontSize:"clamp(26px,4vw,38px)",fontWeight:850,margin:"28px 0 32px"}}>{current.word}</div>
+   <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,240px),1fr))",gap:14}}>{current.options.map((opt,i)=><button key={i} type="button" disabled={checked} onClick={()=>setChoice(i)} style={{textAlign:"left",minHeight:94,padding:18,borderRadius:17,border:"2px solid "+(checked&&i===current.answer?"#21bd68":choice===i?"#2167ff":"#e1e8f5"),background:checked&&i===current.answer?"#e9fff2":choice===i?"#edf4ff":"white",color:"#0b236b",fontSize:20,fontWeight:750,cursor:checked?"default":"pointer",display:"flex",alignItems:"center",gap:17}}><span style={{display:"grid",placeItems:"center",flexShrink:0,width:48,height:48,borderRadius:"50%",background:"#e9effc",color:"#1d5de0"}}>{String.fromCharCode(65+i)}</span>{opt}</button>)}</div>
+   {checked&&<p role="status" style={{padding:"14px 18px",borderRadius:12,background:choice===current.answer?"#e7faef":"#fff4e6",color:"#164e36",marginTop:22,fontWeight:700}}>{choice===current.answer?"✓ Chính xác!":"Đáp án đúng: "+current.meaning}{current.example?" · Ví dụ: "+current.example:""}</p>}
+   <div style={{display:"flex",justifyContent:"flex-end",marginTop:30}}><button type="button" disabled={choice===null} onClick={()=>{if(!checked){setChecked(true);if(choice===current.answer)setCorrect(v=>v+1);}else{setIndex(v=>v+1);setChoice(null);setChecked(false);}}} style={{background:choice===null?"#b5c7e8":"#2167ff",color:"white",padding:"15px 34px",minWidth:220,border:0,borderRadius:14,fontSize:19,fontWeight:800,cursor:choice===null?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>{checked?"Tiếp tục":"Kiểm tra"} {checked?<ArrowRight size={19}/>:<CheckCircle2 size={19}/>}</button></div>
+  </>}
+ </section>;
+}
