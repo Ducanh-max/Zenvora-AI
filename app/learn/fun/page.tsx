@@ -28,7 +28,8 @@ const games:{id:Mode;icon:string;vi:string;en:string;descVi:string;descEn:string
 ];
 const gameArt={quiz:Target,scramble:Languages,match:Link2,memory:Brain,truefalse:Zap,missing:Puzzle,sentence:NotebookPen,emoji:Palette,odd:Search};
 const gameTags={quiz:["ĐỐI KHÁNG","VERSUS"],scramble:["DỊCH TỪ","TRANSLATE"],match:["GHÉP ĐÔI","MATCH"],memory:["TRÍ NHỚ","MEMORY"],truefalse:["PHẢN XẠ","QUICK"],missing:["CHÍNH TẢ","SPELLING"],sentence:["NGỮ PHÁP","GRAMMAR"],emoji:["HÌNH ẢNH","VISUAL"],odd:["TƯ DUY","LOGIC"]};
-function normalizeAnswer(value:string){return value.trim().toLocaleLowerCase("vi-VN").normalize("NFC").replace(/\s+/g," ");}\nfunction shuffle<T,>(values:T[]):T[]{const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function normalizeAnswer(value:string){return value.trim().toLocaleLowerCase("vi-VN").normalize("NFC").replace(/\s+/g," ");}
+function shuffle<T,>(values:T[]):T[]{const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 type Card={id:string;value:string;pair:number};
 export default function FunPage(){
  const [lang,setLang]=useState<"vi"|"en">("vi");
