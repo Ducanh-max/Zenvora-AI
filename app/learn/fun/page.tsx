@@ -2,7 +2,7 @@
 import Link from "next/link";
 import {createClient} from "@/lib/supabase/client";
 import {useEffect,useState} from "react";
-import {ArrowLeft,RotateCcw,Trophy,Sparkles,Target,Blocks,Link2,Brain,Zap,Puzzle,NotebookPen,Palette,Search,ArrowUpRight,Play,Star} from "lucide-react";
+import {ArrowLeft,RotateCcw,Trophy,Sparkles,Target,Languages,Link2,Brain,Zap,Puzzle,NotebookPen,Palette,Search,ArrowUpRight,Play,Star} from "lucide-react";
 type Mode="menu"|"quiz"|"scramble"|"match"|"memory"|"truefalse"|"missing"|"sentence"|"emoji"|"odd";
 type Item={en:string;vi:string;emoji:string};
 const vocab:Item[]=[
@@ -17,7 +17,7 @@ const sentences=[{en:"I love English",vi:"Tôi yêu tiếng Anh"},{en:"She reads
 const oddSets=[{items:["apple","banana","orange","car"],answer:"car",reason:"car = xe hơi"},{items:["cat","dog","flower","bird"],answer:"flower",reason:"flower = hoa"},{items:["school","house","book","hospital"],answer:"book",reason:"book = sách"},{items:["red","blue","happy","green"],answer:"happy",reason:"happy = vui vẻ"},{items:["run","walk","jump","water"],answer:"water",reason:"water = nước"},{items:["sun","moon","star","friend"],answer:"friend",reason:"friend = bạn bè"}];
 const games:{id:Mode;icon:string;vi:string;en:string;descVi:string;descEn:string}[]=[
  {id:"quiz",icon:"🎯",vi:"Nối Từ – Đấu Aivanta",en:"Word Chain vs Aivanta",descVi:"Nối chữ cuối thành từ mới. 3 mạng, không lặp.",descEn:"Chain words by last letter. Three lives."},
- {id:"scramble",icon:"🔤",vi:"Giải mã từ bí mật",en:"Word Scramble",descVi:"Sắp xếp chữ cái thành từ.",descEn:"Unscramble the letters."},
+ {id:"scramble",icon:"🔤",vi:"Dịch từ vựng",en:"Vocabulary Translation",descVi:"Dịch Anh ↔ Việt để ôn tập từ vựng đã học.",descEn:"Translate English ↔ Vietnamese to review vocabulary."},
  {id:"match",icon:"🔗",vi:"Ghép cặp từ vựng",en:"Word Match",descVi:"Nối tiếng Anh với nghĩa tiếng Việt.",descEn:"Match words and meanings."},
  {id:"memory",icon:"🧠",vi:"Lật thẻ trí nhớ",en:"Memory Flip",descVi:"Tìm các cặp từ giống nhau.",descEn:"Find matching pairs."},
  {id:"truefalse",icon:"⚡",vi:"Đúng hay Sai",en:"True or False",descVi:"Phán đoán nghĩa từ thật nhanh.",descEn:"Judge each word meaning."},
@@ -26,9 +26,9 @@ const games:{id:Mode;icon:string;vi:string;en:string;descVi:string;descEn:string
  {id:"emoji",icon:"🎨",vi:"Đoán từ qua Emoji",en:"Emoji Guess",descVi:"Nhìn hình đoán từ tiếng Anh.",descEn:"Guess words from emojis."},
  {id:"odd",icon:"🔍",vi:"Tìm từ khác biệt",en:"Odd One Out",descVi:"Chọn từ không cùng nhóm.",descEn:"Find the word that doesn't belong."}
 ];
-const gameArt={quiz:Target,scramble:Blocks,match:Link2,memory:Brain,truefalse:Zap,missing:Puzzle,sentence:NotebookPen,emoji:Palette,odd:Search};
-const gameTags={quiz:["ĐỐI KHÁNG","VERSUS"],scramble:["TỪ VỰNG","VOCAB"],match:["GHÉP ĐÔI","MATCH"],memory:["TRÍ NHỚ","MEMORY"],truefalse:["PHẢN XẠ","QUICK"],missing:["CHÍNH TẢ","SPELLING"],sentence:["NGỮ PHÁP","GRAMMAR"],emoji:["HÌNH ẢNH","VISUAL"],odd:["TƯ DUY","LOGIC"]};
-function shuffle<T,>(values:T[]):T[]{const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const gameArt={quiz:Target,scramble:Languages,match:Link2,memory:Brain,truefalse:Zap,missing:Puzzle,sentence:NotebookPen,emoji:Palette,odd:Search};
+const gameTags={quiz:["ĐỐI KHÁNG","VERSUS"],scramble:["DỊCH TỪ","TRANSLATE"],match:["GHÉP ĐÔI","MATCH"],memory:["TRÍ NHỚ","MEMORY"],truefalse:["PHẢN XẠ","QUICK"],missing:["CHÍNH TẢ","SPELLING"],sentence:["NGỮ PHÁP","GRAMMAR"],emoji:["HÌNH ẢNH","VISUAL"],odd:["TƯ DUY","LOGIC"]};
+function normalizeAnswer(value:string){return value.trim().toLocaleLowerCase("vi-VN").normalize("NFC").replace(/\s+/g," ");}\nfunction shuffle<T,>(values:T[]):T[]{const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 type Card={id:string;value:string;pair:number};
 export default function FunPage(){
  const [lang,setLang]=useState<"vi"|"en">("vi");
@@ -73,7 +73,7 @@ export default function FunPage(){
  function start(nextMode:Mode){const newPool=shuffle(bank);setPool(newPool);setMode(nextMode);setRound(0);setScore(0);setLives(3);setSaveMessage("");if(nextMode==="match"||nextMode==="memory"){buildPairs(newPool,nextMode);}resetRound(0,newPool,nextMode);}
  function next(){const r=round+1;setRound(r);if((mode==="match"||mode==="memory")){buildPairs(shuffle(bank),mode);}else if(r>=pool.length){const reshuffled=shuffle(bank);setPool(reshuffled);resetRound(0,reshuffled,mode);setRound(0);}else{resetRound(r,pool,mode);}}
  function answer(value:string,correct:string){if(selected!==null)return;setSelected(value);if(value===correct)setScore(n=>n+1);else loseLife();}
- function submit(){if(checked||!input.trim())return;setChecked(true);if(input.trim().toLowerCase()===item?.en)setScore(n=>n+1);else loseLife();}
+ function submit(){if(checked||!input.trim())return;setChecked(true);if(normalizeAnswer(input)===(mode==="scramble"&&round%2===1?normalizeAnswer(item?.vi||""):normalizeAnswer(item?.en||"")))setScore(n=>n+1);else loseLife();}
  function matchCard(card:Card){
   if(matched.includes(card.pair)||flipped.length>=2)return;
   if(mode==="match"){
@@ -91,7 +91,7 @@ export default function FunPage(){
   function selectToken(id:number){if(checked||chosenTokens.includes(id))return;setChosenTokens(x=>[...x,id]);}
  function checkSentence(){if(checked||chosenTokens.length!==tokens.length)return;setChecked(true);const phrase=chosenTokens.map(id=>tokens.find(t=>t.id===id)?.word).join(" ");if(phrase===sentence.en)setScore(s=>s+1);else loseLife();}
  const correct=mode==="odd"?odd?.answer:mode==="sentence"?sentence?.en:mode==="truefalse"?(round%2===0?"true":"false"):item?.en;
- const success=mode==="sentence"?chosenTokens.map(id=>tokens.find(t=>t.id===id)?.word).join(" ")===sentence?.en:mode==="truefalse"?selected===correct:mode==="missing"||mode==="scramble"?input.trim().toLowerCase()===item?.en:selected===correct;
+ const success=mode==="sentence"?chosenTokens.map(id=>tokens.find(t=>t.id===id)?.word).join(" ")===sentence?.en:mode==="truefalse"?selected===correct:mode==="missing"||mode==="scramble"?normalizeAnswer(input)===(mode==="scramble"&&round%2===1?normalizeAnswer(item?.vi||""):normalizeAnswer(item?.en||"") ):selected===correct;
  return <main className="funzone"><div className="funzone-shell">
  <header className="funzone-top"><Link href="/learn"><ArrowLeft size={17}/>{vi?"Về trang học tập":"Back to learning"}</Link><b>🐺 AUNORA FUN ZONE</b></header>
  <section className="funzone-hero"><div><span><Sparkles size={15}/> {vi?"GIẢI TRÍ • HỌC TIẾNG ANH":"FUN • LEARN ENGLISH"}</span><h1>{vi?"Thế giới trò chơi Aivanta":"Aivanta's Game World"}</h1><p>{vi?"9 trò chơi nhỏ để thư giãn, rèn trí nhớ và học tiếng Anh mỗi ngày.":"9 mini-games to relax, train your memory and learn English."}</p></div><div className="funzone-mascot"><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta – AI Tutor của AUNORA"/></div></section>
@@ -103,14 +103,14 @@ export default function FunPage(){
  {(mode==="match"||mode==="memory")?<><h2 className="funzone-prompt">{vi?(mode==="match"?"Ghép từ với nghĩa tương ứng":"Lật hai thẻ giống nhau"):(mode==="match"?"Match each word to its meaning":"Flip two matching cards")}</h2><div className={mode==="match"?"funzone-pairs":"funzone-memory"}>{cards.map(card=>{const done=matched.includes(card.pair);const active=mode==="match"&&pairPick?.pair===card.pair&&pairPick.side===(card.id.startsWith("a")?"en":"vi");const shown=mode==="match"||done||flipped.includes(card.id);return <button key={card.id} className={`${done?"done":""} ${active?"active":""}`} disabled={done} onClick={()=>matchCard(card)}>{shown?card.value:"❔"}</button>;})}</div>{matched.length===6&&<button className="funzone-submit" onClick={next}>{vi?"Vòng tiếp theo":"Next round"} →</button>}</>:
  <>
  <div className="funzone-prompt"><small>{vi?"CÂU":"QUESTION"} {round+1}</small>
- <h2>{mode==="quiz"?`“${item?.vi}”`:mode==="emoji"?`${item?.emoji} — ${vi?"Đây là gì?":"What is this?"}`:mode==="scramble"?`${vi?"Giải mã":"Unscramble"}: ${item?.vi}`:mode==="missing"?`${vi?"Điền chữ còn thiếu":"Fill the missing letter"}: ${item?.vi}`:mode==="truefalse"?`“${item?.en}” = “${choices[0]}” ?`:mode==="sentence"?`${vi?"Xếp câu":"Build sentence"}: ${sentence?.vi}`:vi?"Từ nào khác nhóm?":"Which word is different?"}</h2>
- {mode==="scramble"&&<div className="funzone-letters">{item?.en.split("").reverse().join(" · ")}</div>}
+ <h2>{mode==="quiz"?`“${item?.vi}”`:mode==="emoji"?`${item?.emoji} — ${vi?"Đây là gì?":"What is this?"}`:mode==="scramble"?(round%2===0?`${vi?"Dịch sang tiếng Anh":"Translate into English"}: ${item?.vi}`:`${vi?"Dịch sang tiếng Việt":"Translate into Vietnamese"}: ${item?.en}`):mode==="missing"?`${vi?"Điền chữ còn thiếu":"Fill the missing letter"}: ${item?.vi}`:mode==="truefalse"?`“${item?.en}” = “${choices[0]}” ?`:mode==="sentence"?`${vi?"Xếp câu":"Build sentence"}: ${sentence?.vi}`:vi?"Từ nào khác nhóm?":"Which word is different?"}</h2>
+ {mode==="scramble"&&<p className="funzone-translate-hint">{vi?"Ôn tập hai chiều: Anh → Việt và Việt → Anh.":"Practice both directions: English → Vietnamese and Vietnamese → English."}</p>}
  {mode==="missing"&&<div className="funzone-letters">{item?.en.replace(/./g,(c,i)=>i===Math.floor(item.en.length/2)?"_":c).toUpperCase()}</div>}
  </div>
  {(mode==="quiz"||mode==="emoji"||mode==="odd"||mode==="truefalse")?<div className="funzone-options">{(mode==="truefalse"?["true","false"]:choices).map(opt=><button key={opt} disabled={selected!==null} className={selected!==null?(opt===correct?"correct":opt===selected?"wrong":""):""} onClick={()=>answer(opt,correct||"")}>{mode==="truefalse"?(opt==="true"?(vi?"✓ Đúng":"✓ True"):(vi?"✕ Sai":"✕ False")):opt}</button>)}</div>:null}
- {(mode==="scramble"||mode==="missing")?<div className="funzone-input"><label htmlFor="fun-answer">{vi?"Nhập từ tiếng Anh":"Type the English word"}</label><input id="fun-answer" value={input} disabled={checked} maxLength={30} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submit();}} placeholder={vi?"Đáp án...":"Answer..."}/>{!checked&&<button disabled={!input.trim()} onClick={submit}>{vi?"Kiểm tra":"Check"}</button>}</div>:null}
+ {(mode==="scramble"||mode==="missing")?<div className="funzone-input"><label htmlFor="fun-answer">{mode==="scramble"&&round%2===1?(vi?"Nhập nghĩa tiếng Việt":"Type the Vietnamese meaning"):(vi?"Nhập từ tiếng Anh":"Type the English word")}</label><input id="fun-answer" value={input} disabled={checked} maxLength={30} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")submit();}} placeholder={vi?"Đáp án...":"Answer..."}/>{!checked&&<button disabled={!input.trim()} onClick={submit}>{vi?"Kiểm tra":"Check"}</button>}</div>:null}
  {mode==="sentence"?<div className="funzone-sentence"><div className="funzone-selected">{chosenTokens.map(id=><button key={id} disabled={checked} onClick={()=>setChosenTokens(x=>x.filter(v=>v!==id))}>{tokens.find(t=>t.id===id)?.word} ×</button>)}</div><div className="funzone-tokens">{tokens.filter(t=>!chosenTokens.includes(t.id)).map(t=><button key={t.id} onClick={()=>selectToken(t.id)}>{t.word}</button>)}</div>{!checked&&<button className="funzone-submit" disabled={chosenTokens.length!==tokens.length} onClick={checkSentence}>{vi?"Kiểm tra câu":"Check sentence"}</button>}</div>:null}
- {(selected!==null||checked)&&<div className="funzone-feedback"><strong>{success?(vi?"🎉 Chính xác!":"🎉 Correct!"):(vi?"💡 Học thêm một chút nhé!":"💡 Keep learning!")}</strong><p>{vi?"Đáp án đúng":"Correct answer"}: <b>{mode==="sentence"?sentence?.en:mode==="truefalse"?(correct==="true"?(vi?"Đúng":"True"):(vi?"Sai":"False")):mode==="odd"?`${odd?.answer} (${odd?.reason})`:item?.en}</b>{mode!=="sentence"&&mode!=="truefalse"&&mode!=="odd"?` — ${item?.vi}`:""}</p><button onClick={next}>{lives===0?(vi?"Xem kết quả":"See results"):(vi?"Tiếp theo":"Next")} →</button></div>}
+ {(selected!==null||checked)&&<div className="funzone-feedback"><strong>{success?(vi?"🎉 Chính xác!":"🎉 Correct!"):(vi?"💡 Học thêm một chút nhé!":"💡 Keep learning!")}</strong><p>{vi?"Đáp án đúng":"Correct answer"}: <b>{mode==="sentence"?sentence?.en:mode==="scramble"&&round%2===1?item?.vi:mode==="truefalse"?(correct==="true"?(vi?"Đúng":"True"):(vi?"Sai":"False")):mode==="odd"?`${odd?.answer} (${odd?.reason})`:item?.en}</b>{mode!=="sentence"&&mode!=="truefalse"&&mode!=="odd"&&mode!=="scramble"?` — ${item?.vi}`:""}</p><button onClick={next}>{lives===0?(vi?"Xem kết quả":"See results"):(vi?"Tiếp theo":"Next")} →</button></div>}
  </>}
  </>}
  </section>}
