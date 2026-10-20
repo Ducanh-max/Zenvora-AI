@@ -536,3 +536,58 @@
 .aunora-dashboard .side-language button{min-width:36px;padding:8px 9px;font-size:11px}
 .aunora-dashboard .ah-dashboard-content{padding:26px 30px 0}
 @media(max-width:700px){.aunora-dashboard .ah-dashboard-content{padding:20px 13px 0}}
+
+/* AUNORA membership detail refresh */
+.aunora-plan-page{min-height:100vh;background:linear-gradient(120deg,#eaf5ffed,#f8fbffef 65%,#e6edffdd),url('/images/aunora/aunora-castle-background.png.png') center/cover fixed;color:#173766}
+.aunora-plan-wrap{max-width:1220px;margin:auto;padding:28px 24px 60px}
+.aunora-plan-nav{display:flex;justify-content:space-between;gap:15px;margin-bottom:20px}
+.aunora-plan-nav a{color:#236ee7;text-decoration:none;font-weight:800;background:#ffffffdc;border:1px solid #d7e6ff;border-radius:12px;padding:11px 15px}
+.aunora-plan-hero{position:relative;display:grid;grid-template-columns:1.1fr .9fr;min-height:385px;overflow:hidden;border:1px solid #cde0ff;border-radius:28px;background:linear-gradient(110deg,#ffffffed 0%,#f0f8ffdc 47%,#7ab5f49e 100%);box-shadow:0 18px 45px #225aa21e}
+.aunora-plan-hero:before{content:"";position:absolute;inset:0;background:url('/images/aunora/aunora-castle-background.png.png') center 38%/cover;opacity:.19;pointer-events:none}
+.aunora-plan-hero-copy{position:relative;z-index:2;padding:35px 38px}
+.aunora-plan-eyebrow{font-size:11px;font-weight:900;letter-spacing:1.5px;color:#266bd6}
+.aunora-plan-emblem{font-size:38px;color:#276ff1;margin:12px 0}
+.aunora-plan-pill{display:inline-block;background:#e3f0ff;border:1px solid #c5dfff;color:#2671de;border-radius:30px;padding:7px 12px;font-size:11px;font-weight:900}
+.aunora-plan-hero h1{font-size:clamp(33px,4.4vw,55px);letter-spacing:-1.7px;margin:10px 0;color:#103877;line-height:1.12}
+.aunora-plan-subtitle{font-size:16px;color:#5374a0}
+.aunora-plan-price{font-size:30px;font-weight:900;color:#1758c8;margin:14px 0}
+.aunora-plan-price span{font-size:14px;color:#7291b6;font-weight:600}
+.aunora-plan-availability{font-size:13px;color:#3f699e;font-weight:700}
+.aunora-plan-primary{display:inline-flex;align-items:center;gap:14px;background:linear-gradient(100deg,#2168ed,#5598ff);color:white;text-decoration:none;padding:13px 22px;border-radius:13px;font-weight:900;margin-top:10px;box-shadow:0 7px 18px #2767ce36}
+.aunora-plan-disabled{background:#dce7f4;color:#57718e;box-shadow:none}
+.aunora-plan-hero-art{position:relative;display:flex;align-items:center;justify-content:center;min-height:360px;overflow:hidden}
+.aunora-plan-mascot-art{position:relative;z-index:2;width:90%;height:330px;object-fit:cover;border-radius:23px;box-shadow:0 20px 36px #0b3f8d42;transform:rotate(3deg)}
+.aunora-plan-orbit{position:absolute;width:330px;height:330px;border:2px solid #ffffff7d;border-radius:50%;transform:rotate(-25deg)}
+.aunora-plan-orbit.orbit-two{width:420px;height:420px}
+.aunora-plan-art-label{position:absolute;bottom:30px;left:6%;z-index:3;background:#ffffffed;border-radius:13px;padding:10px 16px;font-weight:900;box-shadow:0 5px 18px #2e57903b;color:#2367d6}
+.aunora-plan-art-label small{font-size:10px;letter-spacing:2px}
+.aunora-plan-spark{position:absolute;color:#fff;font-size:35px;z-index:3}
+.aunora-plan-spark.spark-one{top:10%;right:8%}.aunora-plan-spark.spark-two{bottom:15%;right:5%}
+.aunora-plan-highlights{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:19px 0 35px}
+.aunora-plan-highlights>div{display:flex;align-items:center;gap:9px;padding:16px;background:#ffffffec;border:1px solid #dceaff;border-radius:15px;font-size:12px;font-weight:800;box-shadow:0 4px 12px #2b6ab510}
+.aunora-plan-highlights svg{flex-shrink:0;color:#2779ed}
+.aunora-plan-benefits,.aunora-plan-fit{margin:32px 0}
+.aunora-plan-section-title>span{font-size:12px;color:#2675e9;font-weight:900;letter-spacing:2px}
+.aunora-plan-section-title h2{font-size:clamp(24px,3vw,34px);color:#123875;margin:7px 0}
+.aunora-plan-section-title p{color:#6e85a8;font-size:14px}
+.aunora-plan-benefit-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:22px}
+.aunora-plan-benefit{background:#fff;border:1px solid #dbe7fa;border-radius:18px;padding:22px;box-shadow:0 8px 22px #3067ad10}
+.aunora-plan-benefit-icon{width:52px;height:52px;display:grid;place-items:center;background:#e8f3ff;border-radius:15px;font-size:27px;margin-bottom:16px}
+.aunora-plan-benefit span,.aunora-plan-fit-card>span{color:#3984e8;font-size:10px;letter-spacing:1px;font-weight:900}
+.aunora-plan-benefit h3{font-size:17px;margin:8px 0;color:#15396e}
+.aunora-plan-fit-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-top:20px}
+.aunora-plan-fit-card{background:#fff;border:1px solid #dbe7fa;border-radius:20px;padding:25px}
+.aunora-plan-fit-icon{font-size:30px;color:#2776ea}
+.aunora-plan-fit-card h3{font-size:21px;margin:9px 0;color:#143c79}
+.aunora-plan-fit-card p,.aunora-plan-fit-card li{color:#667fa2;line-height:1.65;font-size:14px}
+.aunora-plan-fit-card ul{padding-left:19px}
+.aunora-plan-fit-reason{margin-top:16px;background:#e5f2ff;border:1px solid #c9e0ff;border-radius:17px;padding:18px 23px}
+.aunora-plan-fit-reason strong{color:#1659c6}
+.aunora-plan-fit-reason p,.aunora-plan-fit-disclaimer{font-size:13px;line-height:1.6;color:#617c9e}
+.aunora-plan-journey{position:relative;display:flex;justify-content:space-between;align-items:center;gap:20px;overflow:hidden;background:linear-gradient(100deg,#16439d,#2278e5);color:white;border-radius:24px;padding:25px 34px;min-height:220px}
+.aunora-plan-journey>div{z-index:1;max-width:600px}.aunora-plan-journey span{font-size:11px;letter-spacing:2px;font-weight:900;color:#bcd8ff}.aunora-plan-journey h2{font-size:28px;margin:10px 0}.aunora-plan-journey p{color:#d6e9ff;font-size:14px;line-height:1.5}.aunora-plan-journey a{display:inline-flex;align-items:center;gap:7px;background:white;color:#175bd2;padding:11px 16px;border-radius:12px;text-decoration:none;font-weight:900;font-size:13px}
+.aunora-plan-journey img{height:190px;width:270px;object-fit:cover;border-radius:20px;transform:rotate(5deg);box-shadow:0 9px 30px #052b694d}
+.aunora-plan-notice{display:flex;align-items:flex-start;gap:12px;padding:15px 20px;margin-top:20px;background:#ffffffd9;border:1px solid #d6e4f6;border-radius:14px;color:#617b9e;font-size:12px}
+.aunora-plan-footer{display:flex;justify-content:space-between;gap:12px;margin-top:22px}.aunora-plan-footer a{color:#216bdc;font-weight:800;text-decoration:none;font-size:13px}
+@media(max-width:900px){.aunora-plan-highlights,.aunora-plan-benefit-grid{grid-template-columns:repeat(2,1fr)}.aunora-plan-hero-copy{padding:25px}.aunora-plan-mascot-art{height:260px}}
+@media(max-width:600px){.aunora-plan-wrap{padding:16px 12px 35px}.aunora-plan-hero{grid-template-columns:1fr}.aunora-plan-hero-art{min-height:230px}.aunora-plan-mascot-art{height:205px;width:80%}.aunora-plan-highlights,.aunora-plan-benefit-grid,.aunora-plan-fit-grid{grid-template-columns:1fr}.aunora-plan-journey{padding:22px}.aunora-plan-journey img{display:none}.aunora-plan-nav a{font-size:11px;padding:9px}.aunora-plan-footer{flex-direction:column}}
