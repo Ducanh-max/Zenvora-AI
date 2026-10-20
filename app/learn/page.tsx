@@ -8,7 +8,7 @@ import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, Log
 type Lang = "vi" | "en";
 const copy = {
  vi: {
-  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển", entertainment:"Giải trí",
+  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển", entertainment:"Giải trí", plans:"Gói đăng ký",
   space:"KHÔNG GIAN HỌC TẬP", journey:"HÀNH TRÌNH CỦA BẠN", dashboard:"Bảng điều khiển",
   hello:"Chào mừng trở lại!", lead:"Cùng AUNORA và AI Tutor, chinh phục tiếng Anh mỗi ngày!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"Mình là Aivanta!", tutorText:"Gia sư AI đồng hành cùng bạn trên hành trình học tiếng Anh. Cùng bắt đầu nhé!",
@@ -23,7 +23,7 @@ const copy = {
   account:"Tài khoản", language:"Ngôn ngữ", menu:"Mở menu", courseDescriptions:["Nền tảng tiếng Anh cho người mới bắt đầu.","Giao tiếp tự nhiên trong các tình huống hằng ngày.","Tiếng Anh thực tế khi đi du lịch.","Nắm vững ngữ pháp qua ví dụ và bài tập.","Tự tin trò chuyện và bày tỏ ý kiến."]
  },
  en: {
-  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary", entertainment:"Fun Zone",
+  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary", entertainment:"Fun Zone", plans:"Membership plans",
   space:"YOUR LEARNING SPACE", journey:"YOUR JOURNEY", dashboard:"Learning dashboard",
   hello:"Welcome back!", lead:"Learn English every day with AUNORA and your AI Tutor!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"I'm Aivanta!", tutorText:"Your AI tutor and learning companion. Let's make your English journey brighter!",
@@ -48,7 +48,8 @@ const menuItems=[
  {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
  {key:"speaking" as const,href:"/learn/tutor",icon:Mic2},
  {key:"dictionary" as const,href:"/learn/library",icon:BookText},
- {key:"entertainment" as const,href:"/learn/fun",icon:Gamepad2}
+ {key:"entertainment" as const,href:"/learn/fun",icon:Gamepad2},
+ {key:"plans" as const,href:"/learn/plans",icon:Star}
 ];
 export default function LearnPage(){
  const [profile,setProfile]=useState<{name:string;email:string;avatar:string}|null>(null);
@@ -86,31 +87,6 @@ export default function LearnPage(){
    <header className="dash-topbar"><button className="dash-mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div className="dash-breadcrumb"><span>{t.journey}</span><b>{t.dashboard}</b></div><div className="dash-top-actions"><button className="dash-notification" aria-label="Notifications"><Bell size={20}/><i/></button><Link href="/learn/profile" className="dash-profile">{profile?.avatar?<img src={profile.avatar} alt=""/>:<span className="dash-avatar-fallback">{(profile?.name||"A").slice(0,1).toUpperCase()}</span>}<b>{profile?.name||t.account}</b><ChevronDown size={15}/></Link></div></header>
    <div className="dash-content">
     <LearningPath lang={lang}/>
-    <section className="dash-memberships" id="memberships">
-      <div className="dash-section-heading"><div><span>{lang==="vi"?"CHỌN GÓI HỌC PHÙ HỢP":"LEARNING OPTIONS"}</span><h2>{lang==="vi"?"Khám phá gói học phù hợp với bạn":"Find your ideal learning plan"}</h2></div></div>
-      <p className="dash-memberships-intro">{lang==="vi"?"Xem đặc quyền của từng gói và chọn lộ trình phù hợp. Bảng giá và quyền lợi dự kiến theo từng gói. Thanh toán chưa mở.":"Explore our learning plans. All five courses remain free to access; upgrades are not yet available."}</p>
-      <a className="dash-benefits-all" href="/learn/plans">{lang==="vi"?"Xem tất cả đặc quyền":"View all benefits"} <ArrowRight size={16}/></a>
-      <div className="dash-membership-grid" id="plan-benefits">
-       {[
-        {name:"Aunora Sprout",slug:"free",icon:"✦",vi:"Bắt đầu hành trình",en:"Start learning",featured:false,price:"Miễn phí",lessons:"500",quiz:"15",tutor:"10",energy:"40"},
-        {name:"Aunora Explorer",slug:"starter",icon:"♧",vi:"Khám phá kiến thức",en:"Explore more",featured:false,price:"49.000đ",lessons:"800",quiz:"50",tutor:"30",energy:"100"},
-        {name:"Aunora Achiever",slug:"pro",icon:"♛",vi:"Chinh phục mục tiêu",en:"Reach your goals",featured:true,price:"99.000đ",lessons:"1.400",quiz:"50",tutor:"60",energy:"∞"},
-        {name:"Aunora Mastery",slug:"premium",icon:"◆",vi:"Làm chủ tiếng Anh",en:"Master English",featured:false,price:"149.000đ",lessons:"2.100",quiz:"50",tutor:"∞",energy:"∞"}
-       ].map(plan=><article className={`dash-membership-card ${plan.featured?"featured":""}`} key={plan.name}>
-        <span className="dash-membership-icon">{plan.icon}</span>
-        <h3>{plan.name}</h3><p>{lang==="vi"?plan.vi:plan.en}</p>
-        <ul className="dash-plan-feature-list">
-         <li><span>✓</span>{lang==="vi"?"Số bài học: ":"Lessons: "}{plan.lessons}</li>
-         <li><span>✓</span>{lang==="vi"?"Kiểm tra: ":"Quiz: "}{plan.quiz} {lang==="vi"?"câu/bài":"questions/lesson"}</li>
-         <li><span>✓</span>AI Tutor: {plan.tutor==="∞"?(lang==="vi"?"Không giới hạn":"Unlimited"):plan.tutor+" "+(lang==="vi"?"lượt":"uses")}</li>
-         <li><span>✓</span>{lang==="vi"?"Năng lượng Sói: ":"Wolf Energy: "}{plan.energy==="∞"?(lang==="vi"?"Không giới hạn":"Unlimited"):plan.energy}</li>
-        </ul>
-        <strong>{plan.price}{plan.slug==="free"?"":"/"+(lang==="vi"?"tháng":"month")}</strong>
-        {plan.slug==="free"?<Link href="/learn/library">{lang==="vi"?"Vào học":"Start learning"} <ArrowRight size={15}/></Link>:<span className="dash-membership-unavailable">{lang==="vi"?"Chưa mở đăng ký":"Not available yet"}</span>}
-        <Link className="dash-plan-link" href={`/learn/plans/${plan.slug}`}>{lang==="vi"?"Xem đặc quyền gói":"View plan benefits"} <ArrowRight size={15}/></Link>
-       </article>)}
-      </div>
-    </section>
     <section className="dash-bottom-cta"><div className="cta-mascot"><span className="mini-aivanta-fallback">🐺</span><img src="/brand/aivanta-mascot.webp.png" alt="" onLoad={(event)=>{const fallback=event.currentTarget.previousElementSibling as HTMLElement|null;if(fallback)fallback.style.display="none";}} onError={(event)=>{event.currentTarget.style.display="none";}}/></div><div><h2>{t.cta}</h2><p>{t.ctaText}</p></div><Link href="/learn/tutor">{t.begin} <ArrowRight size={16}/></Link></section>
    </div>
   </section>
