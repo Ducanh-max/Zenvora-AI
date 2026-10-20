@@ -13,7 +13,7 @@ export default function LearningPath({lang}:{lang:"vi"|"en"}){
  const [courseIndex,setCourseIndex]=useState(0);
  const [loading,setLoading]=useState(true);
  const vi=lang==="vi";
- useEffect(()=>{let alive=true;void(async()=>{const db=createClient();const [{data:c},{data:l},{data:{user}}]=await Promise.all([db.from("zenvora_courses").select("id,slug,title,sort_order").order("sort_order"),db.from("zenvora_lessons").select("id,course_id,title,sort_order").order("sort_order"),db.auth.getUser()]);let p:Progress[]=[];if(user){const {data}=await db.from("aunora_lesson_progress").select("lesson_id,completed,score,total_questions").eq("user_id",user.id);p=(data||[]) as Progress[];}if(alive){setCourses((c||[]) as Course[]);setLessons((l||[]) as Lesson[]);setProgress(p);setLoading(false);}})();return()=>{alive=false};},[]);
+ useEffect(()=>{let alive=true;void(async()=>{const db=createClient();const [{data:c},{data:l},{data:{user}}]=await Promise.all([db.from("zenvora_courses").select("id,slug,title,sort_order").order("sort_order"),db.from("zenvora_lessons").select("id,course_id,title,sort_order").eq("is_published",true).order("sort_order"),db.auth.getUser()]);let p:Progress[]=[];if(user){const {data}=await db.from("aunora_lesson_progress").select("lesson_id,completed,score,total_questions").eq("user_id",user.id);p=(data||[]) as Progress[];}if(alive){setCourses((c||[]) as Course[]);setLessons((l||[]) as Lesson[]);setProgress(p);setLoading(false);}})();return()=>{alive=false};},[]);
  const course=courses[courseIndex];
  const currentLessons=useMemo(()=>lessons.filter(l=>l.course_id===course?.id),[lessons,course?.id]);
  const done=new Set(progress.filter(p=>p.completed).map(p=>p.lesson_id));
