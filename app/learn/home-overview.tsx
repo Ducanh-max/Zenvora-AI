@@ -9,6 +9,7 @@ type Progress={lesson_id:string;completed:boolean};
 const names=["English Starter","Daily Life","Travel English","Study & Work","Advanced English"];
 const descriptions={vi:["Bắt đầu hành trình với những kiến thức cơ bản","Giao tiếp trong cuộc sống hằng ngày","Du lịch và khám phá thế giới","Học tập và công việc","Nâng cao toàn diện"],en:["Build your English foundation","Everyday communication","Travel and explore the world","English for school and work","Take your English to the next level"]};
 const tones=["blue","orange","sky","indigo","purple"];
+const courseImages=["coursesenglish-starter.png","coursesdaily-life.png","coursestravel-english.png","coursesstudy-work.png","coursesadvanced-english.png"];
 const courseImages=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"].map(file=>"/images/aunora/"+file);
 export default function HomeOverview({lang,name}:{lang:"vi"|"en";name:string}){
  const vi=lang==="vi";const [courses,setCourses]=useState<Course[]>([]),[lessons,setLessons]=useState<Lesson[]>([]),[progress,setProgress]=useState<Progress[]>([]),[query,setQuery]=useState("");
