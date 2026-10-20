@@ -54,6 +54,7 @@ const menuItems=[
 export default function LearnPage(){
  const [profile,setProfile]=useState<{name:string;email:string;avatar:string}|null>(null);
  const [mobileOpen,setMobileOpen]=useState(false);
+ const [isAdmin,setIsAdmin]=useState(false);
  const [lang,setLang]=useState<Lang>("vi");
  const [showLogoutConfirm,setShowLogoutConfirm]=useState(false);
  useEffect(()=>{
@@ -63,6 +64,7 @@ export default function LearnPage(){
     const supabase=createClient();
     const {data:{user}}=await supabase.auth.getUser();
     if(!user){window.location.href="/login";return;}
+    if(active)setIsAdmin(user.app_metadata?.role==="admin");
     const {data}=await supabase.from("profiles").select("display_name,avatar_url").eq("id",user.id).maybeSingle();
     if(active)setProfile({name:data?.display_name||user.user_metadata?.display_name||user.email?.split("@")[0]||"",email:user.email||"",avatar:data?.avatar_url||user.user_metadata?.avatar_url||""});
    }catch{if(active)setProfile({name:"",email:"",avatar:""});}
@@ -78,7 +80,7 @@ export default function LearnPage(){
   <aside className={`aunora-side ${mobileOpen?"is-open":""}`}>
    <Link href="/learn" className="aunora-logo-lockup"><span className="aunora-logo-symbol"><img className="aunora-brand-logo" src="/brand/aunora-logo.webp.png" alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/><span className="brand-logo-fallback">A</span></span><span><b>AUNORA</b><small>HỌC TIẾNG ANH CÙNG AI</small></span></Link>
    <div className="side-caption">{t.space}</div>
-   <nav className="side-nav">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={item.active?"current":""}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<i>AI</i>}</Link>)}</nav>
+   <nav className="side-nav">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={item.active?"current":""}><item.icon size={19}/><span>{t[item.key]}</span>{item.ai&&<i>AI</i>}</Link>)}{isAdmin&&<Link href="/admin/scores" onClick={()=>setMobileOpen(false)}><Trophy size={19}/><span>{lang==="vi"?"Quản lý điểm":"Manage scores"}</span></Link>}</nav>
    <div className="side-bottom"><div className="side-account"><Link href="/learn/profile" className="side-user-avatar">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:<UserRound size={19}/>}</Link><div><b>{profile?.name||t.account}</b><Link href="/learn/profile">{t.profile}</Link></div><button onClick={()=>setShowLogoutConfirm(true)} aria-label={t.logout} title={t.logout}><LogOut size={17}/></button></div>
     <div className="side-language"><Languages size={17}/><span>{t.language}</span><div><button className={lang==="vi"?"chosen":""} onClick={()=>changeLang("vi")}>VI</button><button className={lang==="en"?"chosen":""} onClick={()=>changeLang("en")}>EN</button></div></div>
    </div>
