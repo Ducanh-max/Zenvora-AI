@@ -7,7 +7,7 @@ import LibraryClient, { type LibraryLesson } from "./library-client";
 export const dynamic = "force-dynamic";
 
 const planLimits: Record<string, { name: string; lessonLimit: number; quizSize: number }> = {
-  starter: { name: "Aunora Sprout", lessonLimit: 117, quizSize: 15 },
+  starter: { name: "Aunora Sprout", lessonLimit: 200, quizSize: 15 },
   plus: { name: "Aunora Explorer", lessonLimit: 800, quizSize: 50 },
   pro: { name: "Aunora Achiever", lessonLimit: 1400, quizSize: 50 },
   elite: { name: "Aunora Mastery", lessonLimit: 2100, quizSize: 50 },
