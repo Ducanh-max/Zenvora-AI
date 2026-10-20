@@ -591,3 +591,7 @@
 .aunora-plan-footer{display:flex;justify-content:space-between;gap:12px;margin-top:22px}.aunora-plan-footer a{color:#216bdc;font-weight:800;text-decoration:none;font-size:13px}
 @media(max-width:900px){.aunora-plan-highlights,.aunora-plan-benefit-grid{grid-template-columns:repeat(2,1fr)}.aunora-plan-hero-copy{padding:25px}.aunora-plan-mascot-art{height:260px}}
 @media(max-width:600px){.aunora-plan-wrap{padding:16px 12px 35px}.aunora-plan-hero{grid-template-columns:1fr}.aunora-plan-hero-art{min-height:230px}.aunora-plan-mascot-art{height:205px;width:80%}.aunora-plan-highlights,.aunora-plan-benefit-grid,.aunora-plan-fit-grid{grid-template-columns:1fr}.aunora-plan-journey{padding:22px}.aunora-plan-journey img{display:none}.aunora-plan-nav a{font-size:11px;padding:9px}.aunora-plan-footer{flex-direction:column}}
+
+/* Illustrated AUNORA navigation: use uploaded fantasy scenery under a dark blue overlay. */
+.aunora-dashboard .aunora-side{background-image:linear-gradient(180deg,#061c49f2 0%,#092a66e9 50%,#071d49b8 100%),url('/images/aunora/aunora-castle-background.png.png')!important;background-size:cover!important;background-position:54% center!important}
+.aunora-dashboard .aunora-side::before{content:none!important}
