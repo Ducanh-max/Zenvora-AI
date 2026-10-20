@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
 
@@ -126,7 +127,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <button className="library-back" onClick={resetLesson}><ArrowLeft size={16}/> Tất cả bài học</button>
       {mode === "learn" && <>
         <div className="eyebrow">BÀI HỌC · {selected.sort_order}</div><h2>{selected.title}</h2><p>{selected.summary}</p>
-        <h3>Từ vựng trọng tâm</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
+        <div style={{padding:"16px",margin:"16px 0",borderRadius:14,background:"#eaf3ff",color:"#153c78"}}><strong>🐉 AI Tutor Aivanta đồng hành cùng bạn</strong><p>Hỏi AI về 5 từ mới, luyện hội thoại và nhờ sửa câu tiếng Anh của bài này.</p><Link href={"/learn/tutor?lesson="+encodeURIComponent(selected.title)+"&words="+encodeURIComponent((content.vocabulary||[]).map(v=>v.word).join(", "))} style={{display:"inline-block",background:"#2468e8",color:"white",padding:"10px 15px",borderRadius:10,textDecoration:"none",fontWeight:700}}>💬 Luyện bài này với AI Tutor →</Link></div><h3>Từ vựng trọng tâm (5 từ)</h3><div className="library-vocab">{(content.vocabulary || []).map(item => <article key={item.word}><div><b>{item.word}</b><button aria-label={`Nghe phát âm ${item.word}`} onClick={() => { if ("speechSynthesis" in window) { const speech = new SpeechSynthesisUtterance(item.word); speech.lang = "en-US"; window.speechSynthesis.speak(speech); } }}><Volume2 size={15}/></button></div><span>{item.pronunciation || ""}</span><p>{item.meaning}</p><small>{item.example}</small></article>)}</div>
         <h3>Ví dụ giao tiếp</h3><div className="library-examples">{(content.examples || []).map((item, index) => <article key={index}><b>{item.english}</b><span>{item.vietnamese}</span></article>)}</div>
         <div className="library-quiz-intro"><b>Bài kiểm tra nhỏ · {Math.min(quizSize, availableQuestionCount)} câu</b><span>{availableQuestionCount ? "Trả lời từng câu để xem giải thích và tổng kết kết quả." : "Bài học này đang được biên tập câu hỏi. Vui lòng quay lại sau."}</span><button className="btn nextbtn" onClick={startQuiz} disabled={availableQuestionCount === 0}>{isEnglish ? "Start quiz" : "Bắt đầu kiểm tra"} <ChevronRight size={17}/></button>{nextLesson && <button className="btn nextbtn" onClick={goToNextLesson}>{isEnglish ? "Next" : "Tiếp theo"} <ChevronRight size={17}/></button>}</div>
       </>}
