@@ -25,8 +25,8 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
     supabase.from("aunora_user_entitlements").select("plan_id,active_until").eq("user_id", user.id).maybeSingle(),
   ]);
 
-  let planId = "starter";
-  if (entitlement?.active_until && new Date(entitlement.active_until).getTime() < Date.now()) planId = "starter";
+  let planId = user.app_metadata?.role === "admin" ? "elite" : (entitlement?.plan_id || "starter");
+  if (user.app_metadata?.role !== "admin" && entitlement?.active_until && new Date(entitlement.active_until).getTime() < Date.now()) planId = "starter";
   const plan = planLimits[planId] || planLimits.starter;
   const { data: progress } = await supabase.from("aunora_lesson_progress")
     .select("lesson_id,completed,score,total_questions")
@@ -45,7 +45,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>1 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
-      <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={15} initialCourseSlug={params?.course} />}
+      <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
     <p className="library-footnote">Chọn khóa học phù hợp với mục tiêu của bạn và bắt đầu hành trình học tiếng Anh.</p>
   
 <style>{`
