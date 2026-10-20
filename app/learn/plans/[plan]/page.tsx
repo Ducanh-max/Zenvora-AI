@@ -1,3 +1,4 @@
+import {BookOpen,Bot,Sparkles,ShieldCheck,ArrowRight,CheckCircle2,GraduationCap,Star,Clock3} from "lucide-react";
 import Link from "next/link";
 import {notFound} from "next/navigation";
 const plans={
@@ -16,6 +17,7 @@ export function generateStaticParams(){return Object.keys(plans).map(plan=>({pla
 export default async function PlanDetail({params}:{params:Promise<{plan:string}>}){
  const {plan}=await params;const info=plans[plan as keyof typeof plans];if(!info)notFound();
  const stats=info.features;const audience=audiences[plan as keyof typeof audiences];
+ const artwork="/images/aunora/"+({free:"coursesenglish-starter.png.png",starter:"coursestravel-english.png.png",pro:"coursesstudy-work.png.png",premium:"coursesadvanced-english.png.png"} as Record<string,string>)[plan];
  return <main className={`aunora-plan-page aunora-plan-${plan}`}>
   <div className="aunora-plan-wrap">
    <nav className="aunora-plan-nav"><Link href="/learn">← Trang học tập</Link><Link href="/learn/plans">So sánh các gói →</Link></nav>
@@ -29,10 +31,12 @@ export default async function PlanDetail({params}:{params:Promise<{plan:string}>
      <p className="aunora-plan-availability">{plan==="free"?"✓ Có thể bắt đầu ngay":"✧ Chưa mở đăng ký — xem trước đặc quyền"}</p>
      {plan==="free"?<Link className="aunora-plan-primary" href="/learn/library">Bắt đầu học ngay <span>↗</span></Link>:<span className="aunora-plan-primary aunora-plan-disabled">Sắp ra mắt <span>✦</span></span>}
     </div>
-    <div className="aunora-plan-hero-art" aria-hidden="true"><div className="aunora-plan-orbit orbit-one"/><div className="aunora-plan-orbit orbit-two"/><div className="aunora-plan-art-symbol">{info.symbol}</div><div className="aunora-plan-art-label">AUNORA<br/><small>{info.name.replace("Aunora ","").toUpperCase()}</small></div><span className="aunora-plan-spark spark-one">✧</span><span className="aunora-plan-spark spark-two">✦</span></div>
+    <div className="aunora-plan-hero-art" aria-hidden="true"><div className="aunora-plan-orbit orbit-one"/><div className="aunora-plan-orbit orbit-two"/><img className="aunora-plan-mascot-art" src={artwork} alt=""/><div className="aunora-plan-art-label">AUNORA<br/><small>{info.name.replace("Aunora ","").toUpperCase()}</small></div><span className="aunora-plan-spark spark-one">✧</span><span className="aunora-plan-spark spark-two">✦</span></div>
    </section>
-   <section className="aunora-plan-benefits"><div className="aunora-plan-section-title"><span>ĐẶC QUYỀN CỦA BẠN</span><h2>Học tập theo cách của bạn</h2><p>Những quyền lợi được thiết kế cho hành trình chinh phục tiếng Anh.</p></div><div className="aunora-plan-benefit-grid">{stats.map((feature,index)=><article className="aunora-plan-benefit" key={feature}><div className="aunora-plan-benefit-icon">{["▤","✓","✧","⚡"][index]}</div><div><span>QUYỀN LỢI {String(index+1).padStart(2,"0")}</span><h3>{feature}</h3></div></article>)}</div></section>
+   <div className="aunora-plan-highlights"><div><BookOpen size={21}/><span>Học theo lộ trình</span></div><div><Bot size={21}/><span>Đồng hành cùng AI</span></div><div><Sparkles size={21}/><span>Khám phá kỹ năng mới</span></div><div><ShieldCheck size={21}/><span>Thông tin minh bạch</span></div></div>
+   <section className="aunora-plan-benefits"><div className="aunora-plan-section-title"><span>ĐẶC QUYỀN CỦA BẠN</span><h2>Học tập theo cách của bạn</h2><p>Những quyền lợi được thiết kế cho hành trình chinh phục tiếng Anh.</p></div><div className="aunora-plan-benefit-grid">{stats.map((feature,index)=><article className="aunora-plan-benefit" key={feature}><div className="aunora-plan-benefit-icon">{["📚","🎯","✨","⚡"][index]}</div><div><span>QUYỀN LỢI {String(index+1).padStart(2,"0")}</span><h3>{feature}</h3></div></article>)}</div></section>
    <section className="aunora-plan-fit"><div className="aunora-plan-section-title"><span>CHỌN ĐÚNG LỘ TRÌNH</span><h2>Gói này phù hợp với ai?</h2><p>Gợi ý theo trình độ và nhu cầu học tập để bạn dễ lựa chọn.</p></div><div className="aunora-plan-fit-grid"><article className="aunora-plan-fit-card"><div className="aunora-plan-fit-icon">◎</div><span>TRÌNH ĐỘ GỢI Ý</span><h3>{audience.level}</h3><p>{audience.who}</p></article><article className="aunora-plan-fit-card"><div className="aunora-plan-fit-icon">✧</div><span>NHU CẦU PHÙ HỢP</span><h3>Mục tiêu học tập</h3><ul>{audience.needs.map(need=><li key={need}>✓ {need}</li>)}</ul></article></div><div className="aunora-plan-fit-reason"><strong>🐺 Vì sao Aivanta gợi ý gói này?</strong><p>{audience.why}</p></div><p className="aunora-plan-fit-disclaimer">Trình độ CEFR chỉ mang tính gợi ý để lựa chọn gói, không phải yêu cầu bắt buộc hay chứng nhận năng lực.</p></section>
+   <section className="aunora-plan-journey"><div><span>✦ AUNORA JOURNEY</span><h2>Mỗi ngày một bước tiến cùng Aivanta</h2><p>Bắt đầu từ những bài học nhỏ, luyện tập đều đặn và theo dõi sự tiến bộ của chính bạn.</p><Link href="/learn/library">Khám phá bài học <ArrowRight size={17}/></Link></div><img src="/images/aunora/coursesenglish-starter.png.png" alt="Aivanta học tiếng Anh"/></section>
    <div className="aunora-plan-notice"><span>ⓘ</span><p>{info.note}</p></div>
    <div className="aunora-plan-footer"><Link href="/learn/plans">← Khám phá các gói khác</Link><Link href="/learn">Về trang học tập →</Link></div>
   </div>
