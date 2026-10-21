@@ -14,3 +14,13 @@
 .ex-tasks>a{flex-shrink:0}
 .ex-tasks{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#a8c4f1 transparent}
 @media(max-width:780px){.ex-sidebar nav a{padding:12px 0}}
+
+
+.ex-brand-mark{width:43px;height:43px;display:grid;place-items:center;flex-shrink:0}
+.ex-brand-mark img{display:block;width:43px;height:43px;object-fit:contain}
+.ex-lang{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:7px 9px;font-size:11px}
+.ex-lang>span{white-space:nowrap}
+.ex-lang-buttons{display:flex;gap:3px;align-items:center;margin-left:auto}
+.ex-lang-buttons button{background:transparent;border:0;color:#d8e7ff;border-radius:6px;padding:8px 9px;font-weight:800;cursor:pointer}
+.ex-lang-buttons button.selected{background:white;color:#103778;box-shadow:0 2px 8px #0002}
+@media(max-width:780px){.ex-brand-mark{width:40px}.ex-brand-mark img{width:40px;height:40px}}
