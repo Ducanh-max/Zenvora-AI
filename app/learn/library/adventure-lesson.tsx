@@ -71,7 +71,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
    if(!canCheck)return;
    setChecked(true);
    if(correct){setRight(n=>n+1);playSuccessSound();}
-   else if(activity.type!=="match"&&activity.type!=="chat"&&!reviewMode){setReviewQueue(prev=>prev.includes(activityIndex)?prev:[...prev,activityIndex]);}
+   else if(activity.type!=="match"&&!reviewMode){setReviewQueue(prev=>prev.includes(activityIndex)?prev:[...prev,activityIndex]);}
    return;
   }
   advance();
