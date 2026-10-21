@@ -68,6 +68,11 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return () => window.removeEventListener("storage", readLanguage);
   }, []);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
+  const [enteringLesson, setEnteringLesson] = useState<LibraryLesson | null>(null);
+  function openLesson(lesson: LibraryLesson) {
+    setEnteringLesson(lesson);
+    window.setTimeout(() => { setSelected(lesson); setMode("learn"); setEnteringLesson(null); }, 550);
+  }
   const [mode, setMode] = useState<"learn" | "quiz" | "result">("learn");
   const [questionIndex, setQuestionIndex] = useState(0);
   const [choice, setChoice] = useState<number | null>(null);
@@ -126,6 +131,9 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   }
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
+  if (enteringLesson) {
+    return <section className="aunora-loading" aria-live="polite" aria-busy="true"><div className="aunora-loading-card" role="status"><img className="aunora-loading-wolf" src="/brand/aivanta-mascot.webp.png" alt=""/><h1 className="aunora-loading-title">Aivanta đang chuẩn bị bài học...</h1><p className="aunora-loading-desc">Sẵn sàng khám phá: {enteringLesson.title} 🐺</p><div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar"/></div></div></section>;
+  }
   if (selected && (selected.content.vocabulary || []).length >= 3) {
     return <AdventureLesson lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,goal:selected.content.lesson_goal}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug,score:correct,totalQuestions:total})});if(!response.ok)throw new Error("Không thể lưu tiến độ");setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);resetLesson();}finally{setSaving(false);}}}/>;
   }
@@ -165,7 +173,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với sự đồng hành của Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>
       <div className="acd-grid">{courseLessons.map((lesson,index)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
         <div><span className="acd-card-label">BÀI {String(index+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
-        <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>{setSelected(lesson);setMode("learn");}}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
+        <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
       </article>)}</div>
     </section>;
   }
