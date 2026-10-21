@@ -13,7 +13,7 @@ export default function MatchPairs({words,onChange,locked}:{words:Word[];onChang
  const rightRefs=useRef<(HTMLButtonElement|null)[]>([]);
  const [lines,setLines]=useState<{x1:number;y1:number;x2:number;y2:number;correct:boolean}[]>([]);
  const [size,setSize]=useState({width:0,height:0});
- useEffect(()=>{setSelected(null);setConnections([]);setMessage("");onChange(false,false);},[words]);
+ useEffect(()=>{setSelected(null);setConnections([]);setMessage("");onChange(false,false);},[words.map(w=>w.word+"|"+w.meaning).join("~")]);
  useLayoutEffect(()=>{
   const update=()=>{const rect=board.current?.getBoundingClientRect();if(!rect)return;setSize({width:rect.width,height:rect.height});setLines(connections.flatMap(p=>{const l=leftRefs.current[p.left]?.getBoundingClientRect(),r=rightRefs.current[p.right]?.getBoundingClientRect();return l&&r?[{x1:l.right-rect.left,y1:l.top+l.height/2-rect.top,x2:r.left-rect.left,y2:r.top+r.height/2-rect.top,correct:p.correct}]:[];}));};
   update();const obs=new ResizeObserver(update);if(board.current)obs.observe(board.current);window.addEventListener("resize",update);return()=>{obs.disconnect();window.removeEventListener("resize",update);};
