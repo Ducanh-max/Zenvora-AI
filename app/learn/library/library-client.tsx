@@ -126,7 +126,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   }
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
-  if (selected && selectedCourseSlug === "english-starter" && currentLessonIndex === 0) {
+  if (selected && (selected.content.vocabulary || []).length >= 3) {
     return <AdventureLesson lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,goal:selected.content.lesson_goal}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug,score:correct,totalQuestions:total})});if(!response.ok)throw new Error("Không thể lưu tiến độ");setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);resetLesson();}finally{setSaving(false);}}}/>;
   }
   if (selected) {
