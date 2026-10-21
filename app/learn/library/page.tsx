@@ -63,6 +63,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
 .als-page .library-heading .library-aivanta{position:absolute!important;right:10%;bottom:-30px;height:315px;width:315px;object-fit:contain;z-index:0;filter:drop-shadow(0 12px 25px #051a4e88)}
 .als-page .library-summary{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:20px;max-width:760px;margin-top:22px;padding:16px 19px;border:1px solid #75b6ff63;background:#072956a8;border-radius:15px;color:#dceaff;font-size:12px}
 .als-page .library-summary b,.als-page .library-summary span{color:#fff!important}
+.als-page .library-courses-title{max-width:1380px;margin:20px auto 14px;padding:10px 16px;border-radius:12px;background:#0b285dc9;color:#ffffff!important;font-size:21px;font-weight:900;letter-spacing:.2px;text-shadow:0 1px 3px #061b46;display:block;width:fit-content;box-shadow:0 4px 16px #061b4633}
 .aunora-library-showcase{max-width:1380px;margin:0 auto;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;position:relative;z-index:1}
 .als-card{overflow:hidden;position:relative;border:2px solid #8aabf7;border-radius:21px;background:linear-gradient(160deg,#fff,#dbe7ff 78%,#b4c6ff);box-shadow:0 12px 25px #0006;color:#102a61;min-width:0}
 .als-feature{grid-column:span 2}.als-wide{grid-column:span 3;display:grid;grid-template-columns:50% 50%;min-height:188px}
