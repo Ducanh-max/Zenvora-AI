@@ -7,6 +7,31 @@ type Dialogue={speaker:string;english:string;vietnamese?:string};
 type Activity={type:"intro"|"choice"|"listen"|"fill"|"order"|"match"|"speak"|"chat"|"read";word?:Word;question:string;answer:string;options?:string[];sentence?:string};
 const wolf="/brand/aivanta-mascot.webp.png";
 function say(t:string){if(typeof window!=="undefined"&&"speechSynthesis"in window){window.speechSynthesis.cancel();const s=new SpeechSynthesisUtterance(t);s.lang="en-US";s.rate=.85;window.speechSynthesis.speak(s);}}
+function playSuccessSound(){
+ if(typeof window==="undefined")return;
+ try{
+  const AudioContextClass=window.AudioContext;
+  if(!AudioContextClass)return;
+  const ctx=new AudioContextClass();
+  if(ctx.state==="suspended")void ctx.resume();
+  const notes=[659.25,783.99,1046.5];
+  notes.forEach((frequency,index)=>{
+   const oscillator=ctx.createOscillator();
+   const gain=ctx.createGain();
+   const start=ctx.currentTime+index*0.11;
+   oscillator.type="sine";
+   oscillator.frequency.setValueAtTime(frequency,start);
+   gain.gain.setValueAtTime(0.0001,start);
+   gain.gain.exponentialRampToValueAtTime(0.13,start+0.015);
+   gain.gain.exponentialRampToValueAtTime(0.0001,start+0.24);
+   oscillator.connect(gain);
+   gain.connect(ctx.destination);
+   oscillator.start(start);
+   oscillator.stop(start+0.25);
+  });
+  window.setTimeout(()=>{void ctx.close().catch(()=>{});},1100);
+ }catch{/* Audio is optional when the browser blocks playback. */}
+}
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
 export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
@@ -32,13 +57,13 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  const correct=activity?.type==="order"?norm(tokens.join(" "))===norm(activity.answer):activity?.type==="speak"?norm(recognized)===norm(activity.answer):activity?.type==="match"?matched.length>=8:norm(selected)===norm(activity?.answer||"");
  const easy=activity?.type==="intro"||activity?.type==="chat";
  const canCheck=easy||activity?.type==="match"?activity?.type==="match"?matched.length===8:true:activity?.type==="order"?tokens.length===orderWords.length:activity?.type==="speak"?!!recognized:!!selected;
- function next(){if(!activity)return;if(!checked){if(!canCheck)return;setChecked(true);if(correct||easy)setRight(n=>n+1);return;}setStep(n=>n+1);setSelected("");setChecked(false);setHint(false);setMatched([]);setFirst("");setTokens([]);setRecognized("");setError("");}
+ function next(){if(!activity)return;if(activity.type==="intro"){setStep(n=>n+1);setChecked(false);setHint(false);return;}if(!checked){if(!canCheck)return;setChecked(true);if(correct||easy){setRight(n=>n+1);if(!easy)playSuccessSound();}return;}setStep(n=>n+1);setSelected("");setChecked(false);setHint(false);setMatched([]);setFirst("");setTokens([]);setRecognized("");setError("");}
  function listen(){const SpeechRecognition=(window as unknown as {SpeechRecognition?:new()=>any;webkitSpeechRecognition?:new()=>any}).SpeechRecognition||(window as unknown as {webkitSpeechRecognition?:new()=>any}).webkitSpeechRecognition;if(!SpeechRecognition){setError("Trình duyệt chưa hỗ trợ nhận diện giọng nói. Bạn có thể nhập câu vào ô bên dưới.");return;}try{const r=new SpeechRecognition();r.lang="en-US";r.interimResults=false;r.onresult=(e:{results:{[key:number]:{[key:number]:{transcript:string}}}})=>{setRecognized(e.results[0][0].transcript);setListening(false);};r.onerror=()=>{setListening(false);setError("Không nhận diện được giọng nói. Hãy thử lại hoặc nhập câu.");};r.onend=()=>setListening(false);setListening(true);r.start();}catch{setListening(false);setError("Không thể mở micro.");}}
  const matchItems=activity?.type==="match"?[...lesson.words.slice(0,4).map(w=>w.word),...lesson.words.slice(0,4).map(w=>w.meaning).reverse()]:[];
  function chooseMatch(value:string){if(matched.includes(value)||checked)return;if(!first){setFirst(value);return;}const pair=lesson.words.slice(0,4).find(w=>(w.word===first&&w.meaning===value)||(w.meaning===first&&w.word===value));if(pair)setMatched(prev=>[...prev,first,value]);setFirst("");}
  return <section className="adv-screen"><div className="adv-top"><button onClick={onExit} className="adv-back"><ArrowLeft size={19}/> Bài học</button><div className="adv-progress"><div style={{width:(Math.min(step,activities.length)/Math.max(activities.length,1)*100)+"%"}}/></div><b>{Math.min(step+1,activities.length)} / {activities.length}</b></div>
  {finished?<div className="adv-main adv-done"><img src={wolf} alt="Aivanta"/><h1>🎉 Hoàn thành bài học!</h1><p>Aivanta: Bạn đã hoàn thành {activities.length} hoạt động và làm đúng {right} hoạt động. Hãy ôn lại những phần chưa chắc nhé!</p><button disabled={saving} className="adv-primary" onClick={async()=>{setSaving(true);try{await onFinish(right,activities.length);}catch{setError("Chưa lưu được tiến độ. Vui lòng thử lại.");}finally{setSaving(false);}}}>{saving?"Đang lưu...":"Lưu tiến độ và về danh sách"} <ArrowRight size={18}/></button>{error&&<p role="alert">{error}</p>}</div>:<div className="adv-layout"><main className="adv-main"><div className="adv-heading"><span>📖 {lesson.title}</span><h1>{activity.question}</h1><div className="adv-mini-progress">{activity.type==="chat"?"Hội thoại AI":activity.type==="intro"?"Học cùng Aivanta":"Thử thách tương tác"}</div></div>
- {activity.type==="intro"&&<div className="adv-word"><button onClick={()=>say(activity.word?.word||"")}><Volume2 size={26}/></button><h2>{activity.word?.word}</h2><strong>{activity.word?.meaning}</strong><p>{activity.word?.example}</p><small>Nhấn loa để nghe phát âm.</small></div>}
+ {activity.type==="intro"&&<div className="adv-word"><button onClick={()=>say(activity.word?.word||"")}><Volume2 size={26}/></button><h2>{activity.word?.word}</h2><strong>{activity.word?.meaning}</strong><small>Nhấn loa để nghe phát âm.</small></div>}
  {(activity.type==="choice"||activity.type==="listen"||activity.type==="read")&&<>{activity.type==="listen"&&<button className="adv-audio" onClick={()=>say(activity.answer)}><Volume2 size={27}/> Nghe phát âm</button>}{activity.type==="choice"&&<h2 className="adv-prompt">{activity.word?.word}</h2>}{activity.type==="read"&&<p className="adv-read">🐺 Aivanta: {activity.sentence}</p>}<div className="adv-choices">{activity.options?.map((o,i)=><button disabled={checked} className={selected===o?"adv-selected":""} onClick={()=>setSelected(o)} key={i}><span>{String.fromCharCode(65+i)}</span>{o}</button>)}</div></>}
  {activity.type==="fill"&&<div className="adv-input"><p>🇻🇳 {activity.word?.meaning}</p><input autoComplete="off" value={selected} disabled={checked} onChange={e=>setSelected(e.target.value)} placeholder="Nhập từ tiếng Anh..."/></div>}
  {activity.type==="order"&&<><div className="adv-order-answer">{tokens.length?tokens.map((w,i)=><button key={i} onClick={()=>!checked&&setTokens(t=>t.filter((_,j)=>j!==i))}>{w}</button>):"Chạm vào các từ bên dưới để tạo câu"}</div><div className="adv-order-pool">{options.map(o=><button key={o.id} disabled={checked||tokens.filter(x=>x===o.word).length>=orderWords.filter(x=>x===o.word).length} onClick={()=>setTokens(t=>[...t,o.word])}>{o.word}</button>)}</div></>}
@@ -47,5 +72,5 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  {activity.type==="chat"&&<LessonTutor lesson={{id:lesson.id,title:lesson.title,words:lesson.words.map(w=>w.word),goal:lesson.goal,dialogue:lesson.dialogue}}/>}
  {hint&&<p className="adv-hint">💡 {activity.type==="intro"?"Hãy nghe từ mới và đọc lại.":activity.type==="match"?"Ghép nghĩa tương ứng với từng từ.":activity.type==="chat"?"Hãy thử giới thiệu bản thân với Aivanta.":activity.word?.example?"Ví dụ: "+activity.word.example:"Hãy đọc kỹ yêu cầu và thử lại nhé!"}</p>}
  {checked&&<div role="status" className={"adv-feedback "+(correct||easy?"adv-good":"adv-bad")}>{correct||easy?"🎉 Làm tốt lắm!":"💡 Chưa chính xác. Đáp án: "+(activity.type==="match"?"Hãy ghép đúng các cặp từ":activity.answer)}</div>}
- <div className="adv-actions"><button className="adv-hint-btn" onClick={()=>setHint(v=>!v)}><Lightbulb size={19}/> Gợi ý từ Aivanta</button><button className="adv-primary" disabled={!checked&&!canCheck} onClick={next}>{checked?"Tiếp tục":"Kiểm tra"} <ArrowRight size={19}/></button></div></main><aside className="adv-companion"><div className="adv-wolf"><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div><div className="adv-side-note"><h3>🐺 Aivanta gợi ý</h3><p>{activity.type==="intro"?"Nghe và lặp lại từ mới để ghi nhớ.":activity.type==="chat"?"Hãy trò chuyện bằng tiếng Anh. Mình sẽ sửa lỗi nhẹ nhàng.":"Đọc kỹ câu hỏi. Bạn có thể nhấn Gợi ý khi cần."}</p></div></aside></div>}</section>;
+ <div className="adv-actions"><button className="adv-hint-btn" onClick={()=>setHint(v=>!v)}><Lightbulb size={19}/> Gợi ý từ Aivanta</button><button className="adv-primary" disabled={!checked&&!canCheck} onClick={next}>{activity.type==="intro"?"Tiếp theo":checked?"Tiếp tục":"Kiểm tra"} <ArrowRight size={19}/></button></div></main><aside className="adv-companion"><div className="adv-wolf"><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div><div className="adv-side-note"><h3>🐺 Aivanta gợi ý</h3><p>{activity.type==="intro"?"Nghe và lặp lại từ mới để ghi nhớ.":activity.type==="chat"?"Hãy trò chuyện bằng tiếng Anh. Mình sẽ sửa lỗi nhẹ nhàng.":"Đọc kỹ câu hỏi. Bạn có thể nhấn Gợi ý khi cần."}</p></div></aside></div>}</section>;
 }
