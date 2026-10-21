@@ -39,13 +39,23 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,5);if(!words.length)return[];
   const a:Activity[]=[];
   words.forEach(w=>a.push({type:"intro",word:w,question:"Làm quen với từ mới",answer:w.word}));
-  words.slice(0,3).forEach((w,i)=>{const opts=[w.meaning,...words.filter(x=>x.word!==w.word).slice(0,3).map(x=>x.meaning)];const shift=i%opts.length;a.push({type:"choice",word:w,question:"Chọn nghĩa đúng của từ sau",answer:w.meaning,options:[...opts.slice(shift),...opts.slice(0,shift)]});});
+  words.slice(0,3).forEach((w,i)=>{
+   // Only one valid meaning per question; avoid duplicate meanings in the lesson.
+   const key=(value:string)=>norm(value.normalize("NFC"));
+   const seen=new Set([key(w.meaning)]);
+   const distractors=words.filter(x=>x.word!==w.word).map(x=>x.meaning).filter(meaning=>{
+    const k=key(meaning);if(!k||seen.has(k))return false;seen.add(k);return true;
+   }).slice(0,3);
+   const choices=[w.meaning,...distractors];
+   const shift=(i+1)%choices.length;
+   a.push({type:"choice",word:w,question:"Chọn nghĩa đúng của từ sau",answer:w.meaning,options:[...choices.slice(shift),...choices.slice(0,shift)]});
+  });
   const w0=words[0];a.push({type:"listen",word:w0,question:"Nghe và chọn từ bạn nghe được",answer:w0.word,options:words.slice(0,4).map(x=>x.word).reverse()});
   const w1=words[1]||w0;a.push({type:"fill",word:w1,question:"Điền từ tiếng Anh tương ứng với nghĩa",answer:w1.word});
   const w2=words[2]||w0;const phrase=(w2.example||"I like English.").replace(/[.!?]+$/,"");a.push({type:"order",word:w2,question:"Sắp xếp các từ thành câu đúng",answer:phrase});
   a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
   words.slice(0,Math.min(3,words.length)).forEach(w=>a.push({type:"speak",word:w,question:"Luyện phát âm từ vựng",answer:w.word}));
-  const dialogue=(lesson.dialogue||[]);a.push({type:"read",question:"Đọc hội thoại rồi chọn câu trả lời phù hợp",answer:dialogue[1]?.english||"Nice to meet you!",options:[dialogue[1]?.english||"Nice to meet you!","Goodbye!","I don't know.","No, thank you."],sentence:dialogue[0]?.english||"Hello! What's your name?"});
+  const dialogue=(lesson.dialogue||[]);a.push({type:"read",question:"Đọc hội thoại rồi chọn câu trả lời phù hợp",answer:dialogue[1]?.english||"Nice to meet you!",options:Array.from(new Set([dialogue[1]?.english||"Nice to meet you!","Goodbye!","I don't know.","No, thank you."])),sentence:dialogue[0]?.english||"Hello! What's your name?"});
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
