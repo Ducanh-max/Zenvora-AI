@@ -1,8 +1,9 @@
 import {redirect} from "next/navigation";
 import {getMembership} from "@/lib/membership";
-import PaidDashboard from "../paid-dashboard";
+import ExplorerDashboard from "./explorer-dashboard";
 export default async function Page(){
- const {plan,isAdmin}=await getMembership();
+ const {plan,isAdmin,user}=await getMembership();
  if(plan!=="explorer"&&!isAdmin)redirect("/learn/"+plan);
- return <PaidDashboard tier="explorer" adminPreview={isAdmin&&plan!=="explorer"}/>;
+ const name=String(user.user_metadata?.full_name||user.user_metadata?.name||user.email?.split("@")[0]||"Bạn");
+ return <ExplorerDashboard name={name} adminPreview={Boolean(isAdmin&&plan!=="explorer")}/>;
 }
