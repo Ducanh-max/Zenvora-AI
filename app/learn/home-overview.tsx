@@ -4,7 +4,7 @@ import {useEffect,useMemo,useState} from "react";
 import {createClient} from "@/lib/supabase/client";
 import {Search,ArrowRight,BookOpen,Flame,Star,Crown,Target,Mic2,MessageCircle,ClipboardCheck,CheckCircle2,LockKeyhole,Gamepad2,ChevronRight} from "lucide-react";
 type Course={id:string;slug:string;title:string;description:string;sort_order:number};
-type Lesson={id:string;course_id:string};
+type Lesson={id:string;slug:string;course_id:string};
 type Progress={lesson_id:string;completed:boolean};
 const names=["English Starter","Daily Life","Travel English","Study & Work","Advanced English"];
 const descriptions={vi:["Bắt đầu hành trình với những kiến thức cơ bản","Giao tiếp trong cuộc sống hằng ngày","Du lịch và khám phá thế giới","Học tập và công việc","Nâng cao toàn diện"],en:["Build your English foundation","Everyday communication","Travel and explore the world","English for school and work","Take your English to the next level"]};
@@ -13,9 +13,10 @@ const tones=["blue","orange","sky","indigo","purple"];
 const courseImages=["coursesenglish-starter","coursesdaily-life","coursestravel-english","coursesstudy-work","coursesadvanced-english"].map(file=>"/images/aunora/"+file+".png.png");
 export default function HomeOverview({lang,name}:{lang:"vi"|"en";name:string}){
  const vi=lang==="vi";const [courses,setCourses]=useState<Course[]>([]),[lessons,setLessons]=useState<Lesson[]>([]),[progress,setProgress]=useState<Progress[]>([]),[query,setQuery]=useState("");
- useEffect(()=>{let mounted=true;void(async()=>{const db=createClient();const [{data:c},{data:l},{data:{user}}]=await Promise.all([db.from("zenvora_courses").select("id,slug,title,description,sort_order").order("sort_order"),db.from("zenvora_lessons").select("id,course_id").eq("is_published",true).order("sort_order"),db.auth.getUser()]);let p:Progress[]=[];if(user){const {data}=await db.from("aunora_lesson_progress").select("lesson_id,completed").eq("user_id",user.id);p=(data||[]) as Progress[];}if(mounted){setCourses((c||[]) as Course[]);setLessons((l||[]) as Lesson[]);setProgress(p);}})();return()=>{mounted=false}},[]);
- const completed=new Set(progress.filter(p=>p.completed).map(p=>p.lesson_id));const totalDone=completed.size;
- const cards=useMemo(()=>courses.map((c,i)=>{const ls=lessons.filter(l=>l.course_id===c.id);const count=ls.filter(l=>completed.has(l.id)).length;return {...c,index:i,total:ls.length,done:count}}),[courses,lessons,progress]);
+ useEffect(()=>{let mounted=true;void(async()=>{const db=createClient();const [{data:c},{data:l},{data:{user}}]=await Promise.all([db.from("zenvora_courses").select("id,slug,title,description,sort_order").order("sort_order"),db.from("zenvora_lessons").select("id,slug,course_id").eq("is_published",true).order("sort_order"),db.auth.getUser()]);let p:Progress[]=[];if(user){const {data}=await db.from("aunora_lesson_progress").select("lesson_id,completed").eq("user_id",user.id);p=(data||[]) as Progress[];}if(mounted){setCourses((c||[]) as Course[]);setLessons((l||[]) as Lesson[]);setProgress(p);}})();return()=>{mounted=false}},[]);
+ const completed=new Set(progress.filter(p=>p.completed).map(p=>p.lesson_id));const isDone=(lesson:Lesson)=>completed.has(lesson.slug)||completed.has(lesson.id);
+ const totalDone=lessons.filter(isDone).length;
+ const cards=useMemo(()=>courses.map((c,i)=>{const ls=lessons.filter(l=>l.course_id===c.id);const count=ls.filter(isDone).length;return {...c,index:i,total:ls.length,done:count}}),[courses,lessons,progress]);
  const filtered=cards.filter(c=>!query||[c.title,c.description,names[c.index]||""].join(" ").toLowerCase().includes(query.toLowerCase()));
  const first=cards[0];const allLessons=lessons.length;const current=first?Math.round(first.done/Math.max(first.total,1)*100):0;
  return <div className="ah-home ah-home-illustrated">
