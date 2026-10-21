@@ -1,0 +1,1 @@
+import Dashboard from "../dashboard";import {getMembership} from "@/lib/membership";import {redirect} from "next/navigation";export default async function FreePage(){const {plan}=await getMembership();if(plan!=="free")redirect("/learn/"+plan);return <Dashboard/>}
