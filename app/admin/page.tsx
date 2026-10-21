@@ -53,6 +53,7 @@ export default async function AdminPage() {
     <aside className="admin-sidebar">
       <Link href="/" className="admin-brand"><span className="admin-brand-photo"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA"/></span><b>AUNORA<small>ADMIN CONSOLE</small></b></Link>
       <div className="admin-side-label">QUẢN TRỊ</div>
+      <Link href="/learn" className="admin-side-link"><ArrowLeft size={17}/> Về trang học tập</Link>
       <a href="#overview" className="admin-side-link active"><Activity size={17}/> Tổng quan</a>
       <a href="#users" className="admin-side-link"><Users size={17}/> Người dùng</a>
       <a href="#courses" className="admin-side-link"><BookOpen size={17}/> Khóa học</a>
