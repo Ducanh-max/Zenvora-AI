@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, BookOpen, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import LibraryClient, { type LibraryLesson } from "./library-client";
+import {getMembership} from "@/lib/membership";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ const planLimits: Record<string, { name: string; lessonLimit: number; quizSize: 
 
 export default async function LibraryPage({ searchParams }: { searchParams?: Promise<{ course?: string }> }) {
   const params = await searchParams;
+  const membership = await getMembership();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
@@ -28,6 +30,10 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
   let planId = user.app_metadata?.role === "admin" ? "elite" : (entitlement?.plan_id || "starter");
   if (user.app_metadata?.role !== "admin" && entitlement?.active_until && new Date(entitlement.active_until).getTime() < Date.now()) planId = "starter";
   const plan = planLimits[planId] || planLimits.starter;
+  const explorerAllowed = membership.isAdmin || membership.plan !== "free";
+  const visibleCourses = (courses || []).filter(course => course.is_free || explorerAllowed);
+  const visibleCourseIds = new Set(visibleCourses.map(course => course.id));
+  const visibleLessons = (lessons || []).filter(lesson => visibleCourseIds.has(lesson.course_id));
   const { data: progress } = await supabase.from("aunora_lesson_progress")
     .select("lesson_id,completed,score,total_questions")
     .eq("user_id", user.id);
@@ -42,10 +48,10 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH CỦA BẠN</div><img className="library-aivanta" src="/brand/aivanta-mascot.webp.png" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Chọn một khóa học phù hợp với mục tiêu của bạn. Mỗi khóa học đều có bài học, luyện tập, bài kiểm tra và AI Tutor đồng hành cùng bạn.</p>
-      <div className="library-summary"><b>{courses?.length || 0} khóa học · {lessons?.length || 0} bài học</b><span>5 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
+      <div className="library-summary"><b>{visibleCourses.length} khóa học · {visibleLessons.length} bài học</b><span>5 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
-      <LibraryClient courses={(courses || []) as import("./library-client").LibraryCourse[]} lessons={(lessons || []) as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
+      <LibraryClient courses={visibleCourses as import("./library-client").LibraryCourse[]} lessons={visibleLessons as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
     <p className="library-footnote">Chọn khóa học phù hợp với mục tiêu của bạn và bắt đầu hành trình học tiếng Anh.</p>
   
 <style>{`
