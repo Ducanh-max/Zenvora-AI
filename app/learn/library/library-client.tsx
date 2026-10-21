@@ -3,6 +3,7 @@
 import Link from "next/link";
 import LessonTutor from "./lesson-tutor";
 import LessonPractice from "./lesson-practice";
+import AdventureLesson from "./adventure-lesson";
 import "./course-design.css";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
@@ -124,6 +125,9 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   }
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
+  if (selected && selectedCourseSlug === "english-starter" && currentLessonIndex === 0) {
+    return <AdventureLesson lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,goal:selected.content.lesson_goal}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug,score:correct,totalQuestions:total})});if(!response.ok)throw new Error("Không thể lưu tiến độ");setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);resetLesson();}finally{setSaving(false);}}}/>;
+  }
   if (selected) {
     const content = selected.content || {};
     return <section className="library-study">
