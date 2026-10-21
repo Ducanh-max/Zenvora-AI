@@ -3,22 +3,37 @@ import {FormEvent,useEffect,useRef,useState} from "react";
 import {Send,RotateCcw,Volume2} from "lucide-react";
 type Turn={question:string;translation:string;hint:string;why:string;evaluate:(s:string)=>{ok:boolean;reason:string}};
 const clean=(s:string)=>s.toLowerCase().replace(/[.,!?;:'"“”]/g," ").replace(/\s+/g," ").trim();
-const questions:Turn[]=[
+const defaultQuestions:Turn[]=[
  {question:"Hello! What's your name?",translation:"Xin chào! Bạn tên là gì?",hint:"Bạn có thể trả lời: My name is [tên của bạn].",why:"Vì “What's your name?” hỏi tên, nên “My name is ...” trả lời trực tiếp câu hỏi. “My” nghĩa là “của tôi”, “name” là “tên”, “is” là “là”.",evaluate:(s)=>{const t=clean(s);const match=t.match(/^(?:my name is|i am|i m|im)\s+([a-z][a-z -]{0,35})$/i);return match?{ok:true,reason:"Đúng rồi! “My name is ...” và “I'm ...” đều là cách giới thiệu tên tự nhiên bằng tiếng Anh."}:{ok:false,reason:"Câu hỏi “What's your name?” hỏi tên của bạn. Hãy trả lời thành câu hoàn chỉnh như “My name is Minh.” hoặc “I'm Lan.”"};}},
  {question:"Nice to meet you! How are you today?",translation:"Rất vui được gặp bạn! Hôm nay bạn thế nào?",hint:"Bạn có thể trả lời: I'm fine, thank you.",why:"Vì “How are you?” hỏi tình trạng hoặc cảm xúc hiện tại. “I'm fine” nghĩa là “Mình khỏe/ổn”; “thank you” thể hiện sự lịch sự.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:i am|i m|im|i feel)\s+(?:fine|good|great|happy|okay|ok|well|tired|sad|excited|not bad|very good|very well|pretty good)(?:\s+(?:thank you|thanks|today))?$/.test(t)||/^(?:fine|good|great|okay|ok|not bad)(?:\s+(?:thank you|thanks))?$/.test(t);return ok?{ok:true,reason:"Chính xác! Khi được hỏi “How are you?”, bạn có thể nói “I'm fine”, “I'm good” hoặc diễn tả cảm xúc của mình."}:{ok:false,reason:"“How are you?” hỏi bạn đang cảm thấy thế nào, không phải tên hay tuổi. Hãy thử “I'm fine, thank you.” hoặc “I'm happy.”"};}},
  {question:"Where are you from?",translation:"Bạn đến từ đâu?",hint:"Bạn có thể trả lời: I'm from Vietnam. (hoặc thay Vietnam bằng nơi bạn sống)",why:"Vì “Where” hỏi địa điểm, “are you from” hỏi nơi xuất thân. Cấu trúc “I'm from + địa điểm” diễn tả nơi bạn đến từ.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:i am|i m|im)\s+from\s+[a-z][a-z -]+$/.test(t)||/^i (?:come|am coming) from\s+[a-z][a-z -]+$/.test(t);return {ok,reason:ok?"Tốt lắm! Cấu trúc “I'm from + địa điểm” dùng để nói bạn đến từ đâu.":"“Where are you from?” hỏi quê quán hoặc nơi bạn đến từ. Hãy dùng “I'm from + tên địa điểm”, ví dụ “I'm from Vietnam.”"};}},
  {question:"Do you like learning English?",translation:"Bạn có thích học tiếng Anh không?",hint:"Bạn có thể trả lời: Yes, I do. (hoặc No, I don't.)",why:"Vì câu hỏi bắt đầu bằng “Do you ...?”, câu trả lời ngắn thường dùng “Yes, I do” hoặc “No, I don't”. Bạn có thể trả lời theo sở thích thật của mình.",evaluate:(s)=>{const t=clean(s);const ok=/^(yes|yeah|yep)( i do| i like (learning )?english| i love (learning )?english)?$/.test(t)||/^(no|nope)( i do not| i don t| i dislike (learning )?english)?$/.test(t)||/^i (?:like|love|enjoy|do not like|don t like) (?:learning )?english$/.test(t);return {ok,reason:ok?"Giỏi lắm! Với câu hỏi bắt đầu bằng “Do you...?”, bạn có thể trả lời ngắn “Yes, I do” hoặc “No, I don't”.":"Đây là câu hỏi Yes/No. Bạn có thể trả lời “Yes, I do.”, “No, I don't.” hoặc “I like English.”"};}},
  {question:"It was great talking to you! How do you say goodbye?",translation:"Nói chuyện với bạn thật vui! Bạn nói lời tạm biệt như thế nào?",hint:"Bạn có thể trả lời: Goodbye!",why:"Vì Aivanta đang kết thúc cuộc trò chuyện và hỏi cách nói tạm biệt. “Goodbye” nghĩa là “Tạm biệt”; “See you later” nghĩa là “Hẹn gặp lại”.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:goodbye|bye|bye bye|see you|see you later|see you soon|take care)(?: aivanta)?$/.test(t);return {ok,reason:ok?"Tuyệt vời! “Goodbye”, “Bye” và “See you later” đều là cách chào tạm biệt phù hợp.":"Khi kết thúc hội thoại, hãy nói “Goodbye!”, “Bye!” hoặc “See you later!”."};}}
 ];
+function buildLessonQuestions(words:{word:string;meaning:string;example:string}[],title:string):Turn[]{
+ const usable=words.filter(w=>w.word?.trim()&&w.meaning?.trim()).slice(0,5);
+ return usable.map((w,i)=>({
+  question:i===0?`Hello! Let's practice ${title}. How do you say "${w.meaning}" in English?`:`Great! How do you say "${w.meaning}" in English?`,
+  translation:`Chúng mình cùng luyện bài ${title}. Bạn nói “${w.meaning}” bằng tiếng Anh như thế nào?`,
+  hint:`Bạn có thể trả lời: ${w.word}.`,
+  why:`Vì “${w.word}” có nghĩa là “${w.meaning}” trong chủ đề này. ${w.example?"Ví dụ: "+w.example:"Hãy nghe và nhắc lại từ mới."}`,
+  evaluate:(input:string)=>{
+   const answer=clean(w.word),text=clean(input);
+   const ok=text===answer||text===clean(w.example||"")||text===clean("It is "+w.word)||text===clean("The answer is "+w.word);
+   return {ok,reason:ok?`Đúng rồi! “${w.word}” nghĩa là “${w.meaning}”. ${w.example?"Ví dụ: "+w.example:""}`:`“${w.meaning}” tương ứng với “${w.word}”. Hãy thử nhập “${w.word}” hoặc nói theo ví dụ: ${w.example||w.word}.`};
+  }
+ }));
+}
 type Message={role:"assistant"|"user";text:string;kind?:"question"|"correct"|"incorrect"|"done"};
 function speak(t:string){if(typeof window==="undefined"||!("speechSynthesis"in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.88;window.speechSynthesis.speak(u);}
-export default function GuidedLessonTutor({onComplete}:{onComplete?:()=>void}){
+export default function GuidedLessonTutor({onComplete,words,title}:{onComplete?:()=>void;words?:{word:string;meaning:string;example:string}[];title?:string}){
+ const questions=words?.length?buildLessonQuestions(words,title||"English"):defaultQuestions;
  const [index,setIndex]=useState(0),[input,setInput]=useState(""),[busy,setBusy]=useState(false),[done,setDone]=useState(false);
- const [messages,setMessages]=useState<Message[]>([{role:"assistant",text:questions[0].question,kind:"question"}]);
+ const [messages,setMessages]=useState<Message[]>([{role:"assistant",text:questions[0]?.question||"Hello!",kind:"question"}]);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null),bottom=useRef<HTMLDivElement>(null);
  useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
  useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages]);
- function reset(){if(timer.current)clearTimeout(timer.current);setIndex(0);setInput("");setBusy(false);setDone(false);setMessages([{role:"assistant",text:questions[0].question,kind:"question"}]);}
+ function reset(){if(timer.current)clearTimeout(timer.current);setIndex(0);setInput("");setBusy(false);setDone(false);setMessages([{role:"assistant",text:questions[0]?.question||"Hello!",kind:"question"}]);}
  function send(e:FormEvent){e.preventDefault();const value=input.trim();if(!value||busy||done)return;
  const result=questions[index].evaluate(value);setInput("");
  setMessages(prev=>[...prev,{role:"user",text:value},{role:"assistant",text:(result.ok?"🎉 Làm tốt lắm! ":"💡 Thử lại nhé! ")+result.reason,kind:result.ok?"correct":"incorrect"}]);
