@@ -5,6 +5,7 @@ import LessonTutor from "./lesson-tutor";
 import LessonPractice from "./lesson-practice";
 import AdventureLesson from "./adventure-lesson";
 import "./course-design.css";
+import "./adventure-lesson.css";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
 
