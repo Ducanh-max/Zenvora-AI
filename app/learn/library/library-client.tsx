@@ -181,7 +181,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const coursePictures = ["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
   const courseNames = ["English Starter","Everyday English","English for Travel","Grammar in Action","Confident Conversations"];
   const courseSummaries = ["Xây nền tảng từ vựng và câu giao tiếp hằng ngày.","Giao tiếp tự nhiên trong những tình huống quen thuộc hằng ngày.","Tự tin sử dụng tiếng Anh tại sân bay, khách sạn và khi khám phá địa điểm mới.","Hiểu và vận dụng ngữ pháp qua ví dụ, hội thoại và tình huống thực tế.","Diễn đạt ý kiến, cảm xúc và xử lý các cuộc trò chuyện dài hơn."];
-  return <section className="aunora-library-showcase">{courses.map((course,index) => {
+  return <><h2 className="library-courses-title">Tất cả khóa học</h2><section className="aunora-library-showcase">{courses.map((course,index) => {
     const courseLessonsForCard = lessons.filter(lesson => lesson.course_id === course.id);
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
     const feature = index < 3;
@@ -192,5 +192,5 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>
       <button type="button" onClick={()=>setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={17}/></button></div>
     </article>;
-  })}</section>;
+  })}</section></>;
 }
