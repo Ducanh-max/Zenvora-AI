@@ -1,5 +1,6 @@
 import {createClient} from "@/lib/supabase/server";
 import {redirect} from "next/navigation";
+import {unstable_noStore as noStore} from "next/cache";
 
 export type Plan="free"|"explorer"|"achiever"|"mastery";
 export const planNames:Record<Plan,string>={free:"Aunora Sprout",explorer:"Aunora Explorer",achiever:"Aunora Achiever",mastery:"Aunora Mastery"};
@@ -16,6 +17,7 @@ function normalizePlan(value:unknown):Plan{
 }
 
 export async function getMembership(){
+ noStore();
  const db=await createClient();
  const {data:{user},error}=await db.auth.getUser();
  if(error||!user)redirect("/login");
