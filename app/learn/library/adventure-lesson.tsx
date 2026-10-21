@@ -87,7 +87,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   advance();
  }
  function skipSpeaking(){if(activity?.type!=="speak"||checked)return;setSpeechSkipped(true);setChecked(true);if(!reviewMode)setReviewQueue(prev=>prev.includes(activityIndex)?prev:[...prev,activityIndex]);}
- // Enter mirrors the main action, but never interrupts AI Tutor typing or other inputs.
+ // Capture Enter before a focused answer button consumes it as a click.
  const nextRef=useRef<()=>void>(()=>{});
  nextRef.current=next;
  useEffect(()=>{
@@ -95,16 +95,20 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
    if(event.key!=="Enter"||event.repeat||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||event.shiftKey)return;
    const target=event.target;
    if(target instanceof HTMLElement){
-    if(target.closest(".guided-tutor")||target.closest("[contenteditable=true]")||target.tagName==="TEXTAREA")return;
-    if(target.tagName==="BUTTON"||target.tagName==="A"||target.tagName==="SELECT")return;
+    if(target.closest(".guided-tutor")||target.closest("[contenteditable]")||target.tagName==="TEXTAREA"||target.tagName==="SELECT")return;
+    // Keep normal Enter behavior for external controls, but allow lesson answer buttons.
+    if(target.closest("a, [role=dialog]"))return;
    }
-   if(reviewPrompt||finished)return;
+   if(reviewPrompt||finished||!activity||activity.type==="chat")return;
+   // Do not trigger when an answer hasn't been selected yet (except vocabulary introduction).
+   if(!checked&&activity.type!=="intro"&&!canCheck)return;
    event.preventDefault();
+   event.stopPropagation();
    nextRef.current();
   };
-  window.addEventListener("keydown",handleEnter);
-  return()=>window.removeEventListener("keydown",handleEnter);
- },[reviewPrompt,finished]);
+  document.addEventListener("keydown",handleEnter,true);
+  return()=>document.removeEventListener("keydown",handleEnter,true);
+ },[reviewPrompt,finished,activity,checked,canCheck]);
  function listen(){const SpeechRecognition=(window as unknown as {SpeechRecognition?:new()=>any;webkitSpeechRecognition?:new()=>any}).SpeechRecognition||(window as unknown as {webkitSpeechRecognition?:new()=>any}).webkitSpeechRecognition;if(!SpeechRecognition){setError("Trình duyệt chưa hỗ trợ nhận diện giọng nói. Bạn có thể nhập câu vào ô bên dưới.");return;}try{const r=new SpeechRecognition();r.lang="en-US";r.interimResults=false;r.onresult=(e:{results:{[key:number]:{[key:number]:{transcript:string}}}})=>{setRecognized(e.results[0][0].transcript);setListening(false);};r.onerror=()=>{setListening(false);setError("Không nhận diện được giọng nói. Hãy thử lại hoặc nhập câu.");};r.onend=()=>setListening(false);setListening(true);r.start();}catch{setListening(false);setError("Không thể mở micro.");}}
 
  return <section className="adv-screen"><div className="adv-top"><button onClick={onExit} className="adv-back"><ArrowLeft size={19}/> Bài học</button><div className="adv-progress"><div style={{width:(Math.min(step,activities.length)/Math.max(activities.length,1)*100)+"%"}}/></div><b>{Math.min(step+1,activities.length)} / {activities.length}</b></div>
