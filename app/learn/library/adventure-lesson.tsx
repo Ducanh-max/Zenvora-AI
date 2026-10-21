@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useMemo,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 import {ArrowLeft,ArrowRight,Lightbulb,Volume2,Mic,CheckCircle2,RotateCcw} from "lucide-react";
 import GuidedLessonTutor from "./guided-lesson-tutor";
 import MatchPairs from "./match-pairs";
