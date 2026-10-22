@@ -10,3 +10,6 @@
 @keyframes aunora-progress{from{transform:translateX(0)}to{transform:translateX(190%)}}
 @keyframes aunora-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @media(prefers-reduced-motion:reduce){.aunora-loading-wolf,.aunora-loading-bar{animation:none}.aunora-loading-bar{width:65%}}
+
+/* Explorer uses its own uploaded tall illustrated covers; Free keeps its original art. */
+.als-card .als-art.als-explorer-art img{width:100%;height:100%;object-fit:cover;object-position:center 38%;display:block}
