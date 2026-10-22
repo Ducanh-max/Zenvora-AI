@@ -54,3 +54,45 @@
 .ex-course-row article:has(.ex-course-img .paid) .ex-course-img img{width:100%;height:100%;object-fit:cover;object-position:center}
 .ex-course-row article:has(.ex-course-img .paid){border:1px solid #e7eefb;box-shadow:none}
 @media(max-width:780px){.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:83px}}
+
+/* Mobile-first Explorer dashboard: no cropped hero, horizontal overflow or giant sidebar. */
+@media(max-width:780px){
+ .ex-root{width:100%;max-width:100vw;overflow-x:clip}
+ .ex-sidebar{width:56px!important;flex:0 0 56px!important}
+ .ex-sidebar .ex-logo.aunora-logo-lockup{padding:5px!important;justify-content:center}
+ .ex-sidebar .ex-logo .aunora-logo-symbol{width:42px;min-width:42px;flex-basis:42px}
+ .ex-main{width:calc(100% - 56px);min-width:0;overflow:hidden}
+ .ex-topbar{left:56px;right:0;padding:0 10px;gap:7px;height:64px}
+ .ex-search{min-width:0;width:auto;flex:1;height:40px;padding:0 10px}
+ .ex-search input{min-width:0;font-size:12px}
+ .ex-topright{gap:8px;flex-shrink:0}
+ .ex-topright>a:not(.ex-profile){display:none}
+ .ex-profile{padding:4px 7px!important;gap:4px}
+ .ex-profile .ex-top-avatar{width:32px;height:32px}
+ .ex-profile>div,.ex-profile>svg{display:none}
+ .ex-hero{height:auto;min-height:350px;padding:76px 12px 20px;display:flex;align-items:stretch}
+ .ex-welcome{position:relative;top:auto;left:auto;right:auto;max-width:none;width:100%;padding:22px 17px;border-radius:22px;overflow:hidden}
+ .ex-welcome h1{font-size:clamp(23px,6vw,31px);line-height:1.2;letter-spacing:-.5px;overflow-wrap:anywhere}
+ .ex-welcome p{font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+ .ex-welcome>div{flex-wrap:wrap;gap:8px}
+ .ex-btn-primary,.ex-btn-light{font-size:11px;padding:11px 12px;white-space:normal;text-align:center;min-width:0}
+ .ex-content{margin:10px 10px 25px}
+ .ex-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}
+ .ex-stats>div,.ex-stats>a{min-width:0;padding:13px 9px;gap:8px;font-size:20px;overflow-wrap:anywhere}
+ .ex-stats span{min-width:0;font-size:11px}
+ .ex-grid{grid-template-columns:minmax(0,1fr);gap:12px}
+ .ex-panel{min-width:0;padding:12px}
+ .ex-course-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:none}
+ .ex-course-row article{min-width:0}
+ .ex-course-row h3{overflow-wrap:anywhere}
+ .ex-continue-bottom{flex-wrap:wrap}
+ .ex-continue-bottom>*{min-width:0}
+}
+@media(max-width:390px){
+ .ex-sidebar{width:48px!important;flex-basis:48px!important}
+ .ex-main{width:calc(100% - 48px)}
+ .ex-topbar{left:48px}
+ .ex-welcome{padding:18px 13px}
+ .ex-stats>div,.ex-stats>a{font-size:18px;padding:11px 7px}
+ .ex-btn-primary,.ex-btn-light{width:100%}
+}
