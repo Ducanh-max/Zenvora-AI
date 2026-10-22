@@ -47,3 +47,10 @@
 
 .ex-tasks>a span:has(.ex-task-mascot){display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px}
 .ex-tasks .ex-task-mascot{width:28px;height:28px;object-fit:contain;display:block}
+
+
+/* Explorer course cards share the exact Free card layout; only their cover images differ. */
+.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:83px;background:#0a204e}
+.ex-course-row article:has(.ex-course-img .paid) .ex-course-img img{width:100%;height:100%;object-fit:cover;object-position:center}
+.ex-course-row article:has(.ex-course-img .paid){border:1px solid #e7eefb;box-shadow:none}
+@media(max-width:780px){.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:83px}}
