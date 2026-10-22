@@ -54,7 +54,8 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   const w1=words[1]||w0;a.push({type:"fill",word:w1,question:"Điền từ tiếng Anh tương ứng với nghĩa",answer:w1.word});
   const w2=words[2]||w0;const phrase=(w2.example||"I like English.").replace(/[.!?]+$/,"");a.push({type:"order",word:w2,question:"Sắp xếp các từ thành câu đúng",answer:phrase});
   a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
-  // Speaking and dialogue exercises belong to the dedicated Speaking studio.
+  // Keep vocabulary pronunciation practice in lessons; conversational Speaking stays in the separate studio.
+  words.slice(0,Math.min(3,words.length)).forEach(w=>a.push({type:"speak",word:w,question:"Luyện phát âm từ vựng",answer:w.word}));
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
