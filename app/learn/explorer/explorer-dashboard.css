@@ -37,3 +37,10 @@
 .ex-sidebar .ex-logo>span:last-child b{font-size:21px;font-weight:800;line-height:1.2;letter-spacing:.4px}
 .ex-sidebar .ex-logo>span:last-child small{font-size:8px;line-height:1.4;letter-spacing:0;white-space:nowrap}
 @media(max-width:780px){.ex-sidebar .ex-logo>span:last-child{display:none}}
+
+
+/* Tall illustrated cover art for Explorer-only vocabulary courses. */
+.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:205px;background:#0a204e}
+.ex-course-row article:has(.ex-course-img .paid) .ex-course-img img{width:100%;height:100%;object-fit:cover;object-position:center}
+.ex-course-row article:has(.ex-course-img .paid){border-color:#b7caff;box-shadow:0 4px 16px #264b9e19}
+@media(max-width:780px){.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:210px}}
