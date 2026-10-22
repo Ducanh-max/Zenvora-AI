@@ -165,7 +165,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const totalWords=courseLessons.reduce((sum,lesson)=>sum+(lesson.content.vocabulary||[]).length,0);
     const courseImageFiles=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
     const courseIndex=courses.findIndex(course=>course.id===activeCourse.id);
-    const courseImage="/images/aunora/"+courseImageFiles[Math.max(0,courseIndex)%courseImageFiles.length];
+    const courseImage=activeCourse.is_free?"/images/aunora/"+courseImageFiles[Math.max(0,courseIndex)%courseImageFiles.length]:"/images/courses/"+activeCourse.slug+".webp.png";
     const heroBackground=`linear-gradient(90deg,rgba(8,38,99,.94),rgba(18,69,137,.77) 48%,rgba(18,69,137,.03) 78%),url("${courseImage}")`;
     const cardBackground=`linear-gradient(90deg,#ffffff 2%,#fffffff2 46%,#ffffff22 100%),url("${courseImage}")`;
     return <section className="aunora-course-design">
@@ -186,7 +186,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
     const feature = index < 3;
     return <article className={`als-card als-card-${index} ${feature?"als-feature":"als-wide"}`} key={course.id}>
-      <div className="als-art"><img src={"/images/aunora/"+coursePictures[index%coursePictures.length]} alt={courseNames[index]||course.title}/>{index===0&&<span className="als-free">🌱 Miễn phí</span>}</div>
+      <div className={"als-art"+(!course.is_free?" als-explorer-art":"")}><img src={course.is_free?"/images/aunora/"+coursePictures[index%coursePictures.length]:"/images/courses/"+course.slug+".webp.png"} alt={course.title}/>{index===0&&<span className="als-free">🌱 Miễn phí</span>}</div>
       <div className="als-info"><div className="als-info-top"><h2>{courseNames[index]||course.title}</h2><span className="als-symbol">{["🌱","♧","✈","▤","☏"][index%5]}</span></div>
       <p>{courseSummaries[index]||course.description}</p>
       <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>
