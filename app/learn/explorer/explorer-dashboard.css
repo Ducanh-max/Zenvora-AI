@@ -96,3 +96,21 @@
  .ex-stats>div,.ex-stats>a{font-size:18px;padding:11px 7px}
  .ex-btn-primary,.ex-btn-light{width:100%}
 }
+
+/* Collapsible mobile navigation */
+.ex-menu-toggle,.ex-sidebar-close,.ex-mobile-backdrop{display:none}
+@media(max-width:780px){
+ .ex-app{display:block!important;width:100%;max-width:100vw;overflow-x:clip}
+ .ex-sidebar{position:fixed!important;z-index:101!important;left:0;top:0;bottom:0;width:min(290px,84vw)!important;max-width:84vw;flex:0 0 auto!important;transform:translateX(-105%);transition:transform .24s ease;box-shadow:12px 0 35px #071b4a35;overflow-y:auto}
+ .ex-sidebar.ex-sidebar-open{transform:translateX(0)}
+ .ex-sidebar .ex-logo.aunora-logo-lockup{justify-content:flex-start;padding:5px 12px!important}
+ .ex-sidebar .ex-logo>span:last-child{display:flex!important}
+ .ex-sidebar nav a{justify-content:flex-start!important;padding:12px 14px!important}
+ .ex-sidebar nav a span,.ex-sidebar nav a b{display:inline!important}
+ .ex-sidebar-bottom{display:grid!important}
+ .ex-sidebar-close{display:grid;place-items:center;position:absolute;top:17px;right:10px;width:32px;height:32px;color:#fff;background:#ffffff25;border:0;border-radius:9px;cursor:pointer;z-index:3}
+ .ex-mobile-backdrop{display:block;position:fixed;inset:0;background:#071a43a8;border:0;z-index:100}
+ .ex-main{width:100%!important;min-width:0}
+ .ex-topbar{left:0!important;padding:0 12px;gap:10px}
+ .ex-menu-toggle{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:0;border-radius:12px;background:#ffffffed;color:#123d7a;cursor:pointer;box-shadow:0 3px 12px #1645881f}
+}
