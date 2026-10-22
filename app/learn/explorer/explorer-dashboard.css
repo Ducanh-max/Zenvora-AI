@@ -44,3 +44,6 @@
 .ex-course-row article:has(.ex-course-img .paid) .ex-course-img img{width:100%;height:100%;object-fit:cover;object-position:center}
 .ex-course-row article:has(.ex-course-img .paid){border-color:#b7caff;box-shadow:0 4px 16px #264b9e19}
 @media(max-width:780px){.ex-course-row article:has(.ex-course-img .paid) .ex-course-img{height:210px}}
+
+.ex-tasks>a span:has(.ex-task-mascot){display:grid;place-items:center;width:28px;height:28px;flex:0 0 28px}
+.ex-tasks .ex-task-mascot{width:28px;height:28px;object-fit:contain;display:block}
