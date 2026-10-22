@@ -44,7 +44,7 @@ const courseLevels=["A1","A1–A2","A2","A2–B1","B1"];
 const menuItems=[
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
  {key:"learning" as const,href:"/learn/library",icon:BookOpen},
- {key:"practice" as const,href:"/learn/library",icon:Dumbbell},
+ {key:"practice" as const,href:"/learn/practice",icon:Dumbbell},
  {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
  {key:"speaking" as const,href:"/learn/speaking",icon:Mic2},
  {key:"dictionary" as const,href:"/learn/dictionary",icon:BookText},
