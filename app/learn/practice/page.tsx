@@ -23,4 +23,12 @@ export default function PracticePage(){return <main className="practice"><header
 .practice a.card .foot>span:first-child{font-size:12px;font-weight:750;border-radius:7px;padding:6px 10px;align-self:flex-start}
 .practice a.card .skill-button{display:flex;align-items:center;justify-content:center;gap:10px;color:white!important;border-radius:10px;padding:12px 16px;font-weight:800;font-size:15px;box-shadow:none}
 @media(max-width:900px){.practice .grid{grid-template-columns:repeat(2,minmax(0,1fr))}.practice .hero{padding:25px}}
-@media(max-width:600px){.practice .grid{grid-template-columns:1fr}.practice .hero img{height:140px}.practice .hero{padding:16px;min-height:200px;width:calc(100% - 24px)}.practice .hero p{font-size:14px}.practice .practice-header{padding:0 16px}.practice .heading h2{font-size:22px}.practice .body{width:calc(100% - 24px)}.practice a.card .card-image{height:200px}}`}</style></main>}
+@media(max-width:600px){.practice .grid{grid-template-columns:1fr}.practice .hero img{height:140px}.practice .hero{padding:16px;min-height:200px;width:calc(100% - 24px)}.practice .hero p{font-size:14px}.practice .practice-header{padding:0 16px}.practice .heading h2{font-size:22px}.practice .body{width:calc(100% - 24px)}.practice a.card .card-image{height:200px}}
+/* Fantasy academy background and translucent content panel */
+.practice{background:linear-gradient(180deg,rgba(228,242,255,.24),rgba(229,239,255,.34)),url('/images/aunora/aunora-castle-background.png.png') center top / cover fixed!important}
+.practice .practice-header{background:linear-gradient(90deg,#092650,#103f83)!important;box-shadow:0 4px 18px #07234c35}
+.practice .hero{background:linear-gradient(90deg,rgba(235,247,255,.91) 0%,rgba(235,247,255,.72) 56%,rgba(224,241,255,.36) 100%)!important;backdrop-filter:blur(7px);box-shadow:0 14px 36px #082b5c35;border:1px solid #ffffffb8}
+.practice .body{background:rgba(234,244,255,.76);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);padding:24px!important;border:1px solid rgba(255,255,255,.8);border-radius:24px;box-shadow:0 16px 40px #0d3c7830}
+.practice a.card{box-shadow:0 9px 24px #133d7425!important}
+@media(max-width:640px){.practice .body{padding:14px!important}.practice{background-attachment:scroll!important}}
+`}</style></main>}
