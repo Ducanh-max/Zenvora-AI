@@ -26,3 +26,14 @@
 @media(max-width:780px){.ex-brand-mark{width:40px}.ex-brand-mark img{width:40px;height:40px}}
 
 .ex-practice>a .ex-practice-mascot{width:48px;height:52px;flex:0 0 48px;object-fit:contain;object-position:center;display:block;filter:drop-shadow(0 2px 3px #26385d24)}
+
+
+/* Explorer logo uses the same lockup structure and dimensions as Free. */
+.ex-sidebar .ex-logo.aunora-logo-lockup{display:flex;align-items:center;gap:10px;width:100%;height:65px;min-height:65px;padding:5px 10px;overflow:hidden;font-size:inherit;letter-spacing:normal}
+.ex-sidebar .ex-logo .aunora-logo-symbol{position:relative;display:grid;place-items:center;width:44px;height:44px;min-width:44px;max-width:44px;max-height:44px;overflow:hidden;flex:0 0 44px}
+.ex-sidebar .ex-logo .aunora-brand-logo{position:static!important;display:block;width:44px!important;height:44px!important;max-width:44px!important;max-height:44px!important;min-width:0!important;min-height:0!important;object-fit:contain;transform:none!important}
+.ex-sidebar .ex-logo .brand-logo-fallback{display:none}
+.ex-sidebar .ex-logo>span:last-child{display:flex;flex-direction:column;min-width:0;color:#fff}
+.ex-sidebar .ex-logo>span:last-child b{font-size:21px;font-weight:800;line-height:1.2;letter-spacing:.4px}
+.ex-sidebar .ex-logo>span:last-child small{font-size:8px;line-height:1.4;letter-spacing:0;white-space:nowrap}
+@media(max-width:780px){.ex-sidebar .ex-logo>span:last-child{display:none}}
