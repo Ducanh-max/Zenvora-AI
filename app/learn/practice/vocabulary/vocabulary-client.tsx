@@ -1,5 +1,5 @@
 "use client";
-import {useEffect,useMemo,useState} from "react";
+import {useEffect,useState} from "react";
 import Link from "next/link";
 import {ArrowLeft,ArrowRight,BookOpen,CheckCircle2,RotateCcw} from "lucide-react";
 type Word={word:string;meaning:string};
@@ -25,7 +25,7 @@ export default function VocabularyClient({courses}:{courses:Course[]}){
  const reset=()=>{setIndex(0);setAnswer("");setChecked(false);setCorrect(0);setFinished(false)};
  const chooseCourse=(id:string)=>{setCourseId(id);setUnit(null);reset()};
  const chooseUnit=(n:number)=>{setUnit(n);reset()};
- const advance=()=>{if(index+1>=current.length){setFinished(true);const next={...history,[key]:Math.max(history[key]||0,correct+(isCorrect?1:0))};setHistory(next);localStorage.setItem("aunora-vocab-practice-v1",JSON.stringify(next));}else{setIndex(v=>v+1);setAnswer("");setChecked(false)}};
+ const advance=()=>{if(index+1>=current.length){setFinished(true);const next={...history,[key]:Math.max(history[key]||0,correct)};setHistory(next);localStorage.setItem("aunora-vocab-practice-v1",JSON.stringify(next));}else{setIndex(v=>v+1);setAnswer("");setChecked(false)}};
  const scored=checked&&isCorrect;
  return <main className="vp"><div className="vp-wrap"><header className="vp-top"><Link href="/learn/practice"><ArrowLeft size={18}/> Luyện tập</Link><strong>AUNORA <span>· Từ vựng</span></strong></header>
  <section className="vp-hero"><div><small>✦ VOCABULARY PRACTICE</small><h1>Ôn luyện từ vựng</h1><p>Chỉ luyện dịch nghĩa từ tiếng Anh sang tiếng Việt. Mỗi bài tối đa 20 từ.</p></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta"/></section>
