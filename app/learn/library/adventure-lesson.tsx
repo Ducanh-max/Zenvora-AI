@@ -55,7 +55,20 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   const w2=words[2]||w0;const phrase=(w2.example||"I like English.").replace(/[.!?]+$/,"");a.push({type:"order",word:w2,question:"Sắp xếp các từ thành câu đúng",answer:phrase});
   a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
   words.slice(0,Math.min(3,words.length)).forEach(w=>a.push({type:"speak",word:w,question:"Luyện phát âm từ vựng",answer:w.word}));
-  const dialogue=(lesson.dialogue||[]);a.push({type:"read",question:"Đọc hội thoại rồi chọn câu trả lời phù hợp",answer:dialogue[1]?.english||"Nice to meet you!",options:Array.from(new Set([dialogue[1]?.english||"Nice to meet you!","Goodbye!","I don't know.","No, thank you."])),sentence:dialogue[0]?.english||"Hello! What's your name?"});
+  const dialogue=lesson.dialogue||[];
+  const topicWord=words[0];
+  const topicMeaning=topicWord?.meaning||"từ vựng";
+  const topicEnglish=topicWord?.word||"English";
+  const firstLine=dialogue.find(line=>line.english?.trim())?.english?.trim();
+  const secondLine=dialogue.slice(1).find(line=>line.english?.trim())?.english?.trim();
+  // Missing dialogue must not fall back to the same "What's your name?" exchange in every lesson.
+  const sentence=firstLine||`Aivanta: What does "${topicEnglish}" mean in Vietnamese?`;
+  const answer=secondLine||`It means "${topicMeaning}".`;
+  const wrongOptions=firstLine&&secondLine
+    ? ["Goodbye!","I don't know.","No, thank you.","See you later."]
+    : [`It means "${words[1]?.meaning||"Goodbye"}".`,`It means "${words[2]?.meaning||"Thank you"}".`,"I don't know."];
+  const options=Array.from(new Set([answer,...wrongOptions].filter(Boolean))).slice(0,4);
+  a.push({type:"read",question:"Đọc hội thoại rồi chọn câu trả lời phù hợp",answer,options,sentence});
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
