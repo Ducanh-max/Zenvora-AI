@@ -8,7 +8,7 @@ type Course={id:string;slug:string;title:string;description:string;sort_order:nu
 type Lesson={id:string;course_id:string;slug:string;title:string;sort_order:number};
 type Progress={lesson_id:string;completed:boolean};
 const images=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
-const menu=[{name:"Trang chủ",icon:Home,url:"/learn/explorer"},{name:"Khóa học",icon:BookOpen,url:"/learn/library"},{name:"Luyện tập",icon:Target,url:"/learn/library"},{name:"AI Tutor",icon:MessageCircle,url:"/learn/tutor"},{name:"Luyện nói",icon:Mic2,url:"/learn/speaking"},{name:"Từ điển",icon:BookText,url:"/learn/dictionary"},{name:"Nhiệm vụ",icon:CalendarCheck,url:"#nhiem-vu"},{name:"Thành tích",icon:Star,url:"#thanh-tich"},{name:"Hồ sơ",icon:UserRound,url:"/learn/profile"}];
+const menu=[{name:"Trang chủ",icon:Home,url:"/learn/explorer"},{name:"Khóa học",icon:BookOpen,url:"/learn/library"},{name:"Luyện tập",icon:Target,url:"/learn/library"},{name:"AI Tutor",icon:MessageCircle,url:"/learn/tutor"},{name:"Từ điển",icon:BookText,url:"/learn/dictionary"},{name:"Nhiệm vụ",icon:CalendarCheck,url:"#nhiem-vu"},{name:"Thành tích",icon:Star,url:"#thanh-tich"},{name:"Hồ sơ",icon:UserRound,url:"/learn/profile"}];
 export default function ExplorerDashboard({name,adminPreview,avatarUrl}:{name:string;adminPreview:boolean;avatarUrl?:string}){
  const [lang,setLang]=useState<"vi"|"en">("vi");
  const [mobileMenuOpen,setMobileMenuOpen]=useState(false);
