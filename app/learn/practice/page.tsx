@@ -4,7 +4,7 @@ import {useState} from "react";
 import {BookOpen,Target,Headphones,MessageCircle,FileText,PenLine,ArrowRight,ChevronLeft} from "lucide-react";
 const skills=[
  {name:"Từ vựng",description:"Ôn tập và mở rộng vốn từ qua các bài học.",icon:BookOpen,color:"#18b76b",bg:"#e3fff1",href:"/learn/practice/vocabulary",tag:"Dịch nghĩa từ vựng",image:"/images/practice/vocabulary.webp.png"},
- {name:"Ngữ pháp",description:"Luyện ngữ pháp qua bài tập tương tác.",icon:Target,color:"#fa426e",bg:"#ffeaf0",href:"/learn/library?course=grammar-in-action",tag:"Bài học ngữ pháp",image:"/images/practice/grammar.webp.png"},
+ {name:"Ngữ pháp",description:"Luyện ngữ pháp qua bài tập tương tác.",icon:Target,color:"#fa426e",bg:"#ffeaf0",href:"/learn/practice/grammar",tag:"Bài học ngữ pháp",image:"/images/practice/grammar.webp.png"},
  {name:"Luyện nghe",description:"Rèn khả năng nghe và hiểu tiếng Anh.",icon:Headphones,color:"#2187ff",bg:"#e5f1ff",href:"/learn/library",tag:"Bài học có âm thanh",image:"/images/practice/listening.webp.png"},
  {name:"Luyện nói",description:"Thực hành phát âm và giao tiếp với AI.",icon:MessageCircle,color:"#9950f4",bg:"#f3e9ff",href:"/learn/speaking",tag:"Speaking cùng Nova",image:"/images/practice/speaking.webp.png?v=20261022"},
  {name:"Đọc hiểu",description:"Đọc đoạn văn và trả lời câu hỏi.",icon:FileText,color:"#e99a13",bg:"#fff2dd",href:"/learn/library",tag:"Đọc & hiểu",image:"/images/practice/reading.webp.png"},
