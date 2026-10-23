@@ -11,6 +11,6 @@ export default function TutorQuotaNotice({onLock}:{onLock?:(locked:boolean)=>voi
  return <aside style={{padding:16,borderRadius:16,background:locked?"#fff0e9":"#eef6ff",border:"1px solid #cbdcf5",margin:"12px 0",color:"#173c75"}}>
  <strong>🤖 AI Tutor: {Math.min(quota.used,quota.quota)}/{quota.quota} lượt hôm nay</strong>
  {locked?<p style={{margin:"8px 0"}}>⏳ Bạn đã hết lượt AI hôm nay. Bạn có thể trả lời tiếp sau <b>{countdown(new Date(quota.resetAt).getTime()-now)}</b>. Bài học đã hoàn thành vẫn được lưu bình thường.</p>:<p style={{margin:"8px 0"}}>Còn {quota.remaining} lượt AI hôm nay.</p>}
- <Link href="/learn/plans" style={{display:"inline-block",padding:"9px 14px",background:"#2467ed",color:"white",borderRadius:10,textDecoration:"none",fontWeight:700}}>✨ Nâng cấp gói</Link>
+ <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",marginTop:10}}><Link href="/learn/library" aria-disabled={locked} tabIndex={locked?-1:0} onClick={e=>{if(locked)e.preventDefault()}} style={{display:"inline-block",padding:"9px 14px",background:locked?"#d7dce5":"#1d965c",color:locked?"#64748b":"white",borderRadius:10,textDecoration:"none",fontWeight:700,pointerEvents:locked?"none":"auto"}}>🔒 {locked?"Học tiếp (đang khóa)":"Học tiếp"}</Link><Link href="/learn/plans" style={{display:"inline-block",padding:"9px 14px",background:"#2467ed",color:"white",borderRadius:10,textDecoration:"none",fontWeight:700}}>✨ Nâng cấp gói</Link></div>
  </aside>;
 }
