@@ -4,7 +4,30 @@ import Link from "next/link";
 import {ArrowLeft,ArrowRight,BookOpen,CheckCircle2,RotateCcw,Volume2} from "lucide-react";
 type Word={word:string;meaning:string};
 type Course={id:string;slug:string;title:string;words:Word[]};
-function playAnswerSound(ok:boolean){try{const AudioCtx=window.AudioContext;const ctx=new AudioCtx();if(ctx.state==="suspended")void ctx.resume();const notes=ok?[659.25,880,1046.5]:[330,261.63];notes.forEach((hz,i)=>{const osc=ctx.createOscillator();const gain=ctx.createGain();const t=ctx.currentTime+i*.13;osc.type=ok?"sine":"triangle";osc.frequency.setValueAtTime(hz,t);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(ok?.16:.11,t+.018);gain.gain.exponentialRampToValueAtTime(.0001,t+.19);osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+.2)});window.setTimeout(()=>{void ctx.close().catch(()=>{})},1000)}catch{}}
+let feedbackAudioContext:AudioContext|null=null;
+function playAnswerSound(ok:boolean){
+ try{
+  const AudioCtor=window.AudioContext;
+  if(!AudioCtor)return;
+  const ctx=feedbackAudioContext??(feedbackAudioContext=new AudioCtor());
+  if(ctx.state==="suspended")void ctx.resume();
+  const start=ctx.currentTime+.035;
+  const notes=ok?[{hz:659.25,at:0,duration:.16},{hz:880,at:.13,duration:.16},{hz:1046.5,at:.26,duration:.24}]:[{hz:245,at:0,duration:.28},{hz:185,at:.28,duration:.36}];
+  for(const note of notes){
+   const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+   const t=start+note.at;
+   oscillator.type=ok?"sine":"sawtooth";
+   oscillator.frequency.setValueAtTime(note.hz,t);
+   if(!ok)oscillator.frequency.exponentialRampToValueAtTime(note.hz*.76,t+note.duration);
+   gain.gain.setValueAtTime(.0001,t);
+   gain.gain.exponentialRampToValueAtTime(ok?.18:.22,t+.025);
+   gain.gain.setValueAtTime(ok?.18:.22,t+note.duration*.55);
+   gain.gain.exponentialRampToValueAtTime(.0001,t+note.duration);
+   oscillator.connect(gain);gain.connect(ctx.destination);
+   oscillator.start(t);oscillator.stop(t+note.duration+.02);
+  }
+ }catch(error){console.warn("Không phát được âm thanh phản hồi",error)}
+}
 const SIZE=20;
 const images:Record<string,string>={"english-starter":"/images/aunora/coursesenglish-starter.png.png","everyday-english":"/images/aunora/coursesdaily-life.png.png","english-for-travel":"/images/aunora/coursestravel-english.png.png","grammar-in-action":"/images/aunora/coursesstudy-work.png.png","confident-conversations":"/images/aunora/coursesadvanced-english.png.png"};
 export default function VocabularyClient({courses}:{courses:Course[]}){
