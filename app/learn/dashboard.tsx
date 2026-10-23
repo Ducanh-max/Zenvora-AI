@@ -1,3 +1,4 @@
+import TutorQuotaNotice from "./tutor-quota-notice";
 "use client";
 import Link from "next/link";
 import HomeOverview from "./home-overview";
@@ -87,7 +88,7 @@ export default function LearnPage(){
   <section className="aunora-dash-main">
    <header className="dash-topbar"><button className="dash-mobile-menu" onClick={()=>setMobileOpen(!mobileOpen)} aria-label={t.menu}><Menu/></button><div className="dash-breadcrumb"><span>{t.journey}</span><b>{t.dashboard}</b></div><div className="dash-top-actions"><button className="dash-notification" aria-label="Notifications"><Bell size={20}/><i/></button><Link href="/learn/profile" className="dash-profile">{profile?.avatar?<img src={profile.avatar} alt=""/>:<span className="dash-avatar-fallback">{(profile?.name||"A").slice(0,1).toUpperCase()}</span>}<b>{profile?.name||t.account}</b><ChevronDown size={15}/></Link></div></header>
    <div className="dash-content ah-dashboard-content">
-    <HomeOverview lang={lang} name={profile?.name||""}/>
+    <TutorQuotaNotice/><HomeOverview lang={lang} name={profile?.name||""}/>
 
    </div>
   </section>
