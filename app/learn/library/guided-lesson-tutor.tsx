@@ -1,69 +1,51 @@
 "use client";
 import {FormEvent,useEffect,useRef,useState} from "react";
 import {Send,RotateCcw,Volume2} from "lucide-react";
-type Turn={question:string;translation:string;hint:string;why:string;evaluate:(s:string)=>{ok:boolean;reason:string}};
-const clean=(s:string)=>s.toLowerCase().replace(/[.,!?;:'"“”]/g," ").replace(/\s+/g," ").trim();
-const defaultQuestions:Turn[]=[
- {question:"Hello! What's your name?",translation:"Xin chào! Bạn tên là gì?",hint:"Bạn có thể trả lời: My name is [tên của bạn].",why:"Vì “What's your name?” hỏi tên, nên “My name is ...” trả lời trực tiếp câu hỏi. “My” nghĩa là “của tôi”, “name” là “tên”, “is” là “là”.",evaluate:(s)=>{const t=clean(s);const match=t.match(/^(?:my name is|i am|i m|im)\s+([a-z][a-z -]{0,35})$/i);return match?{ok:true,reason:"Đúng rồi! “My name is ...” và “I'm ...” đều là cách giới thiệu tên tự nhiên bằng tiếng Anh."}:{ok:false,reason:"Câu hỏi “What's your name?” hỏi tên của bạn. Hãy trả lời thành câu hoàn chỉnh như “My name is Minh.” hoặc “I'm Lan.”"};}},
- {question:"Nice to meet you! How are you today?",translation:"Rất vui được gặp bạn! Hôm nay bạn thế nào?",hint:"Bạn có thể trả lời: I'm fine, thank you.",why:"Vì “How are you?” hỏi tình trạng hoặc cảm xúc hiện tại. “I'm fine” nghĩa là “Mình khỏe/ổn”; “thank you” thể hiện sự lịch sự.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:i am|i m|im|i feel)\s+(?:fine|good|great|happy|okay|ok|well|tired|sad|excited|not bad|very good|very well|pretty good)(?:\s+(?:thank you|thanks|today))?$/.test(t)||/^(?:fine|good|great|okay|ok|not bad)(?:\s+(?:thank you|thanks))?$/.test(t);return ok?{ok:true,reason:"Chính xác! Khi được hỏi “How are you?”, bạn có thể nói “I'm fine”, “I'm good” hoặc diễn tả cảm xúc của mình."}:{ok:false,reason:"“How are you?” hỏi bạn đang cảm thấy thế nào, không phải tên hay tuổi. Hãy thử “I'm fine, thank you.” hoặc “I'm happy.”"};}},
- {question:"Where are you from?",translation:"Bạn đến từ đâu?",hint:"Bạn có thể trả lời: I'm from Vietnam. (hoặc thay Vietnam bằng nơi bạn sống)",why:"Vì “Where” hỏi địa điểm, “are you from” hỏi nơi xuất thân. Cấu trúc “I'm from + địa điểm” diễn tả nơi bạn đến từ.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:i am|i m|im)\s+from\s+[a-z][a-z -]+$/.test(t)||/^i (?:come|am coming) from\s+[a-z][a-z -]+$/.test(t);return {ok,reason:ok?"Tốt lắm! Cấu trúc “I'm from + địa điểm” dùng để nói bạn đến từ đâu.":"“Where are you from?” hỏi quê quán hoặc nơi bạn đến từ. Hãy dùng “I'm from + tên địa điểm”, ví dụ “I'm from Vietnam.”"};}},
- {question:"Do you like learning English?",translation:"Bạn có thích học tiếng Anh không?",hint:"Bạn có thể trả lời: Yes, I do. (hoặc No, I don't.)",why:"Vì câu hỏi bắt đầu bằng “Do you ...?”, câu trả lời ngắn thường dùng “Yes, I do” hoặc “No, I don't”. Bạn có thể trả lời theo sở thích thật của mình.",evaluate:(s)=>{const t=clean(s);const ok=/^(yes|yeah|yep)( i do| i like (learning )?english| i love (learning )?english)?$/.test(t)||/^(no|nope)( i do not| i don t| i dislike (learning )?english)?$/.test(t)||/^i (?:like|love|enjoy|do not like|don t like) (?:learning )?english$/.test(t);return {ok,reason:ok?"Giỏi lắm! Với câu hỏi bắt đầu bằng “Do you...?”, bạn có thể trả lời ngắn “Yes, I do” hoặc “No, I don't”.":"Đây là câu hỏi Yes/No. Bạn có thể trả lời “Yes, I do.”, “No, I don't.” hoặc “I like English.”"};}},
- {question:"It was great talking to you! How do you say goodbye?",translation:"Nói chuyện với bạn thật vui! Bạn nói lời tạm biệt như thế nào?",hint:"Bạn có thể trả lời: Goodbye!",why:"Vì Aivanta đang kết thúc cuộc trò chuyện và hỏi cách nói tạm biệt. “Goodbye” nghĩa là “Tạm biệt”; “See you later” nghĩa là “Hẹn gặp lại”.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:goodbye|bye|bye bye|see you|see you later|see you soon|take care)(?: aivanta)?$/.test(t);return {ok,reason:ok?"Tuyệt vời! “Goodbye”, “Bye” và “See you later” đều là cách chào tạm biệt phù hợp.":"Khi kết thúc hội thoại, hãy nói “Goodbye!”, “Bye!” hoặc “See you later!”."};}}
-];
-function buildLessonQuestions(words:{word:string;meaning:string;example:string}[],title:string):Turn[]{
- const usable=words.filter(w=>w.word?.trim()).slice(0,5);
- const isGreeting=/how are you|greet|chào hỏi|greeting|xin chào/i.test(title);
- if(isGreeting){
-  const turns=[
-   {q:"Hey there! How are you today?",vi:"Chào bạn! Hôm nay bạn thế nào?",hint:"I'm fine, thank you! And you? / I'm good! / Not bad.",why:"Bạn có thể nói cảm xúc thật và hỏi lại Aivanta để cuộc trò chuyện tự nhiên hơn.",pattern:/^(?:(?:hi|hey|hello)\s+)?(?:(?:i am|i m|im|i feel)\s+)?(?:fine|good|great|okay|ok|well|happy|not bad|pretty good|very good|tired|sad)(?:\s+(?:thanks|thank you))?(?:\s+(?:and you|how about you|what about you))?$/},
-   {q:"I'm great, thanks for asking! Did you have a good day?",vi:"Mình rất khỏe, cảm ơn bạn đã hỏi! Hôm nay bạn có một ngày vui không?",hint:"Yes, I did! / It was great. / Not really, I'm tired.",why:"Khi được hỏi về một ngày của mình, bạn có thể trả lời tích cực hoặc chia sẻ rằng mình hơi mệt.",pattern:/^(?:yes|yeah|yep|no|nope|not really|it was|my day|i had|i m|i am|im|pretty|very|great|good|fine|okay|ok|bad|tiring|wonderful|awesome|so so).*/},
-   {q:"I see! Are you feeling happy or tired right now?",vi:"Mình hiểu rồi! Bây giờ bạn thấy vui hay mệt?",hint:"I'm happy! / I'm a little tired. / I feel great.",why:"Dùng 'I'm...' hoặc 'I feel...' để mô tả cảm xúc hiện tại.",pattern:/^(?:(?:i am|i m|im|i feel|feeling)\s+)?(?:a little\s+|very\s+|really\s+)?(?:happy|tired|good|great|fine|okay|ok|excited|sad|sleepy|relaxed|well).*/},
-   {q:"Thanks for sharing! What would you say if a friend asked, 'How are you?'",vi:"Cảm ơn bạn đã chia sẻ! Nếu một người bạn hỏi 'How are you?' thì bạn trả lời thế nào?",hint:"I'm good, thanks! How about you? / I'm fine, thank you.",why:"Một câu trả lời lịch sự có thể gồm tình trạng của bạn, lời cảm ơn và câu hỏi lại.",pattern:/^(?:(?:hi|hello|hey)\s+)?(?:(?:i am|i m|im|i feel)\s+)?(?:fine|good|great|okay|ok|well|happy|not bad|pretty good|very good|tired)(?:\s+(?:thanks|thank you))?(?:\s+(?:and you|how about you|what about you))?$/},
-   {q:"That's lovely! I'm happy we talked. How would you say goodbye to me?",vi:"Tuyệt quá! Mình rất vui vì được trò chuyện. Bạn sẽ chào tạm biệt mình thế nào?",hint:"Bye, Aivanta! / See you later! / Goodbye!",why:"Kết thúc hội thoại bằng một lời chào ngắn và thân thiện.",pattern:/^(?:bye|bye bye|goodbye|see you|see you later|see you soon|take care|have a nice day).*/}
-  ];
-  return turns.map(t=>({question:t.q,translation:t.vi,hint:t.hint,why:t.why,evaluate:(answer:string)=>{const ok=t.pattern.test(clean(answer));return {ok,reason:ok?"Nice! Cách trả lời của bạn rất tự nhiên.":"Mình chưa hiểu rõ câu trả lời. Bạn có thể thử: "+t.hint};}}));
- }
- return usable.map((w,i)=>{
-  const example=w.example?.trim()||`I like ${w.word}.`;
-  const prompts=[
-   `Hey! Let's chat about ${title}. Do you know the word "${w.word}"?`,
-   `Nice! Speaking of ${title}, what comes to mind when you hear "${w.word}"?`,
-   `Interesting! Can you tell me something about "${w.word}"?`,
-   `I like hearing your ideas! How would you use "${w.word}" in real life?`,
-   `One last thing about ${title}: tell me a sentence with "${w.word}"!`
-  ];
-  return {question:prompts[i],translation:`Cùng trò chuyện về "${title}" và từ "${w.word}" (${w.meaning}).`,hint:`Bạn có thể nói: ${example}`,why:`"${w.word}" nghĩa là "${w.meaning}". Bạn có thể dùng câu của riêng mình, không cần giống câu mẫu.`,evaluate:(answer:string)=>{const t=clean(answer),hasWord=t.includes(clean(w.word)),yesNo=/^(yes|yeah|yep|no|nope)(\s|$)/.test(t);const ok=i===0?(yesNo||hasWord):hasWord&&t.split(" ").length>=3;return {ok,reason:ok?"That's interesting! Let's keep talking about this lesson.":`Bạn thử dùng "${w.word}" trong một câu nhé. Ví dụ: ${example}`};}};
- });
+type Word={word:string;meaning:string;example:string};
+type Message={role:"assistant"|"user";content:string};
+function opening(title:string,words:Word[]){
+ const t=title.toLowerCase();
+ if(/how are you|feeling|emotion/.test(t))return "Hey! How are you feeling today?";
+ if(/greet|introduc|chào hỏi/.test(t))return "Hello! Nice to meet you. How are you?";
+ if(/food|drink|restaurant|đồ ăn/.test(t))return "Hey! What do you like to eat?";
+ if(/travel|airport|hotel|du lịch/.test(t))return "Welcome! Where would you like to go?";
+ if(/family|gia đình/.test(t))return "Hi! Would you like to tell me about your family?";
+ if(/school|class|trường học/.test(t))return "Hey! What do you enjoy about school?";
+ if(/shop|mua sắm/.test(t))return "Hello! Welcome to my shop. What are you looking for?";
+ return `Hi! Let's talk about ${title}. ${words[0]?.word?`What do you think about ${words[0].word}?`:"What would you like to talk about first?"}`;
 }
-type Message={role:"assistant"|"user";text:string;kind?:"question"|"correct"|"incorrect"|"done"};
-function speak(t:string){if(typeof window==="undefined"||!("speechSynthesis"in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.88;window.speechSynthesis.speak(u);}
-export default function GuidedLessonTutor({onComplete,words,title}:{onComplete?:()=>void;words?:{word:string;meaning:string;example:string}[];title?:string}){
- const questions=words?.length?buildLessonQuestions(words,title||"English"):defaultQuestions;
- const [index,setIndex]=useState(0),[input,setInput]=useState(""),[busy,setBusy]=useState(false),[done,setDone]=useState(false);
- const [messages,setMessages]=useState<Message[]>([{role:"assistant",text:questions[0]?.question||"Hello!",kind:"question"}]);
- const timer=useRef<ReturnType<typeof setTimeout>|null>(null),bottom=useRef<HTMLDivElement>(null);
- useEffect(()=>()=>{if(timer.current)clearTimeout(timer.current);},[]);
- useEffect(()=>{if(timer.current)clearTimeout(timer.current);setIndex(0);setInput("");setBusy(false);setDone(false);setMessages([{role:"assistant",text:questions[0]?.question||"Hello!",kind:"question"}]);},[title,words]);
- useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages]);
- function reset(){if(timer.current)clearTimeout(timer.current);setIndex(0);setInput("");setBusy(false);setDone(false);setMessages([{role:"assistant",text:questions[0]?.question||"Hello!",kind:"question"}]);}
- function send(e:FormEvent){e.preventDefault();const value=input.trim();if(!value||busy||done)return;
- const result=questions[index].evaluate(value);setInput("");
- setMessages(prev=>[...prev,{role:"user",text:value},{role:"assistant",text:(result.ok?"🎉 Làm tốt lắm! ":"💡 Thử lại nhé! ")+result.reason,kind:result.ok?"correct":"incorrect"}]);
- if(!result.ok)return;
- setBusy(true);
- timer.current=setTimeout(()=>{if(index+1<questions.length){setMessages(prev=>[...prev,{role:"assistant",text:questions[index+1].question,kind:"question"}]);setIndex(index+1);}else{setDone(true);setMessages(prev=>[...prev,{role:"assistant",text:"🎓 Xuất sắc! Bạn đã hoàn thành hội thoại cùng Aivanta. Mình rất vui vì được luyện tập với bạn!",kind:"done"}]);onComplete?.();}setBusy(false);},1900);
+function speak(t:string){if(!("speechSynthesis"in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.88;window.speechSynthesis.speak(u);}
+export default function GuidedLessonTutor({onComplete,words=[],title="English"}:{onComplete?:()=>void;words?:Word[];title?:string}){
+ const first=opening(title,words);
+ const [messages,setMessages]=useState<Message[]>([{role:"assistant",content:first}]);
+ const [input,setInput]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState(""),[count,setCount]=useState(0),[done,setDone]=useState(false),[help,setHelp]=useState(false);
+ const bottom=useRef<HTMLDivElement>(null);
+ useEffect(()=>{setMessages([{role:"assistant",content:first}]);setInput("");setError("");setCount(0);setDone(false);setHelp(false);},[title,first]);
+ useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,busy]);
+ async function send(e:FormEvent){e.preventDefault();const value=input.trim();if(!value||busy||done)return;
+  const next:Message[]=[...messages,{role:"user",content:value}];setMessages(next);setInput("");setBusy(true);setError("");
+  try{
+   const response=await fetch("/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"lesson_conversation",lesson:{title,words:words.map(w=>w.word)},messages:next})});
+   const data=await response.json();
+   if(!response.ok)throw new Error(data.error||"Không thể kết nối Aivanta.");
+   setMessages([...next,{role:"assistant",content:String(data.reply||"Let's keep talking!")}]);
+   const n=count+1;setCount(n);if(n>=5){setDone(true);onComplete?.();}
+  }catch(err){setError(err instanceof Error?err.message:"Có lỗi xảy ra.");}
+  finally{setBusy(false);}
  }
+ function reset(){setMessages([{role:"assistant",content:first}]);setInput("");setError("");setCount(0);setDone(false);}
  return <section className="guided-tutor" style={{background:"#f0f5ff",border:"1px solid #cdddfb",borderRadius:20,padding:20,marginTop:24}}>
- <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 5px",fontSize:22}}>🐺 Hội thoại cùng Aivanta</h2><p style={{margin:0,color:"#526c9d"}}>Aivanta trò chuyện theo chủ đề bài học, không chỉ yêu cầu đặt câu máy móc.</p></div><button type="button" onClick={reset} style={{border:"1px solid #c8d9f6",background:"white",borderRadius:12,padding:11,cursor:"pointer",display:"flex",gap:7,alignItems:"center"}}><RotateCcw size={16}/> Bắt đầu lại</button></div>
- <div style={{margin:"15px 0",height:8,borderRadius:20,background:"#dbe6fa",overflow:"hidden"}}><div style={{width:((done?questions.length:index)/questions.length*100)+"%",height:"100%",background:"#23bf6a",transition:"width .3s"}}/></div>
- <div aria-live="polite" style={{height:360,overflowY:"auto",background:"white",borderRadius:16,padding:16,display:"flex",flexDirection:"column",gap:12}}>
- {messages.map((m,i)=><div key={i} style={{alignSelf:m.role==="user"?"flex-end":"flex-start",maxWidth:"90%",background:m.role==="user"?"#2169ee":m.kind==="correct"?"#e2f9eb":m.kind==="incorrect"?"#fff2e5":"#eaf1ff",color:m.role==="user"?"white":"#15356d",borderRadius:16,padding:"12px 16px",lineHeight:1.65,whiteSpace:"pre-wrap"}}><strong style={{display:"block",fontSize:12,marginBottom:5}}>{m.role==="user"?"Bạn":"🐺 Aivanta"}</strong>{m.text}{m.kind==="question"&&<button type="button" onClick={()=>speak(m.text)} aria-label="Nghe câu hỏi" style={{display:"inline-flex",verticalAlign:"middle",marginLeft:10,border:0,background:"#d8e7ff",color:"#1956bc",borderRadius:9,padding:6,cursor:"pointer"}}><Volume2 size={17}/></button>}</div>)}
- {busy&&<p style={{color:"#5973a6",fontWeight:700}}>🐺 Aivanta đang chuyển sang câu tiếp theo...</p>}<div ref={bottom}/>
- </div>
- {!done?<><div style={{background:"#fff",border:"1px solid #d4e2fa",borderRadius:14,padding:"13px 16px",margin:"12px 0",color:"#254b8f",lineHeight:1.6}}>
- <p style={{margin:"0 0 8px"}}><strong>🇻🇳 Dịch câu Aivanta hỏi:</strong> {questions[index].translation}</p>
- <p style={{margin:"0 0 8px"}}><strong>💡 Gợi ý trả lời:</strong> {questions[index].hint}</p>
- <details style={{marginTop:8}}><summary style={{cursor:"pointer",fontWeight:700}}>📘 Xem giải thích khi cần</summary><p style={{margin:"8px 0 0"}}>{questions[index].why}</p></details>
- </div><form onSubmit={send} style={{display:"flex",gap:9}}><input aria-label="Trả lời Aivanta" value={input} onChange={e=>setInput(e.target.value)} disabled={busy} placeholder="Nhập câu trả lời tiếng Anh..." style={{flex:1,minWidth:0,border:"1px solid #c8d9f7",borderRadius:13,padding:"13px 15px",fontSize:16}}/><button disabled={busy||!input.trim()} type="submit" style={{display:"flex",gap:7,alignItems:"center",background:"#1766f3",color:"white",border:0,borderRadius:12,padding:"0 18px",cursor:"pointer",opacity:busy?.5:1}}><Send size={17}/> Gửi</button></form></>:<p role="status" style={{fontWeight:800,color:"#17834c"}}>✅ Hoàn thành {questions.length}/{questions.length} câu hội thoại!</p>}
+  <header style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+   <div><h2 style={{margin:0,fontSize:22}}>🐺 Hội thoại cùng Aivanta</h2><p style={{margin:"6px 0",color:"#526c9d"}}>Chủ đề: {title} · Aivanta phản hồi theo câu trả lời của bạn</p></div>
+   <button type="button" onClick={reset} style={{border:"1px solid #c8d9f6",background:"white",borderRadius:12,padding:11,cursor:"pointer"}}><RotateCcw size={16}/> Bắt đầu lại</button>
+  </header>
+  <div style={{height:8,background:"#dbe6fa",borderRadius:20,margin:"15px 0",overflow:"hidden"}}><div style={{width:Math.min(count/5,1)*100+"%",height:"100%",background:"#23bf6a",transition:"width .3s"}}/></div>
+  <div aria-live="polite" style={{height:360,overflowY:"auto",background:"white",borderRadius:16,padding:16,display:"flex",flexDirection:"column",gap:12}}>
+   {messages.map((m,i)=><div key={i} style={{alignSelf:m.role==="user"?"flex-end":"flex-start",maxWidth:"90%",background:m.role==="user"?"#2169ee":"#eaf1ff",color:m.role==="user"?"white":"#15356d",borderRadius:16,padding:"12px 16px",lineHeight:1.65,whiteSpace:"pre-wrap"}}><strong style={{display:"block",fontSize:12,marginBottom:5}}>{m.role==="user"?"Bạn":"🐺 Aivanta"}</strong>{m.content}{m.role==="assistant"&&<button type="button" onClick={()=>speak(m.content)} aria-label="Nghe Aivanta" style={{marginLeft:10,border:0,borderRadius:8,padding:5,background:"#d8e7ff",color:"#1956bc",cursor:"pointer"}}><Volume2 size={16}/></button>}</div>)}
+   {busy&&<p style={{color:"#5973a6"}}>🐺 Aivanta đang trả lời…</p>}<div ref={bottom}/>
+  </div>
+  <div style={{margin:"12px 0"}}><button type="button" onClick={()=>setHelp(v=>!v)} style={{background:"white",border:"1px solid #d4e2fa",borderRadius:10,padding:10,cursor:"pointer"}}>💡 {help?"Ẩn gợi ý":"Cần gợi ý?"}</button>{help&&<p style={{color:"#254b8f"}}>Hãy trả lời câu hỏi gần nhất bằng tiếng Anh. Bạn có thể trả lời ngắn hoặc hỏi lại Aivanta.</p>}</div>
+  {!done?<form onSubmit={send} style={{display:"flex",gap:9}}><input aria-label="Trả lời Aivanta" value={input} onChange={e=>setInput(e.target.value)} disabled={busy} placeholder="Trả lời Aivanta bằng tiếng Anh..." style={{flex:1,minWidth:0,border:"1px solid #c8d9f7",borderRadius:13,padding:"13px 15px",fontSize:16}}/><button disabled={busy||!input.trim()} type="submit" style={{display:"flex",alignItems:"center",gap:7,background:"#1766f3",color:"white",border:0,borderRadius:12,padding:"0 18px",cursor:"pointer"}}><Send size={17}/> Gửi</button></form>:<p role="status" style={{color:"#17834c",fontWeight:800}}>✅ Đã hoàn thành 5 lượt hội thoại! Bạn có thể bắt đầu lại để luyện thêm.</p>}
+  {error&&<p role="alert" style={{color:"#b42318"}}>{error}</p>}
  </section>;
 }
