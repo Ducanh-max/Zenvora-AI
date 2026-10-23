@@ -58,8 +58,12 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
    const data=await response.json();
    if(response.status===429){setQuotaLocked(true);setDone(true);onComplete?.();throw new Error("Bạn đã hết lượt AI hôm nay. Phần hội thoại được tính hoàn thành; bạn có thể tiếp tục bài học.");}
    if(!response.ok)throw new Error(data.error||"Không thể kết nối Aivanta.");
-   setMessages([...next,{role:"assistant",content:String(data.reply||"Let's keep talking!")}]);
-   const n=count+1;setCount(n);if(n>=5){setDone(true);onComplete?.();}
+   const n=count+1;
+   const reply=n>=5
+    ? "You did a great job today! I enjoyed talking with you. Goodbye, and see you next time! 👋"
+    : String(data.reply||"Let's keep talking!");
+   setMessages([...next,{role:"assistant",content:reply}]);
+   setCount(n);if(n>=5){setDone(true);onComplete?.();}
   }catch(err){setError(err instanceof Error?err.message:"Có lỗi xảy ra.");}
   finally{setBusy(false);}
  }
