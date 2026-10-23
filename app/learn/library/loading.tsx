@@ -1,4 +1,8 @@
+"use client";
+import {useEffect,useState} from "react";
 export default function Loading() {
+  const [returning,setReturning]=useState(false);
+  useEffect(()=>{try{setReturning(sessionStorage.getItem("aunora_returning_to_lesson")==="1")}catch{}},[]);
   return (
     <main className="quizpage aunora-quiz lesson-hub als-page" aria-busy="true" aria-live="polite">
       <style>{`
@@ -16,8 +20,8 @@ export default function Loading() {
       <section className="aunora-loading">
         <div className="aunora-loading-card" role="status">
           <img className="aunora-loading-wolf" src="/brand/aivanta-mascot.webp.png" alt="" />
-          <h1 className="aunora-loading-title">Đang vào khóa học...</h1>
-          <p className="aunora-loading-desc">Đang tải danh sách khóa học của bạn 🐺</p>
+          <h1 className="aunora-loading-title">{returning?"Đang quay lại bài học...":"Đang vào khóa học..."}</h1>
+          <p className="aunora-loading-desc">{returning?"Aivanta đang đưa bạn trở lại bài học vừa học 🐺":"Đang tải danh sách khóa học của bạn 🐺"}</p>
           <div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar" /></div>
         </div>
       </section>
