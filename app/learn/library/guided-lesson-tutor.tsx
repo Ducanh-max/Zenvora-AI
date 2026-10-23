@@ -25,14 +25,14 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
  useEffect(()=>{setMessages([{role:"assistant",content:first}]);setInput("");setError("");setCount(0);setDone(false);setHelp(false);setHintText("");setTranslations({});setShowTranslation(false);},[title,first]);
  useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,busy]);
  async function translateMessage(index:number,content:string){
-  if(translations[index]||translating!==null)return;
+  if((translations[index]&&!translations[index].startsWith("⚠️"))||translating!==null)return;
   setTranslating(index);
   try{
    const response=await fetch("/api/speaking/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[content]})});
    const data=await response.json();
    if(!response.ok)throw new Error(data.error||"Không dịch được.");
    setTranslations(prev=>({...prev,[index]:String(data.translations?.[0]||"Chưa có bản dịch.")}));
-  }catch{setTranslations(prev=>({...prev,[index]:"Không thể dịch lúc này. Vui lòng thử lại sau."}));}
+  }catch{setTranslations(prev=>({...prev,[index]:"⚠️ Không thể dịch lúc này. Nhấn để thử lại."}));}
   finally{setTranslating(null);}
  }
  async function getHint(){
@@ -69,7 +69,7 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
   <button type="button" onClick={()=>setShowTranslation(v=>!v)} style={{border:"1px solid #c8d9f6",background:"#fff",borderRadius:10,padding:"9px 12px",cursor:"pointer",marginTop:10}}>🌐 {showTranslation?"Ẩn dịch tiếng Việt":"Hiện dịch tiếng Việt"}</button>
   <div style={{height:8,background:"#dbe6fa",borderRadius:20,margin:"15px 0",overflow:"hidden"}}><div style={{width:Math.min(count/5,1)*100+"%",height:"100%",background:"#23bf6a",transition:"width .3s"}}/></div>
   <div aria-live="polite" style={{height:360,overflowY:"auto",background:"white",borderRadius:16,padding:16,display:"flex",flexDirection:"column",gap:12}}>
-   {messages.map((m,i)=><div key={i} style={{alignSelf:m.role==="user"?"flex-end":"flex-start",maxWidth:"90%",background:m.role==="user"?"#2169ee":"#eaf1ff",color:m.role==="user"?"white":"#15356d",borderRadius:16,padding:"12px 16px",lineHeight:1.65,whiteSpace:"pre-wrap"}}><strong style={{display:"block",fontSize:12,marginBottom:5}}>{m.role==="user"?"Bạn":"🐺 Aivanta"}</strong>{m.content}{m.role==="assistant"&&showTranslation&&<div style={{fontSize:13,marginTop:8,paddingTop:8,borderTop:"1px solid #c8d9f6",color:"#365b91"}}>{translations[i]||<button type="button" disabled={translating===i} onClick={()=>void translateMessage(i,m.content)} style={{border:0,background:"#fff",borderRadius:7,padding:7,cursor:"pointer"}}>{translating===i?"Đang dịch…":"🇻🇳 Dịch câu này"}</button>}</div>}{m.role==="assistant"&&<button type="button" onClick={()=>speak(m.content)} aria-label="Nghe Aivanta" style={{marginLeft:10,border:0,borderRadius:8,padding:5,background:"#d8e7ff",color:"#1956bc",cursor:"pointer"}}><Volume2 size={16}/></button>}</div>)}
+   {messages.map((m,i)=><div key={i} style={{alignSelf:m.role==="user"?"flex-end":"flex-start",maxWidth:"90%",background:m.role==="user"?"#2169ee":"#eaf1ff",color:m.role==="user"?"white":"#15356d",borderRadius:16,padding:"12px 16px",lineHeight:1.65,whiteSpace:"pre-wrap"}}><strong style={{display:"block",fontSize:12,marginBottom:5}}>{m.role==="user"?"Bạn":"🐺 Aivanta"}</strong>{m.content}{m.role==="assistant"&&showTranslation&&<div style={{fontSize:13,marginTop:8,paddingTop:8,borderTop:"1px solid #c8d9f6",color:"#365b91"}}>{translations[i]?.startsWith("⚠️")&&<button type="button" onClick={()=>void translateMessage(i,m.content)} style={{border:0,background:"#fff",borderRadius:7,padding:7,cursor:"pointer"}}>🔄 Thử dịch lại</button>}{translations[i]||<button type="button" disabled={translating===i} onClick={()=>void translateMessage(i,m.content)} style={{border:0,background:"#fff",borderRadius:7,padding:7,cursor:"pointer"}}>{translating===i?"Đang dịch…":"🇻🇳 Dịch câu này"}</button>}</div>}{m.role==="assistant"&&<button type="button" onClick={()=>speak(m.content)} aria-label="Nghe Aivanta" style={{marginLeft:10,border:0,borderRadius:8,padding:5,background:"#d8e7ff",color:"#1956bc",cursor:"pointer"}}><Volume2 size={16}/></button>}</div>)}
    {busy&&<p style={{color:"#5973a6"}}>🐺 Aivanta đang trả lời…</p>}<div ref={bottom}/>
   </div>
   <div style={{margin:"12px 0"}}><button type="button" onClick={()=>void getHint()} style={{background:"white",border:"1px solid #d4e2fa",borderRadius:10,padding:10,cursor:"pointer"}}>💡 {help?"Ẩn gợi ý":"Cần gợi ý?"}</button>{help&&<p style={{color:"#254b8f"}}>{hintBusy?"Aivanta đang chuẩn bị gợi ý…":hintText||"Đang tải gợi ý…"}</p>}</div>
