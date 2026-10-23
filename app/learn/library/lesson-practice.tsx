@@ -2,7 +2,30 @@
 import {useEffect,useMemo,useState} from "react";
 import {Volume2,CheckCircle2,ArrowRight} from "lucide-react";
 type Word={word:string;meaning:string;example:string};
-function playAnswerSound(ok:boolean){try{const ctx=new AudioContext();if(ctx.state==="suspended")void ctx.resume();(ok?[659.25,880,1046.5]:[330,261.63]).forEach((hz,i)=>{const osc=ctx.createOscillator(),gain=ctx.createGain(),t=ctx.currentTime+i*.13;osc.type=ok?"sine":"triangle";osc.frequency.setValueAtTime(hz,t);gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.15,t+.02);gain.gain.exponentialRampToValueAtTime(.0001,t+.2);osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+.21)});window.setTimeout(()=>void ctx.close().catch(()=>{}),1000)}catch{}}
+let feedbackAudioContext:AudioContext|null=null;
+function playAnswerSound(ok:boolean){
+ try{
+  const AudioCtor=window.AudioContext;
+  if(!AudioCtor)return;
+  const ctx=feedbackAudioContext??(feedbackAudioContext=new AudioCtor());
+  if(ctx.state==="suspended")void ctx.resume();
+  const start=ctx.currentTime+.035;
+  const notes=ok?[{hz:659.25,at:0,duration:.16},{hz:880,at:.13,duration:.16},{hz:1046.5,at:.26,duration:.24}]:[{hz:245,at:0,duration:.28},{hz:185,at:.28,duration:.36}];
+  for(const note of notes){
+   const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+   const t=start+note.at;
+   oscillator.type=ok?"sine":"sawtooth";
+   oscillator.frequency.setValueAtTime(note.hz,t);
+   if(!ok)oscillator.frequency.exponentialRampToValueAtTime(note.hz*.76,t+note.duration);
+   gain.gain.setValueAtTime(.0001,t);
+   gain.gain.exponentialRampToValueAtTime(ok?.18:.22,t+.025);
+   gain.gain.setValueAtTime(ok?.18:.22,t+note.duration*.55);
+   gain.gain.exponentialRampToValueAtTime(.0001,t+note.duration);
+   oscillator.connect(gain);gain.connect(ctx.destination);
+   oscillator.start(t);oscillator.stop(t+note.duration+.02);
+  }
+ }catch(error){console.warn("Không phát được âm thanh phản hồi",error)}
+}
 export default function LessonPractice({lessonId,title,words}:{lessonId:string;title:string;words:Word[]}){
  const [index,setIndex]=useState(0);const [choice,setChoice]=useState<number|null>(null);const [checked,setChecked]=useState(false);const [correct,setCorrect]=useState(0);
  const bank=useMemo(()=>words.filter(w=>w.word&&w.meaning).slice(0,5).map((w,i,all)=>{
