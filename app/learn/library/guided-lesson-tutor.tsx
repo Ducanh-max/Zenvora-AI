@@ -30,6 +30,7 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
  const remainingSeconds=Math.max(0,Math.ceil((new Date(resetAt).getTime()-clock)/1000)||0);
  const waitTime=[Math.floor(remainingSeconds/3600),Math.floor(remainingSeconds%3600/60),remainingSeconds%60].map(n=>String(n).padStart(2,"0")).join(":");
  const bottom=useRef<HTMLDivElement>(null);
+ useEffect(()=>{try{sessionStorage.setItem("aunora_conversation_progress",JSON.stringify({title,count,done,total:5,updatedAt:Date.now()}));}catch{}},[title,count,done]);
  useEffect(()=>{setMessages([{role:"assistant",content:first}]);setInput("");setError("");setCount(0);setDone(false);setHelp(false);setHintText("");setTranslations({});setShowTranslation(false);},[title,first]);
  useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,busy]);
  async function translateMessage(index:number,content:string){
