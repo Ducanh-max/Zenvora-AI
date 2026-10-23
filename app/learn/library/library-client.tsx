@@ -69,6 +69,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   }, []);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
   const [enteringLesson, setEnteringLesson] = useState<LibraryLesson | null>(null);
+  useEffect(()=>{try{const saved=sessionStorage.getItem("aunora_active_lesson");if(!saved)return;const item=JSON.parse(saved) as {slug:string;course:string};const found=lessons.find(l=>l.slug===item.slug&&courses.some(c=>c.id===l.course_id&&c.slug===item.course));if(found){setSelectedCourseSlug(item.course);setSelected(found);sessionStorage.removeItem("aunora_active_lesson");}}catch{}},[lessons,courses]);
+  useEffect(()=>{if(selected){try{sessionStorage.setItem("aunora_active_lesson",JSON.stringify({slug:selected.slug,course:selectedCourseSlug}));}catch{}}},[selected,selectedCourseSlug]);
   function openLesson(lesson: LibraryLesson) {
     setEnteringLesson(lesson);
     window.setTimeout(() => { setSelected(lesson); setMode("learn"); setEnteringLesson(null); }, 550);
@@ -108,7 +110,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       return false;
     } finally { setSaving(false); }
   }
-  function resetLesson() { setSelected(null); setMode("learn"); setNotice(""); }
+  function resetLesson() { try{sessionStorage.removeItem("aunora_active_lesson")}catch{} setSelected(null); setMode("learn"); setNotice(""); }
 
   const activeCourse = courses.find(course => course.slug === selectedCourseSlug) || null;
   const courseLessons = activeCourse ? lessons.filter(lesson => lesson.course_id === activeCourse.id).sort((a, b) => a.sort_order - b.sort_order) : [];
