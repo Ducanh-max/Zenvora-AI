@@ -106,3 +106,11 @@ export async function deleteLesson(formData: FormData) {
   if (error) throw new Error("Không thể xóa bài học đang có tiến độ hoặc lượt làm bài liên quan. " + error.message);
   revalidatePath("/admin");
 }
+
+export async function giftTutorCredits(userId:string,amount:number){
+ const db=await requireAdmin();
+ if(!Number.isInteger(amount)||amount<1||amount>10000)throw new Error("Số lượt phải từ 1 đến 10000.");
+ const {data,error}=await db.rpc("aunora_gift_tutor_credits",{p_user:userId,p_amount:amount});
+ if(error)throw new Error(error.message);
+ return Number(data);
+}
