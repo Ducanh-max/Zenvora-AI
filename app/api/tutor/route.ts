@@ -64,7 +64,8 @@ export async function POST(request: Request) {
       auth: { autoRefreshToken: false, persistSession: false }
     });
 
-    const { data: quotaRows, error: quotaError } = await admin.rpc("consume_aunora_quota", {
+    const isAdmin = user.app_metadata?.role === "admin";
+    const { data: quotaRows, error: quotaError } = isAdmin ? { data: [{ allowed: true, used: 0, quota: -1, remaining: -1 }], error: null } : await admin.rpc("consume_aunora_quota", {
       p_user_id: user.id,
       p_feature: "ai_tutor"
     });
