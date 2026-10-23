@@ -66,7 +66,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   try{const raw=sessionStorage.getItem("aunora_lesson_step_"+lesson.id);if(raw){const state=JSON.parse(raw);savedStep=Math.max(0,Math.min(activities.length,Number(state.step)||0));savedChat=Boolean(state.chatCompleted);}}catch{}
   setStep(savedStep);setSelected("");setChecked(false);setHint(false);setMatched([]);setFirst("");setMatchComplete(false);setMatchCorrect(false);setTokens([]);setRecognized("");setRight(0);setReviewQueue([]);setReviewIndex(0);setReviewMode(false);setSpeechSkipped(false);setChatCompleted(savedChat);
  },[lesson.id,activities.length]);
- useEffect(()=>{try{sessionStorage.setItem("aunora_lesson_step_"+lesson.id,JSON.stringify({step,chatCompleted}));}catch{}},[lesson.id,step,chatCompleted]);
+ useEffect(()=>{try{sessionStorage.setItem("aunora_lesson_step_"+lesson.id,JSON.stringify({step,chatCompleted,total:activities.length,title:lesson.title}));}catch{}},[lesson.id,step,chatCompleted]);
  const activityIndex=reviewMode?reviewQueue[reviewIndex]:step;
  const activity=activities[activityIndex];const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
  const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
