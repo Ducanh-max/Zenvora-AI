@@ -27,10 +27,10 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
   if(translations[index]||translating!==null)return;
   setTranslating(index);
   try{
-   const response=await fetch("/api/speaking/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:content,target:"vi"})});
+   const response=await fetch("/api/speaking/translate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:[content]})});
    const data=await response.json();
    if(!response.ok)throw new Error(data.error||"Không dịch được.");
-   setTranslations(prev=>({...prev,[index]:String(data.translation||data.translatedText||data.text||"Chưa có bản dịch.")}));
+   setTranslations(prev=>({...prev,[index]:String(data.translations?.[0]||"Chưa có bản dịch.")}));
   }catch{setTranslations(prev=>({...prev,[index]:"Không thể dịch lúc này. Vui lòng thử lại sau."}));}
   finally{setTranslating(null);}
  }
