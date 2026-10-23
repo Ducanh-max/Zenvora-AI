@@ -1,5 +1,5 @@
-import TutorQuotaNotice from "./tutor-quota-notice";
 "use client";
+import TutorQuotaNotice from "./tutor-quota-notice";
 import Link from "next/link";
 import HomeOverview from "./home-overview";
 import { useEffect, useState } from "react";
