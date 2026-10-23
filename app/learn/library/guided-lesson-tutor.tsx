@@ -11,29 +11,28 @@ const defaultQuestions:Turn[]=[
  {question:"It was great talking to you! How do you say goodbye?",translation:"Nói chuyện với bạn thật vui! Bạn nói lời tạm biệt như thế nào?",hint:"Bạn có thể trả lời: Goodbye!",why:"Vì Aivanta đang kết thúc cuộc trò chuyện và hỏi cách nói tạm biệt. “Goodbye” nghĩa là “Tạm biệt”; “See you later” nghĩa là “Hẹn gặp lại”.",evaluate:(s)=>{const t=clean(s);const ok=/^(?:goodbye|bye|bye bye|see you|see you later|see you soon|take care)(?: aivanta)?$/.test(t);return {ok,reason:ok?"Tuyệt vời! “Goodbye”, “Bye” và “See you later” đều là cách chào tạm biệt phù hợp.":"Khi kết thúc hội thoại, hãy nói “Goodbye!”, “Bye!” hoặc “See you later!”."};}}
 ];
 function buildLessonQuestions(words:{word:string;meaning:string;example:string}[],title:string):Turn[]{
- const usable=words.filter(w=>w.word?.trim()&&w.meaning?.trim()).slice(0,5);
- // Every turn comes from the actual lesson vocabulary, never unrelated small talk.
+ const usable=words.filter(w=>w.word?.trim()).slice(0,5);
+ const isGreeting=/how are you|greet|chào hỏi|greeting|xin chào/i.test(title);
+ if(isGreeting){
+  const turns=[
+   {q:"Hey there! How are you today?",vi:"Chào bạn! Hôm nay bạn thế nào?",hint:"I'm fine, thank you! And you? / I'm good! / Not bad.",why:"Bạn có thể nói cảm xúc thật và hỏi lại Aivanta để cuộc trò chuyện tự nhiên hơn.",pattern:/^(?:(?:hi|hey|hello)\s+)?(?:(?:i am|i m|im|i feel)\s+)?(?:fine|good|great|okay|ok|well|happy|not bad|pretty good|very good|tired|sad)(?:\s+(?:thanks|thank you))?(?:\s+(?:and you|how about you|what about you))?$/},
+   {q:"I'm great, thanks for asking! Did you have a good day?",vi:"Mình rất khỏe, cảm ơn bạn đã hỏi! Hôm nay bạn có một ngày vui không?",hint:"Yes, I did! / It was great. / Not really, I'm tired.",why:"Khi được hỏi về một ngày của mình, bạn có thể trả lời tích cực hoặc chia sẻ rằng mình hơi mệt.",pattern:/^(?:yes|yeah|yep|no|nope|not really|it was|my day|i had|i m|i am|im|pretty|very|great|good|fine|okay|ok|bad|tiring|wonderful|awesome|so so).*/},
+   {q:"I see! Are you feeling happy or tired right now?",vi:"Mình hiểu rồi! Bây giờ bạn thấy vui hay mệt?",hint:"I'm happy! / I'm a little tired. / I feel great.",why:"Dùng 'I'm...' hoặc 'I feel...' để mô tả cảm xúc hiện tại.",pattern:/^(?:(?:i am|i m|im|i feel|feeling)\s+)?(?:a little\s+|very\s+|really\s+)?(?:happy|tired|good|great|fine|okay|ok|excited|sad|sleepy|relaxed|well).*/},
+   {q:"Thanks for sharing! What would you say if a friend asked, 'How are you?'",vi:"Cảm ơn bạn đã chia sẻ! Nếu một người bạn hỏi 'How are you?' thì bạn trả lời thế nào?",hint:"I'm good, thanks! How about you? / I'm fine, thank you.",why:"Một câu trả lời lịch sự có thể gồm tình trạng của bạn, lời cảm ơn và câu hỏi lại.",pattern:/^(?:(?:hi|hello|hey)\s+)?(?:(?:i am|i m|im|i feel)\s+)?(?:fine|good|great|okay|ok|well|happy|not bad|pretty good|very good|tired)(?:\s+(?:thanks|thank you))?(?:\s+(?:and you|how about you|what about you))?$/},
+   {q:"That's lovely! I'm happy we talked. How would you say goodbye to me?",vi:"Tuyệt quá! Mình rất vui vì được trò chuyện. Bạn sẽ chào tạm biệt mình thế nào?",hint:"Bye, Aivanta! / See you later! / Goodbye!",why:"Kết thúc hội thoại bằng một lời chào ngắn và thân thiện.",pattern:/^(?:bye|bye bye|goodbye|see you|see you later|see you soon|take care|have a nice day).*/}
+  ];
+  return turns.map(t=>({question:t.q,translation:t.vi,hint:t.hint,why:t.why,evaluate:(answer:string)=>{const ok=t.pattern.test(clean(answer));return {ok,reason:ok?"Nice! Cách trả lời của bạn rất tự nhiên.":"Mình chưa hiểu rõ câu trả lời. Bạn có thể thử: "+t.hint};}}));
+ }
  return usable.map((w,i)=>{
-  const example=w.example?.trim()||"";
-  const keyword=clean(w.word);
-  const phrase=keyword.split(" ").filter(Boolean);
-  const sample=example||`I can use "${w.word}" in a sentence.`;
-  const question=i===0
-   ?`Hi! Today we're talking about ${title}. Let's start with "${w.word}". Can you use it in a sentence?`
-   :`Great, let's keep talking about ${title}! How would you use "${w.word}" in a sentence?`;
-  return {
-   question,
-   translation:`Chúng ta đang trò chuyện về bài "${title}". Hãy dùng "${w.word}" (nghĩa: ${w.meaning}) trong một câu tiếng Anh.`,
-   hint:`Ví dụ: ${sample}`,
-   why:`Từ "${w.word}" nghĩa là "${w.meaning}". ${example?"Trong bài có câu mẫu: "+example:"Hãy dùng từ này trong một câu có ý nghĩa."}`,
-   evaluate:(input:string)=>{
-    const t=clean(input);
-    const contains=t.includes(keyword)||phrase.length>1&&phrase.every(part=>t.split(" ").includes(part));
-    const enough=t.split(" ").filter(Boolean).length>=Math.max(3,phrase.length+1);
-    const ok=contains&&enough;
-    return {ok,reason:ok?`Nice! Bạn đã sử dụng "${w.word}" trong câu của mình. Chúng ta tiếp tục đúng chủ đề "${title}" nhé.`:`Hãy trả lời bằng một câu tiếng Anh có từ "${w.word}". Bạn có thể tham khảo: ${sample}`};
-   }
-  };
+  const example=w.example?.trim()||`I like ${w.word}.`;
+  const prompts=[
+   `Hey! Let's chat about ${title}. Do you know the word "${w.word}"?`,
+   `Nice! Speaking of ${title}, what comes to mind when you hear "${w.word}"?`,
+   `Interesting! Can you tell me something about "${w.word}"?`,
+   `I like hearing your ideas! How would you use "${w.word}" in real life?`,
+   `One last thing about ${title}: tell me a sentence with "${w.word}"!`
+  ];
+  return {question:prompts[i],translation:`Cùng trò chuyện về "${title}" và từ "${w.word}" (${w.meaning}).`,hint:`Bạn có thể nói: ${example}`,why:`"${w.word}" nghĩa là "${w.meaning}". Bạn có thể dùng câu của riêng mình, không cần giống câu mẫu.`,evaluate:(answer:string)=>{const t=clean(answer),hasWord=t.includes(clean(w.word)),yesNo=/^(yes|yeah|yep|no|nope)(\s|$)/.test(t);const ok=i===0?(yesNo||hasWord):hasWord&&t.split(" ").length>=3;return {ok,reason:ok?"That's interesting! Let's keep talking about this lesson.":`Bạn thử dùng "${w.word}" trong một câu nhé. Ví dụ: ${example}`};}};
  });
 }
 type Message={role:"assistant"|"user";text:string;kind?:"question"|"correct"|"incorrect"|"done"};
@@ -55,7 +54,7 @@ export default function GuidedLessonTutor({onComplete,words,title}:{onComplete?:
  timer.current=setTimeout(()=>{if(index+1<questions.length){setMessages(prev=>[...prev,{role:"assistant",text:questions[index+1].question,kind:"question"}]);setIndex(index+1);}else{setDone(true);setMessages(prev=>[...prev,{role:"assistant",text:"🎓 Xuất sắc! Bạn đã hoàn thành hội thoại cùng Aivanta. Mình rất vui vì được luyện tập với bạn!",kind:"done"}]);onComplete?.();}setBusy(false);},1900);
  }
  return <section className="guided-tutor" style={{background:"#f0f5ff",border:"1px solid #cdddfb",borderRadius:20,padding:20,marginTop:24}}>
- <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 5px",fontSize:22}}>🐺 Hội thoại cùng Aivanta</h2><p style={{margin:0,color:"#526c9d"}}>Chỉ hội thoại theo nội dung bài đang học · Dùng từ vựng của bài trong câu tiếng Anh.</p></div><button type="button" onClick={reset} style={{border:"1px solid #c8d9f6",background:"white",borderRadius:12,padding:11,cursor:"pointer",display:"flex",gap:7,alignItems:"center"}}><RotateCcw size={16}/> Bắt đầu lại</button></div>
+ <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"center",flexWrap:"wrap"}}><div><h2 style={{margin:"0 0 5px",fontSize:22}}>🐺 Hội thoại cùng Aivanta</h2><p style={{margin:0,color:"#526c9d"}}>Aivanta trò chuyện theo chủ đề bài học, không chỉ yêu cầu đặt câu máy móc.</p></div><button type="button" onClick={reset} style={{border:"1px solid #c8d9f6",background:"white",borderRadius:12,padding:11,cursor:"pointer",display:"flex",gap:7,alignItems:"center"}}><RotateCcw size={16}/> Bắt đầu lại</button></div>
  <div style={{margin:"15px 0",height:8,borderRadius:20,background:"#dbe6fa",overflow:"hidden"}}><div style={{width:((done?questions.length:index)/questions.length*100)+"%",height:"100%",background:"#23bf6a",transition:"width .3s"}}/></div>
  <div aria-live="polite" style={{height:360,overflowY:"auto",background:"white",borderRadius:16,padding:16,display:"flex",flexDirection:"column",gap:12}}>
  {messages.map((m,i)=><div key={i} style={{alignSelf:m.role==="user"?"flex-end":"flex-start",maxWidth:"90%",background:m.role==="user"?"#2169ee":m.kind==="correct"?"#e2f9eb":m.kind==="incorrect"?"#fff2e5":"#eaf1ff",color:m.role==="user"?"white":"#15356d",borderRadius:16,padding:"12px 16px",lineHeight:1.65,whiteSpace:"pre-wrap"}}><strong style={{display:"block",fontSize:12,marginBottom:5}}>{m.role==="user"?"Bạn":"🐺 Aivanta"}</strong>{m.text}{m.kind==="question"&&<button type="button" onClick={()=>speak(m.text)} aria-label="Nghe câu hỏi" style={{display:"inline-flex",verticalAlign:"middle",marginLeft:10,border:0,background:"#d8e7ff",color:"#1956bc",borderRadius:9,padding:6,cursor:"pointer"}}><Volume2 size={17}/></button>}</div>)}
@@ -64,7 +63,7 @@ export default function GuidedLessonTutor({onComplete,words,title}:{onComplete?:
  {!done?<><div style={{background:"#fff",border:"1px solid #d4e2fa",borderRadius:14,padding:"13px 16px",margin:"12px 0",color:"#254b8f",lineHeight:1.6}}>
  <p style={{margin:"0 0 8px"}}><strong>🇻🇳 Dịch câu Aivanta hỏi:</strong> {questions[index].translation}</p>
  <p style={{margin:"0 0 8px"}}><strong>💡 Gợi ý trả lời:</strong> {questions[index].hint}</p>
- <p style={{margin:0}}><strong>📘 Vì sao có thể trả lời như vậy?</strong> {questions[index].why}</p>
+ <details style={{marginTop:8}}><summary style={{cursor:"pointer",fontWeight:700}}>📘 Xem giải thích khi cần</summary><p style={{margin:"8px 0 0"}}>{questions[index].why}</p></details>
  </div><form onSubmit={send} style={{display:"flex",gap:9}}><input aria-label="Trả lời Aivanta" value={input} onChange={e=>setInput(e.target.value)} disabled={busy} placeholder="Nhập câu trả lời tiếng Anh..." style={{flex:1,minWidth:0,border:"1px solid #c8d9f7",borderRadius:13,padding:"13px 15px",fontSize:16}}/><button disabled={busy||!input.trim()} type="submit" style={{display:"flex",gap:7,alignItems:"center",background:"#1766f3",color:"white",border:0,borderRadius:12,padding:"0 18px",cursor:"pointer",opacity:busy?.5:1}}><Send size={17}/> Gửi</button></form></>:<p role="status" style={{fontWeight:800,color:"#17834c"}}>✅ Hoàn thành {questions.length}/{questions.length} câu hội thoại!</p>}
  </section>;
 }
