@@ -76,8 +76,23 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
     const sentence=example.slice(0,index)+"_____"+example.slice(index+w.word.length);
     a.push({type:"fill",word:w,question:"Điền từ còn thiếu vào câu",answer:w.word,sentence});
   });
-  const reply=words.find(w=>w.example&&w.example.trim().split(/\s+/).length>=3)||words[0];
-  a.push({type:"read",word:reply,question:"Aivanta nói chuyện với bạn. Chọn câu đáp lại phù hợp",sentence:reply?.meaning||"Hello!",answer:reply?.example||reply?.word||"",options:[reply?.example||reply?.word||"",...words.filter(w=>w.word!==reply?.word).slice(0,3).map(w=>w.example||w.word)].sort((x,y)=>x.localeCompare(y))});
+  // Only create a dialogue question when there is an actual two-turn exchange.
+  // Vocabulary examples are NOT interchangeable conversation responses.
+  const lines=(lesson.dialogue||[]).filter(d=>d.english?.trim());
+  const exchange=lines.findIndex((line,i)=>i<lines.length-1&&line.speaker!==lines[i+1].speaker&&norm(line.english)!==norm(lines[i+1].english));
+  if(exchange>=0){
+    const prompt=lines[exchange].english.trim();
+    const answer=lines[exchange+1].english.trim();
+    const distractors=[
+      ...lines.filter((_,i)=>i!==exchange+1).map(d=>d.english.trim()),
+      ...words.map(w=>w.example?.trim()).filter((v):v is string=>Boolean(v))
+    ].filter(v=>norm(v)!==norm(answer)&&norm(v)!==norm(prompt));
+    const unique=[...new Map(distractors.map(v=>[norm(v),v])).values()].slice(0,3);
+    if(unique.length>=2){
+      const options=[answer,...unique].sort((x,y)=>x.localeCompare(y));
+      a.push({type:"read",question:"Aivanta nói chuyện với bạn. Chọn câu đáp lại phù hợp",sentence:prompt,answer,options});
+    }
+  }
   words.slice(0,2).forEach(w=>a.push({type:"speak",word:w,question:"Tự nói hoặc viết từ tiếng Anh",answer:w.word}));
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
