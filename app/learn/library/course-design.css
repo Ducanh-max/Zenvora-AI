@@ -186,3 +186,22 @@
 .acd-arrival-card small{display:block;margin-top:14px;font-size:12px;color:#6680a2}
 .acd-arrival-start{display:block;width:100%;padding:14px 12px;background:#267bea;color:white;border:0;border-radius:14px;box-shadow:0 4px 0 #1454a9;font-size:17px;font-weight:900;cursor:pointer}
 .acd-arrival-close{position:absolute;right:10px;top:7px;background:transparent;border:0;color:#6680a2;font-size:29px;cursor:pointer}
+
+/* Listening dictation: audio-first shuffled word bank with optional keyboard. */
+.adv-dictation{background:#fff;border:2px solid #d6e5fa;border-radius:24px;padding:clamp(18px,3vw,30px);box-shadow:0 6px 0 #d6e4f3;margin:24px 0}
+.adv-dictation-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;color:#204574;font-size:18px}
+.adv-dictation-modes{display:flex;gap:5px;padding:5px;background:#eef5ff;border-radius:13px}
+.adv-dictation-modes button{border:0;border-radius:10px;padding:9px 13px;background:transparent;color:#476b9b;font-weight:800;cursor:pointer}
+.adv-dictation-modes button.is-active{background:#fff;color:#1262d5;box-shadow:0 2px 7px #1c529b22}
+.adv-dictation-audio{display:flex;align-items:center;justify-content:center;gap:18px;padding:24px 0}
+.adv-dictation-audio button{display:grid;place-items:center;width:76px;height:76px;border-radius:22px;border:2px solid #c8ddff;background:#ecf5ff;color:#1266dc;box-shadow:0 5px 0 #c7d8ee;cursor:pointer}
+.adv-dictation-audio button:first-child{background:#237aeb;color:#fff;border-color:#237aeb;box-shadow:0 5px 0 #1455a8}
+.adv-dictation-audio button span{font-size:37px;line-height:1}
+.adv-dictation-answer{min-height:90px;border-bottom:2px solid #cbdcf4;padding:14px 5px;display:flex;align-items:center;align-content:center;flex-wrap:wrap;gap:9px}
+.adv-dictation-answer>span{color:#8196b3;font-size:15px}
+.adv-dictation-answer button,.adv-dictation-pool button{border:2px solid #d0def1;background:#fff;border-radius:12px;padding:12px 16px;color:#193e79;font-size:18px;font-weight:800;box-shadow:0 3px 0 #d4e0ee;cursor:pointer;transition:transform .15s ease}
+.adv-dictation-answer button:active,.adv-dictation-pool button:active{transform:translateY(2px)}
+.adv-dictation-pool{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;padding:28px 0 8px}
+.adv-dictation-pool button:disabled{opacity:.25;cursor:default}
+.adv-dictation>input{display:block;width:100%;border:2px solid #cbdcf4;border-radius:14px;padding:17px;font-size:20px;color:#163d72;outline-color:#2a7df0}
+@media(max-width:600px){.adv-dictation-audio button{width:62px;height:62px}.adv-dictation-answer button,.adv-dictation-pool button{font-size:16px;padding:10px 12px}}
