@@ -70,10 +70,11 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   words.filter(w=>w.example?.trim().split(/\s+/).length>=3).slice(0,2).forEach(w=>a.push({type:"order",word:w,question:"Ghép các mảnh từ thành câu tiếng Anh",answer:w.example.replace(/[.!?]+$/,"")}));
   a.push({type:"match",question:"Nối các cặp từ Anh – Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
   words.slice(3,5).forEach(w=>{
-    const escaped=w.word.replace(/[.*+?^${}()|[\]\\]/g,"\\  words.slice(3,5).forEach(w=>a.push({type:"fill",word:w,question:"Điền từ còn thiếu vào câu",answer:w.word,sentence:(w.example||"").replace(new RegExp(w.word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____")}));");
-    const re=new RegExp("\\b"+escaped+"\\b","i");
-    if(!w.example||!re.test(w.example))return; // Only ask when the answer actually appears in the sentence.
-    a.push({type:"fill",word:w,question:"Điền từ còn thiếu vào câu",answer:w.word,sentence:w.example.replace(re,"_____")});
+    const example=w.example||"";
+    const index=example.toLowerCase().indexOf(w.word.toLowerCase());
+    if(index<0)return; // Avoid asking for a word absent from the displayed sentence.
+    const sentence=example.slice(0,index)+"_____"+example.slice(index+w.word.length);
+    a.push({type:"fill",word:w,question:"Điền từ còn thiếu vào câu",answer:w.word,sentence});
   });
   const reply=words.find(w=>w.example&&w.example.trim().split(/\s+/).length>=3)||words[0];
   a.push({type:"read",word:reply,question:"Aivanta nói chuyện với bạn. Chọn câu đáp lại phù hợp",sentence:reply?.meaning||"Hello!",answer:reply?.example||reply?.word||"",options:[reply?.example||reply?.word||"",...words.filter(w=>w.word!==reply?.word).slice(0,3).map(w=>w.example||w.word)].sort((x,y)=>x.localeCompare(y))});
