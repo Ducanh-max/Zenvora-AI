@@ -83,3 +83,12 @@
 .acd-world-view .acd-island-label{font-size:clamp(9px,.9vw,12px)}
 .acd-world-view .acd-island-action{font-size:clamp(10px,.95vw,13px)}
 @media(max-width:700px){.acd-world-view .acd-world-map{aspect-ratio:3/4;background-size:cover;background-position:center}.acd-world-view .acd-island{width:45%;height:37%}.acd-world-view .acd-island-0{left:3%;top:9%}.acd-world-view .acd-island-1{right:3%;top:9%}.acd-world-view .acd-island-2{left:3%;bottom:8%}.acd-world-view .acd-island-3{right:3%;bottom:8%}.acd-world-view .acd-island-panel{padding:8px 9px;gap:3px}.acd-world-view .acd-island-panel strong{font-size:13px}.acd-world-view .acd-island-marker{font-size:24px;top:3%}.acd-world-view .acd-island-progress{gap:4px}.acd-world-view .acd-island-progress b{font-size:11px}}
+
+/* When viewing the four-island map, remove the two large introductory banners
+   and the library navigation strip; keep the back button and the map. */
+.als-page:has(.acd-world-view)>.quiztop,
+.als-page:has(.acd-world-view)>.library-heading,
+.als-page:has(.acd-world-view)>.library-footnote,
+.acd-world-view .acd-world-intro{display:none!important}
+.als-page:has(.acd-world-view){padding-top:18px!important}
+.acd-world-view .acd-world-map{margin-top:12px}
