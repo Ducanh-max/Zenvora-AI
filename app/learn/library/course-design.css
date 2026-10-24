@@ -169,12 +169,3 @@
 @keyframes acd-car-bounce{from{transform:translateY(0)}to{transform:translateY(-5px)}}
 @media(max-width:700px){.acd-car-marker{width:clamp(36px,9vw,65px)}}
 @media(prefers-reduced-motion:reduce){.acd-car-marker{transition:none}.acd-car-marker.is-driving img{animation:none}}
-
-/* Reduce visual clutter on the island lesson route. */
-.acd-route-shadow{stroke:#245b92;stroke-width:6;opacity:.38}
-.acd-route-line{stroke:#fff9e4;stroke-width:3;stroke-dasharray:2 11}
-.acd-car-marker{width:clamp(45px,6vw,76px);z-index:4;transform:translate(-50%,-110%);filter:drop-shadow(0 3px 4px #173a6c44)}
-.acd-car-marker img{mix-blend-mode:multiply}
-.acd-lesson-point{z-index:5}
-.acd-lesson-point small{pointer-events:none}
-@media(max-width:700px){.acd-car-marker{width:38px}}
