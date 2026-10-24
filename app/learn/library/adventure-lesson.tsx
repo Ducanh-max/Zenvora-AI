@@ -37,7 +37,7 @@ function visualFor(word:string,meaning:string){const t=(word+" "+meaning).toLowe
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
 export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
-  const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review?10:5);if(!words.length)return[];
+  const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review||lesson.test?10:5);if(!words.length)return[];
   const a:Activity[]=[];
   const choicesFor=(w:Word,field:"meaning"|"word")=>{
     const values=[w[field],...words.filter(x=>x.word!==w.word&&x[field]!==w[field]).map(x=>x[field])];
@@ -56,7 +56,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
     practice.slice(0,2).forEach(w=>a.push({type:"choice",word:w,question:"Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
     practice.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và chọn từ đúng",answer:w.word,options:choicesFor(w,"word")}));
     const exampleWord=practice.find(w=>w.example?.trim().split(/\s+/).length>=3);
-    if(exampleWord)a.push({type:"order",word:exampleWord,question:"Ghép câu đã học",answer:exampleWord.example.replace(/[.!?]+$/,"")}));
+    if(exampleWord)a.push({type:"order",word:exampleWord,question:"Ghép câu đã học",answer:exampleWord.example.replace(/[.!?]+$/,"")});
     a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:[...practice.slice(0,4).flatMap(w=>[w.word,w.meaning])]});
     practice.slice(4,6).forEach(w=>a.push({type:"choice",word:w,question:"Ôn nhanh: Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
     practice.slice(6,8).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và nhận biết từ",answer:w.word,options:choicesFor(w,"word")}));
