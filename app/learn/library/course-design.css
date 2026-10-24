@@ -161,3 +161,11 @@
 .acd-chest-0{left:38%;top:23%}.acd-chest-1{left:92%;top:49%}.acd-chest-2{left:57%;top:83%}.acd-chest-3{left:12%;top:74%}
 .acd-chest.is-open{filter:drop-shadow(0 0 9px #ffe26b)}
 @media(max-width:700px){.acd-lesson-point{width:23px;height:23px}.acd-lesson-point span{font-size:10px}.acd-chest{font-size:17px}}
+
+/* Aivanta drives from the completed stop to the next stop after saving progress. */
+.acd-car-marker{position:absolute;z-index:5;width:clamp(62px,9vw,115px);pointer-events:none;transform:translate(-50%,-100%);transition:left 2s cubic-bezier(.35,.05,.45,1),top 2s cubic-bezier(.35,.05,.45,1);filter:drop-shadow(0 5px 5px #173a6c66)}
+.acd-car-marker img{display:block;width:100%;height:auto;object-fit:contain}
+.acd-car-marker.is-driving img{animation:acd-car-bounce .4s ease-in-out infinite alternate}
+@keyframes acd-car-bounce{from{transform:translateY(0)}to{transform:translateY(-5px)}}
+@media(max-width:700px){.acd-car-marker{width:clamp(36px,9vw,65px)}}
+@media(prefers-reduced-motion:reduce){.acd-car-marker{transition:none}.acd-car-marker.is-driving img{animation:none}}
