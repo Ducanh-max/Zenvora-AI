@@ -35,16 +35,36 @@ function playSuccessSound(){
 }
 function visualFor(word:string,meaning:string){const t=(word+" "+meaning).toLowerCase();const entries:[RegExp,string][]=[[/coffee|cà phê/,"☕"],[/tea|trà/,"🍵"],[/milk|sữa/,"🥛"],[/water|nước/,"💧"],[/apple|táo/,"🍎"],[/banana|chuối/,"🍌"],[/book|sách/,"📚"],[/school|trường/,"🏫"],[/cat|mèo/,"🐱"],[/dog|chó/,"🐶"],[/car|xe hơi|ô tô/,"🚗"],[/plane|máy bay/,"✈️"],[/house|home|nhà/,"🏠"],[/sun|mặt trời/,"☀️"],[/friend|bạn bè/,"🧑‍🤝‍🧑"],[/hello|xin chào/,"👋"],[/food|đồ ăn/,"🍱"],[/phone|điện thoại/,"📱"],[/music|âm nhạc/,"🎵"],[/happy|vui/,"😊"]];return entries.find(([re])=>re.test(t))?.[1]||"✨";}
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
-export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
+export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review?10:5);if(!words.length)return[];
   const a:Activity[]=[];
-  // Fifteen short, varied activities, followed by the Aivanta conversation.
-  words.slice(0,3).forEach(w=>a.push({type:"intro",word:w,question:"Khám phá từ mới qua thẻ và âm thanh",answer:w.word}));
   const choicesFor=(w:Word,field:"meaning"|"word")=>{
     const values=[w[field],...words.filter(x=>x.word!==w.word).map(x=>x[field])];
     return [...new Set(values)].slice(0,4).sort((x,y)=>x.localeCompare(y));
   };
+  if(lesson.review&&!lesson.test){
+    // Lesson 3 revisits both previous lessons: no new-word introductions.
+    // Interleave source halves so neither topic dominates the practice.
+    const midpoint=Math.ceil(words.length/2);
+    const mixed:Word[]=[];
+    for(let i=0;i<midpoint;i++){
+      if(words[i])mixed.push(words[i]);
+      if(words[midpoint+i])mixed.push(words[midpoint+i]);
+    }
+    const practice=mixed.slice(0,8);
+    practice.slice(0,2).forEach(w=>a.push({type:"choice",word:w,question:"Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
+    practice.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và chọn từ đúng",answer:w.word,options:choicesFor(w,"word")}));
+    const exampleWord=practice.find(w=>w.example?.trim().split(/\s+/).length>=2);
+    if(exampleWord)a.push({type:"order",word:exampleWord,question:"Ghép câu đã học",answer:exampleWord.example.replace(/[.!?]+$/,"")}));
+    a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:practice.slice(0,4).flatMap(w=>[w.word,w.meaning])});
+    practice.slice(4,6).forEach(w=>a.push({type:"choice",word:w,question:"Ôn nhanh: Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
+    practice.slice(6,8).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và nhận biết từ",answer:w.word,options:choicesFor(w,"word")}));
+    a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
+    return a;
+  }
+  // Fifteen short, varied activities, followed by the Aivanta conversation.
+  words.slice(0,3).forEach(w=>a.push({type:"intro",word:w,question:"Khám phá từ mới qua thẻ và âm thanh",answer:w.word}));
   words.slice(0,2).forEach(w=>a.push({type:"choice",word:w,question:"Aivanta hỏi: Từ này có nghĩa là gì?",answer:w.meaning,options:choicesFor(w,"meaning")}));
   words.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe Aivanta đọc rồi chọn từ tương ứng",answer:w.word,options:choicesFor(w,"word")}));
   words.slice(0,2).forEach(w=>a.push({type:"order",word:w,question:"Ghép các mảnh từ thành câu tiếng Anh",answer:(w.example||"I like English.").replace(/[.!?]+$/,"")}));
