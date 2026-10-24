@@ -84,6 +84,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [done, setDone] = useState(progress.filter(p => p.completed).map(p => p.lesson_id));
+  useEffect(()=>{setDone(previous=>[...new Set([...previous,...progress.filter(p=>p.completed).map(p=>p.lesson_id)])]);},[progress]);
+  const [sectionTransition,setSectionTransition]=useState<number|null>(null);
   const [carMotion,setCarMotion]=useState<{section:number;index:number}|null>(null);
   const [carArriving,setCarArriving]=useState(false);
   const [carPhase,setCarPhase]=useState<"idle"|"driving"|"waiting"|"entering">("idle");
@@ -127,6 +129,15 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       const index=activities.findIndex(item=>item.slug===lesson.slug);
       if(index<0)continue;
       const next=activities[index+1];
+      const completedAfter=new Set([...done,lesson.slug]);
+      if(activities.every(item=>completedAfter.has(item.slug))&&section+1<Math.ceil(ordered.length/10)){
+        carTimers.current.forEach(clearTimeout);
+        carTimers.current=[];
+        setCarMotion(null);setArrivedLesson(null);setSelectedSection(section+1);
+        setSectionTransition(section+1);
+        carTimers.current.push(setTimeout(()=>setSectionTransition(null),3200));
+        return;
+      }
       if(!next)return;
       carTimers.current.forEach(clearTimeout);
       carTimers.current=[];
@@ -247,6 +258,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
       {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
+      {sectionTransition!==null&&<div className="acd-section-transition" role="status" aria-live="polite"><div className="acd-section-transition-card"><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta"/><span>✨ CHÚC MỪNG!</span><h2>Hoàn thành Phần {sectionTransition}!</h2><p>🗺️ Đang mở hành trình Phần {sectionTransition+1}…</p><button type="button" onClick={()=>setSectionTransition(null)}>Khám phá phần mới →</button></div></div>}
       {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH 16 BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
       <div className={isMapView?"acd-world-map":isLessonMap?"acd-lesson-map-wrap":"acd-sections"}>{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sourceSectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
@@ -264,10 +276,10 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
             const finished=done.includes(lesson.slug);
             const current=offset===Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug)));
             const isTest=offset%4===3;
-            return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>{setArrivedLesson(lesson);setCarPhase("waiting")}} aria-label={"Bài "+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
+            return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>{setArrivedLesson(lesson);setCarPhase("waiting")}} aria-label={(finished?"Ôn tập bài ":"Bài ")+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{finished?"Ôn tập +5 EXP":isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
           })}</div>
           <div className={"acd-car-marker"+(carArriving?" is-driving":"")+(carPhase==="entering"?" is-entering":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/images/aunora/learning-parts/vehicles/aivanta-car.png" alt="Aivanta lái xe"/></div>
-          {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span>🐺 Aivanta đã đến bài tiếp theo!</span><h3>{arrivedLesson.title}</h3><p>⭐ Hoàn thành bài học để nhận +10 EXP</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>Bắt đầu · +10 EXP →</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
+          {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span>🐺 {done.includes(arrivedLesson.slug)?"Ôn tập kiến thức đã học!":"Aivanta đã đến bài tiếp theo!"}</span><h3>{arrivedLesson.title}</h3><p>⭐ {done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP":"Hoàn thành bài học · +10 EXP"}</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>{done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP →":"Bắt đầu · +10 EXP →"}</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
           <div className="acd-lesson-chests">{[0,1,2,3].map(group=>{const cleared=sectionLessons.slice(group*4,group*4+4).every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành 4 bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
           <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · 4 rương phần thưởng</strong></div>
         </section>;
