@@ -163,6 +163,14 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     </section>;
   }
 
+  const sectionNames: Record<string,string[]> = {
+    "english-starter":["Những bước giao tiếp đầu tiên","Thế giới quanh em","Cuộc sống mỗi ngày","Tự tin sử dụng tiếng Anh"],
+    "everyday-english":["Giao tiếp thường ngày","Gia đình và bạn bè","Sinh hoạt và sở thích","Tình huống đời sống"],
+    "english-for-travel":["Chuẩn bị hành trình","Di chuyển và phương hướng","Khách sạn và ăn uống","Khám phá và trải nghiệm"],
+    "grammar-in-action":["Nền tảng câu tiếng Anh","Thì và thời gian","Diễn đạt ý tưởng","Vận dụng ngữ pháp"],
+    "confident-conversations":["Bắt đầu cuộc trò chuyện","Chia sẻ và hỏi đáp","Diễn đạt cảm xúc, ý kiến","Giao tiếp tự tin"]
+  };
+  const sectionTitles = activeCourse ? sectionNames[activeCourse.slug] || [] : [];
   if (activeCourse) {
     const totalWords=courseLessons.reduce((sum,lesson)=>sum+(lesson.content.vocabulary||[]).length,0);
     const courseImageFiles=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
@@ -173,10 +181,18 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return <section className="aunora-course-design">
       <button className="acd-back" onClick={()=>setSelectedCourseSlug(null)}><ArrowLeft size={18}/> Tất cả khóa học</button>
       <header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với sự đồng hành của Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>
-      <div className="acd-grid">{courseLessons.map((lesson,index)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
+      <div className="acd-sections">{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
+        const sectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
+        const completed=sectionLessons.filter(lesson=>done.includes(lesson.slug)).length;
+        const sectionTitle=sectionTitles[sectionIndex]||sectionLessons[0]?.title||"Khám phá tiếng Anh";
+        return <section className="acd-section" key={sectionIndex}>
+          <header className="acd-section-heading"><div><span className="acd-section-kicker">✦ PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><h2>{sectionTitle}</h2><p>{sectionLessons[0]?.title}{sectionLessons.length>1?" · "+sectionLessons[sectionLessons.length-1].title:""}</p></div><strong>{completed}/{sectionLessons.length} bài · {Math.round(completed/sectionLessons.length*100)}%</strong></header>
+          <div className="acd-section-track" role="progressbar" aria-label={`Tiến độ phần ${sectionIndex+1}`} aria-valuenow={Math.round(completed/sectionLessons.length*100)} aria-valuemin={0} aria-valuemax={100}><span style={{width:(completed/sectionLessons.length*100)+"%"}}/></div>
+          <div className="acd-grid">{sectionLessons.map((lesson,offset)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
         <div><span className="acd-card-label">BÀI {String(index+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
         <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
-      </article>)}</div>
+      </article>)}</div></section>;
+      })}</div>
     </section>;
   }
 
