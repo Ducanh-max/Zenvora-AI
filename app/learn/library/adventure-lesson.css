@@ -121,3 +121,7 @@
 .adv-screen .adv-actions .adv-primary{width:auto;min-width:190px;max-width:100%}
 .adv-screen .adv-main{padding-bottom:32px!important}
 @media(max-width:600px){.adv-screen .adv-actions .adv-primary{width:100%}}
+
+.adv-translation{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:16px 0;padding:16px 20px;background:#e7f7ed;border:2px solid #9cdbb5;border-radius:16px;color:#185b37;font-size:17px;line-height:1.5}
+.adv-translation strong{font-weight:900}
+.adv-translation button{display:inline-flex;align-items:center;gap:6px;margin-left:auto;border:1px solid #9cdbb5;border-radius:12px;padding:8px 12px;background:#fff;color:#185b37;font-weight:700;cursor:pointer}
