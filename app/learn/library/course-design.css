@@ -178,3 +178,11 @@
   100%{opacity:0;transform:translate(-50%,-50%) scale(.05)}
 }
 @media(prefers-reduced-motion:reduce){.acd-car-marker.is-entering{animation:acd-car-fade .15s linear forwards}@keyframes acd-car-fade{to{opacity:0}}}
+
+.acd-arrival-card{position:absolute;z-index:20;left:50%;top:47%;transform:translate(-50%,-50%);width:min(390px,88%);padding:25px 24px 20px;text-align:center;background:#fff;border:2px solid #cde0ff;border-radius:22px;box-shadow:0 18px 60px #06244a66;color:#173b72}
+.acd-arrival-card>span{font-size:14px;font-weight:800;color:#327ad2}
+.acd-arrival-card h3{font-size:26px;margin:12px 0;color:#103c80}
+.acd-arrival-card p{color:#cc8a11;font-weight:800}
+.acd-arrival-card small{display:block;margin-top:14px;font-size:12px;color:#6680a2}
+.acd-arrival-start{display:block;width:100%;padding:14px 12px;background:#267bea;color:white;border:0;border-radius:14px;box-shadow:0 4px 0 #1454a9;font-size:17px;font-weight:900;cursor:pointer}
+.acd-arrival-close{position:absolute;right:10px;top:7px;background:transparent;border:0;color:#6680a2;font-size:29px;cursor:pointer}
