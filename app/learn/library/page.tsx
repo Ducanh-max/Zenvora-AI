@@ -56,6 +56,9 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
   
 <style>{`
 .als-page{max-width:none!important;min-height:100vh!important;padding:12px max(22px,calc((100vw - 1450px)/2)) 50px!important;background:linear-gradient(90deg,#061b46df,#0b2850b8),url('/images/aunora/aunora-castle-background.png.png') center center/cover fixed!important;color:#fff!important}
+/* Course and lesson maps use the available viewport; the library welcome banner is only for course selection. */
+.als-page:has(.aunora-course-design) .library-heading{display:none!important}
+.als-page:has(.aunora-course-design) .quiztop{margin-bottom:8px!important}
 .als-page .quiztop{max-width:1380px;margin:0 auto 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:white}
 .als-page .quiztop>a,.als-page .quiztop>span{color:#fff!important;background:#0b285dbd!important;border:1px solid #5b8ac56b!important;border-radius:99px!important;padding:9px 14px!important;font-size:13px!important;font-weight:700!important;display:flex;align-items:center;gap:7px;text-decoration:none}
 .als-page .lesson-chip{background:#164d6cbb!important}
