@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import LessonTutor from "./lesson-tutor";
 import LessonPractice from "./lesson-practice";
 import AdventureLesson from "./adventure-lesson";
@@ -258,7 +259,17 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
       {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
-      {sectionTransition!==null&&<div className="acd-section-transition" role="status" aria-live="polite"><div className="acd-section-transition-card"><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta"/><span>✨ CHÚC MỪNG!</span><h2>Hoàn thành Phần {sectionTransition}!</h2><p>🗺️ Đang mở hành trình Phần {sectionTransition+1}…</p><button type="button" onClick={()=>setSectionTransition(null)}>Khám phá phần mới →</button></div></div>}
+      {sectionTransition!==null&&typeof document!=="undefined"&&createPortal(
+        <div className="acd-section-transition" role="dialog" aria-modal="true" aria-label="Chúc mừng hoàn thành phần học" onClick={()=>setSectionTransition(null)}>
+          <div className="acd-section-transition-card" onClick={event=>event.stopPropagation()}>
+            <img src="/brand/aivanta-mascot.webp.png" alt="Aivanta" width={130} height={130}/>
+            <span>✨ CHÚC MỪNG!</span>
+            <h2>Hoàn thành Phần {sectionTransition}!</h2>
+            <p>🗺️ Đang mở hành trình Phần {sectionTransition+1}…</p>
+            <button type="button" onClick={()=>setSectionTransition(null)}>Khám phá phần mới →</button>
+          </div>
+        </div>,document.body)}
+
       {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH 16 BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
       <div className={isMapView?"acd-world-map":isLessonMap?"acd-lesson-map-wrap":"acd-sections"}>{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sourceSectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
