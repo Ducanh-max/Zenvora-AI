@@ -61,3 +61,7 @@
 .acd-island-action{font-size:13px;font-weight:900;color:#1566ba;margin-top:2px}
 @media(max-width:700px){.aunora-course-design.acd-world-view{background-size:auto 100%;background-position:center top}.acd-world-intro{padding:17px;min-height:145px}.acd-world-intro img{width:85px}.acd-world-intro p{font-size:13px}.acd-world-map{grid-template-columns:1fr;grid-template-rows:none;gap:16px;min-height:0}.acd-world-map:before{inset:7% 48%;border-radius:50%;transform:none}.acd-island{min-height:0;padding:10px 5px 22px}.acd-island-art{height:120px;max-width:265px}.acd-island-symbol{font-size:60px}.acd-island-panel{max-width:320px}}
 @media(prefers-reduced-motion:reduce){.acd-island{transition:none}}
+
+/* User-provided art takes over the island illustration while retaining text/progress cards. */
+.acd-island-upload{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:2}
+.acd-island-upload:not([style*="display: none"])~.acd-island-symbol{visibility:hidden}
