@@ -189,7 +189,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
           <header className="acd-section-heading"><div><span className="acd-section-kicker">✦ PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><h2>{sectionTitle}</h2><p>{sectionLessons[0]?.title}{sectionLessons.length>1?" · "+sectionLessons[sectionLessons.length-1].title:""}</p></div><strong>{completed}/{sectionLessons.length} bài · {Math.round(completed/sectionLessons.length*100)}%</strong></header>
           <div className="acd-section-track" role="progressbar" aria-label={`Tiến độ phần ${sectionIndex+1}`} aria-valuenow={Math.round(completed/sectionLessons.length*100)} aria-valuemin={0} aria-valuemax={100}><span style={{width:(completed/sectionLessons.length*100)+"%"}}/></div>
           <div className="acd-grid">{sectionLessons.map((lesson,offset)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
-        <div><span className="acd-card-label">BÀI {String(index+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
+        <div><span className="acd-card-label">BÀI {String(sectionIndex*10+offset+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
         <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
       </article>)}</div></section>;
       })}</div>
