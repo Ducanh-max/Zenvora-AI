@@ -156,6 +156,14 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  const activity=activities[activityIndex];
  const [translatedSentence,setTranslatedSentence]=useState<{english:string;vietnamese:string|null;loading:boolean}|null>(null);
  const translationCache=useRef(new Map<string,string>());
+const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
+ const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
+ const orderWords=(activity?.answer||"").split(" ").filter(Boolean);
+ const options=activity?.type==="order"?orderWords.map((w,i)=>({id:i,word:w})).sort((a,b)=>((a.id*7+3)%Math.max(orderWords.length,1))-((b.id*7+3)%Math.max(orderWords.length,1))):[];
+ const dictationPool=useMemo(()=>{if(activity?.type!=="fill")return [] as {id:number;word:string}[];const correctWords=activity.answer.trim().replace(/[.!?]+$/,"").split(/\s+/).filter(Boolean);const used=new Set(correctWords.map(w=>w.toLowerCase().replace(/[^a-z']/g,"")));const distractors=[...lesson.words.flatMap(w=>[w.word,...(w.example||"").split(/\s+/)]),"ball","same","next","please","where","they","good","book","school","tomorrow","friend"].map(w=>w.replace(/^[^a-zA-Z]+|[^a-zA-Z']+$/g,"")).filter(w=>w&&!used.has(w.toLowerCase())&&/^[a-zA-Z']+$/.test(w));const unique=[...new Set(distractors.map(w=>w.toLowerCase()))].slice(0,3);const tiles=[...correctWords,...unique].map((word,id)=>({id,word}));let seed=Array.from(activity.answer).reduce((a,c)=>a*31+c.charCodeAt(0),17)>>>0;for(let i=tiles.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]];}return tiles;},[activity?.type,activity?.answer,lesson.words]);
+ const dictationAnswer=dictationMode==="keyboard"?selected:dictationIds.map(id=>dictationPool.find(t=>t.id===id)?.word||"").join(" ");
+ const correct=activity?.type==="fill"?norm(dictationAnswer)===norm(activity.answer):activity?.type==="speak"&&speechSkipped?false:activity?.type==="order"?norm(tokens.join(" "))===norm(activity.answer):activity?.type==="speak"?norm(recognized)===norm(activity.answer):activity?.type==="match"?matchCorrect:norm(selected)===norm(activity?.answer||"");
+ const translationTarget=checked&&activity?.type==="order"&&correct?activity.answer:null;
  useEffect(()=>{
   if(!translationTarget)return;
   const local=sourceSentenceTranslation(translationTarget,lesson);
@@ -170,14 +178,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
    .catch(()=>{if(!controller.signal.aborted)setTranslatedSentence({english:translationTarget,vietnamese:null,loading:false});});
   return ()=>controller.abort();
  },[translationTarget,lesson]);
-const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
- const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
- const orderWords=(activity?.answer||"").split(" ").filter(Boolean);
- const options=activity?.type==="order"?orderWords.map((w,i)=>({id:i,word:w})).sort((a,b)=>((a.id*7+3)%Math.max(orderWords.length,1))-((b.id*7+3)%Math.max(orderWords.length,1))):[];
- const dictationPool=useMemo(()=>{if(activity?.type!=="fill")return [] as {id:number;word:string}[];const correctWords=activity.answer.trim().replace(/[.!?]+$/,"").split(/\s+/).filter(Boolean);const used=new Set(correctWords.map(w=>w.toLowerCase().replace(/[^a-z']/g,"")));const distractors=[...lesson.words.flatMap(w=>[w.word,...(w.example||"").split(/\s+/)]),"ball","same","next","please","where","they","good","book","school","tomorrow","friend"].map(w=>w.replace(/^[^a-zA-Z]+|[^a-zA-Z']+$/g,"")).filter(w=>w&&!used.has(w.toLowerCase())&&/^[a-zA-Z']+$/.test(w));const unique=[...new Set(distractors.map(w=>w.toLowerCase()))].slice(0,3);const tiles=[...correctWords,...unique].map((word,id)=>({id,word}));let seed=Array.from(activity.answer).reduce((a,c)=>a*31+c.charCodeAt(0),17)>>>0;for(let i=tiles.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]];}return tiles;},[activity?.type,activity?.answer,lesson.words]);
- const dictationAnswer=dictationMode==="keyboard"?selected:dictationIds.map(id=>dictationPool.find(t=>t.id===id)?.word||"").join(" ");
- const correct=activity?.type==="fill"?norm(dictationAnswer)===norm(activity.answer):activity?.type==="speak"&&speechSkipped?false:activity?.type==="order"?norm(tokens.join(" "))===norm(activity.answer):activity?.type==="speak"?norm(recognized)===norm(activity.answer):activity?.type==="match"?matchCorrect:norm(selected)===norm(activity?.answer||"");
- const translationTarget=checked&&activity?.type==="order"&&correct?activity.answer:null;
+
  const easy=activity?.type==="intro"||activity?.type==="chat";
  const canCheck=activity?.type==="chat"?chatCompleted:easy||activity?.type==="match"?activity?.type==="match"?matchComplete:true:activity?.type==="order"?tokens.length===orderWords.length:activity?.type==="fill"?(dictationMode==="keyboard"?!!selected.trim():dictationIds.length>0):activity?.type==="speak"?!!recognized||speechSkipped:!!selected;
  function resetAnswer(){setSelected("");setChecked(false);setHint(false);setMatched([]);setFirst("");setMatchComplete(false);setMatchCorrect(false);setTokens([]);setDictationIds([]);setRecognized("");setSpeechSkipped(false);setError("");}
