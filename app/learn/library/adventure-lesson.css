@@ -56,3 +56,45 @@
 @media(max-width:900px){.adv-layout{grid-template-columns:1fr}.adv-companion{position:static}.adv-wolf{min-height:180px}.adv-wolf img{max-height:140px}.adv-companion-tag{font-size:10px}}
 @media(max-width:600px){.adv-top{padding:8px}.adv-main{border-radius:22px;padding:24px 15px}.adv-mission-label span{font-size:11px;padding:7px 10px}.adv-picture-illustration{font-size:52px}.adv-choices{grid-template-columns:1fr}.adv-choices-dialogue{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.adv-picture-illustration,.adv-audio,.adv-wolf-happy img,.adv-wolf-try img,.adv-wolf-help img{animation:none}}
+
+/* Focused lesson layout: one interactive activity at a time, not a large two-column dashboard. */
+.adv-screen{min-height:100dvh;padding:20px 22px 120px;background:linear-gradient(#eaf5ffef,#f6fafff2),url('/images/aunora/aunora-castle-background.png.png') center/cover fixed}
+.adv-top{max-width:1000px;border:0;box-shadow:none;background:transparent;backdrop-filter:none;padding:8px 0;margin-bottom:22px}
+.adv-back{background:transparent;border:0;color:#67819c;font-size:0;padding:8px}
+.adv-back svg{width:28px;height:28px}
+.adv-top>b{background:transparent;color:#456b9b}
+.adv-layout{display:block;max-width:830px;margin:0 auto;position:relative}
+.adv-main{min-height:0;background:transparent;border:0;box-shadow:none;border-radius:0;overflow:visible;padding:10px 15px 135px}
+.adv-main:before{display:none}
+.adv-heading{margin-bottom:26px}
+.adv-mission-label{justify-content:flex-start;margin-bottom:16px}
+.adv-mission-label span{border:0;background:transparent;padding:0;color:var(--scene);font-size:13px}
+.adv-mission-label span+span{margin-left:auto;color:#7590b1}
+.adv-heading h1{font-size:clamp(27px,3vw,39px);margin:8px 0 10px;color:#233f65}
+.adv-heading .adv-lesson-title{font-size:13px}
+.adv-mission-subtitle{font-size:15px;color:#7890ad}
+.adv-choices{margin:18px 0;gap:13px}
+.adv-choices button{min-height:82px;background:#fff;border:2px solid #d8e3ef;border-radius:17px;box-shadow:0 4px 0 #cdd9e6;color:#304b70}
+.adv-choices button span{border-radius:11px;width:42px;height:42px;background:#f0f5fc}
+.adv-choices-listen{grid-template-columns:repeat(3,minmax(0,1fr))}
+.adv-choices-listen button{min-height:160px;flex-direction:column;justify-content:center;gap:10px;text-align:center}
+.adv-choices-listen button span{background:transparent;width:auto;height:auto;font-size:57px}
+.adv-character-prompt{display:flex;align-items:center;gap:15px;margin:16px 0 25px;min-height:150px}
+.adv-character-prompt img{width:125px;height:145px;object-fit:contain;filter:drop-shadow(0 7px 5px #5c7da52a)}
+.adv-character-speech{position:relative;background:white;border:2px solid #dbe6f1;border-radius:20px;padding:20px 26px;font-size:clamp(20px,2.5vw,29px);font-weight:800;color:#294b76;box-shadow:0 4px 0 #dce6f1}
+.adv-character-speech:before{content:"";position:absolute;left:-12px;top:42%;width:19px;height:19px;background:white;border-left:2px solid #dbe6f1;border-bottom:2px solid #dbe6f1;transform:rotate(45deg)}
+.adv-picture-card{max-width:450px;background:#fff;border:2px solid #e0e7f2;box-shadow:0 5px 0 #d4e1f0;padding:28px 18px}
+.adv-picture-illustration{font-size:100px;letter-spacing:0;min-height:145px;display:grid;place-items:center}
+.adv-word h2{font-size:44px}
+.adv-word strong{font-size:23px}
+.adv-input,.adv-speak{background:#fff;border:2px solid #dce7f2;box-shadow:0 4px 0 #dce7f2}
+.adv-workshop-title{font-size:14px}
+.adv-order-answer{background:#fff;border:0;border-bottom:3px solid #dce5ef;border-radius:0}
+.adv-order-pool{justify-content:center}
+.adv-order-pool button{box-shadow:0 4px 0 #d4dfea}
+.adv-actions{position:fixed;bottom:0;left:0;right:0;z-index:20;margin:0;padding:20px max(24px,calc((100vw - 1000px)/2));background:#fffffff5;border-top:2px solid #e2eaf2;justify-content:flex-end;backdrop-filter:blur(10px)}
+.adv-primary{min-width:200px;background:#2679e9;box-shadow:0 4px 0 #1559b4;border-radius:14px}
+.adv-companion{display:none}
+.adv-feedback{margin:18px 0 8px}
+.adv-done{background:#ffffffef;border:2px solid #e4edfa;box-shadow:0 15px 45px #244a8520;padding:40px}
+@media(max-width:600px){.adv-screen{padding:12px 13px 100px}.adv-top{margin-bottom:8px}.adv-main{padding:10px 2px 120px}.adv-choices-listen{grid-template-columns:repeat(2,minmax(0,1fr))}.adv-choices-listen button{min-height:130px}.adv-character-prompt img{width:95px;height:112px}.adv-character-speech{padding:14px 17px}.adv-actions{padding:14px 18px}.adv-actions button{width:100%}.adv-mission-label span+span{font-size:10px}}
