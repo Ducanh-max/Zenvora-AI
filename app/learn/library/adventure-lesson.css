@@ -14,3 +14,45 @@
 .adv-order-pool button:hover{transform:translateY(-3px)}
 @keyframes adv-tile-pop{from{transform:scale(.85);opacity:.5}to{transform:scale(1);opacity:1}}
 @media(prefers-reduced-motion:reduce){.adv-animated-tiles button{animation:none}.adv-order-pool button{transition:none}}
+
+/* AUNORA Adventure Academy — immersive mission scenes rather than a plain quiz sheet. */
+.adv-screen{--scene:#2775dc;--scene-light:#dfeeff;background:linear-gradient(115deg,#0624529c,#2369b122),url('/images/aunora/aunora-castle-background.png.png') center/cover fixed;color:#12305f}
+.adv-scene-intro{--scene:#7655d5;--scene-light:#eee6ff}.adv-scene-choice{--scene:#eb9a26;--scene-light:#fff0d8}.adv-scene-listen{--scene:#128bb7;--scene-light:#d9f5ff}.adv-scene-order{--scene:#8563db;--scene-light:#eee7ff}.adv-scene-match{--scene:#17a78b;--scene-light:#dcfff5}.adv-scene-fill{--scene:#b96fda;--scene-light:#f7e8ff}.adv-scene-read{--scene:#ed7499;--scene-light:#ffe8ef}.adv-scene-speak{--scene:#356cdd;--scene-light:#e2edff}.adv-scene-chat{--scene:#2b9d88;--scene-light:#dcfff4}
+.adv-top{padding:12px 20px;border:1px solid #ffffff80;background:#ffffffdc;backdrop-filter:blur(12px);border-radius:24px;box-shadow:0 12px 35px #052e5c24}
+.adv-progress{height:13px;background:#dce9f9}.adv-progress div{background:linear-gradient(90deg,var(--scene),#69d4f3)}
+.adv-layout{grid-template-columns:minmax(0,1fr) minmax(220px,285px);gap:22px}
+.adv-main{background:linear-gradient(180deg,#fffffffa 0%,#f7fbfffa 100%);border:2px solid #ffffff;border-radius:30px;box-shadow:0 24px 65px #062e6380;min-height:570px;position:relative;overflow:hidden}
+.adv-main:before{content:"";position:absolute;top:0;left:0;right:0;height:7px;background:linear-gradient(90deg,var(--scene),#8ad6ff,var(--scene))}
+.adv-mission-label{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.adv-mission-label span{background:var(--scene-light);border:1px solid var(--scene);border-radius:30px;padding:9px 16px;color:#153b72;font-size:13px;font-weight:900;letter-spacing:.06em}
+.adv-heading .adv-lesson-title{font-size:14px;color:#6684b5}
+.adv-heading h1{font-size:clamp(23px,2.5vw,34px);margin:12px 0;color:#09295f}
+.adv-mission-subtitle{margin:0 0 10px;color:#54739c;font-weight:650}
+.adv-mini-progress{display:none}
+.adv-picture-card{max-width:620px;margin:25px auto;padding:35px 15px;border:3px solid #e3d5ff;background:radial-gradient(circle at 50% 10%,#fff 0%,var(--scene-light) 75%);box-shadow:0 15px 0 #a3a0d032,0 20px 32px #415b9a30}
+.adv-picture-illustration{font-size:70px;animation:adv-float 2.8s ease-in-out infinite}
+.adv-word h2{font-size:clamp(45px,6vw,76px);margin:12px 0}
+.adv-choices button{border:2px solid #d6e5f6;box-shadow:0 5px 0 #d3e0f2;transition:transform .18s,box-shadow .18s,border-color .18s;background:linear-gradient(145deg,#fff,#f5faff)}
+.adv-choices button:not(:disabled):hover{transform:translateY(-3px);box-shadow:0 8px 0 #d3e0f2;border-color:var(--scene)}
+.adv-choices button.adv-selected{background:var(--scene-light)!important;border-color:var(--scene)!important;box-shadow:0 3px 0 var(--scene)}
+.adv-choices-dialogue{grid-template-columns:1fr}
+.adv-choices-dialogue button{min-height:72px;border-radius:26px!important}
+.adv-read{background:linear-gradient(120deg,#fff1f6,#eaf5ff);border:2px solid #f6cfe0;border-radius:26px;font-weight:800}
+.adv-audio{background:var(--scene);box-shadow:0 7px 0 #1e60955a;animation:adv-pulse 2s ease-in-out infinite}
+.adv-workshop-title,.adv-input-badge{text-align:center;color:var(--scene);font-weight:900;letter-spacing:.1em;margin:28px 0 5px}
+.adv-order-answer{background:linear-gradient(135deg,#e8e4ff,#f8f6ff);border:2px dashed var(--scene);min-height:110px}
+.adv-order-pool button{box-shadow:0 5px 0 #b3a5e5}
+.adv-input{background:linear-gradient(145deg,#fff,#f4eaff);border:2px solid #e9d1f5}
+.adv-primary{background:linear-gradient(130deg,var(--scene),#287bd5);box-shadow:0 6px 0 #164d9070}
+.adv-companion{position:sticky;top:18px}
+.adv-wolf{min-height:370px;background:linear-gradient(180deg,#ffffff9e,#e1f1ffcf);border:2px solid #ffffffc4;box-shadow:0 16px 40px #062c5870;border-radius:28px}
+.adv-companion-tag{display:inline-block;margin-top:16px;padding:8px 12px;border-radius:20px;background:#ffffffd9;font-size:12px;color:#214f8c;font-weight:900}
+.adv-wolf img{margin-top:5px;max-height:285px;filter:drop-shadow(0 12px 12px #1456a347)}
+.adv-wolf-happy img{animation:adv-celebrate .55s ease-in-out 2}
+.adv-wolf-try img{animation:adv-encourage .6s ease-in-out 1}
+.adv-wolf-help img{animation:adv-bob 1.5s ease-in-out infinite}
+.adv-bubble{font-size:15px;border:2px solid #e5efff}
+@keyframes adv-float{50%{transform:translateY(-10px)}}@keyframes adv-pulse{50%{box-shadow:0 7px 0 #1e60955a,0 0 0 13px #159de91b}}@keyframes adv-celebrate{50%{transform:translateY(-16px) rotate(-4deg) scale(1.06)}}@keyframes adv-encourage{25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}
+@media(max-width:900px){.adv-layout{grid-template-columns:1fr}.adv-companion{position:static}.adv-wolf{min-height:180px}.adv-wolf img{max-height:140px}.adv-companion-tag{font-size:10px}}
+@media(max-width:600px){.adv-top{padding:8px}.adv-main{border-radius:22px;padding:24px 15px}.adv-mission-label span{font-size:11px;padding:7px 10px}.adv-picture-illustration{font-size:52px}.adv-choices{grid-template-columns:1fr}.adv-choices-dialogue{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.adv-picture-illustration,.adv-audio,.adv-wolf-happy img,.adv-wolf-try img,.adv-wolf-help img{animation:none}}
