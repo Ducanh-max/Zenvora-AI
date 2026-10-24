@@ -102,3 +102,25 @@
   .acd-world-view .acd-island-action{font-size:11px}
   .acd-world-view .acd-island-progress>span{height:7px}
 }
+
+/* Interactive ten-lesson island journey */
+.acd-lesson-map-heading{margin:18px auto 14px;max-width:1100px;text-align:center;color:#173969}
+.acd-lesson-map-heading span{font-size:12px;font-weight:900;letter-spacing:1px;color:#2466bc}
+.acd-lesson-map-heading h2{font-size:clamp(23px,3vw,35px);margin:6px 0}
+.acd-lesson-map-heading p{margin:0 0 12px;color:#43638d}
+.acd-lesson-map-wrap{max-width:1100px;margin:auto}
+.acd-lesson-map{position:relative;aspect-ratio:1661/927;overflow:hidden;border-radius:24px;background:#b9dafa url('/images/aunora/learning-parts/part-1-lesson-map.png') center/100% 100% no-repeat;box-shadow:0 16px 45px #0a397044;border:3px solid #b7d8ff}
+.acd-lesson-map-points{position:absolute;inset:0}
+.acd-lesson-point{position:absolute;transform:translate(-50%,-50%);width:clamp(32px,4.6vw,56px);height:clamp(32px,4.6vw,56px);display:flex;flex-direction:column;justify-content:center;align-items:center;border:3px solid #fff;border-radius:50%;background:linear-gradient(145deg,#3cafff,#1b5dcb);color:#fff;box-shadow:0 4px 0 #164b94,0 5px 15px #05295a7c;cursor:pointer;z-index:2}
+.acd-lesson-point span{font-size:clamp(13px,1.5vw,21px);font-weight:900;line-height:1}
+.acd-lesson-point small{position:absolute;top:calc(100% + 7px);font-size:11px;font-weight:900;white-space:nowrap;background:#fffef0e8;color:#173c77;padding:2px 6px;border-radius:8px;box-shadow:0 2px 5px #2345}
+.acd-lesson-point:hover,.acd-lesson-point:focus-visible{transform:translate(-50%,-50%) scale(1.13);outline:3px solid #ffcf56;outline-offset:3px;z-index:4}
+.acd-lesson-point.is-done{background:linear-gradient(145deg,#42d9ad,#0b9a77)}
+.acd-lesson-point.is-current{background:linear-gradient(145deg,#ffd85b,#e69520);box-shadow:0 0 0 7px #ffe17866,0 5px 16px #9c580a99}
+.acd-lesson-point-0{left:12%;top:35%}.acd-lesson-point-1{left:20%;top:35%}.acd-lesson-point-2{left:29%;top:34%}.acd-lesson-point-3{left:38%;top:32%}.acd-lesson-point-4{left:78%;top:40%}.acd-lesson-point-5{left:89%;top:40%}.acd-lesson-point-6{left:17%;top:70%}.acd-lesson-point-7{left:28%;top:75%}.acd-lesson-point-8{left:61%;top:80%}.acd-lesson-point-9{left:80%;top:86%}
+.acd-lesson-map-footer{position:absolute;left:12px;right:12px;bottom:12px;z-index:5;background:#fffffff0;color:#163d7b;border-radius:14px;padding:9px 12px;box-shadow:0 5px 18px #123b6a33}
+.acd-lesson-map-footer strong{font-size:13px}
+.acd-lesson-map-footer>span{display:none;max-height:160px;overflow:auto;gap:6px;flex-wrap:wrap;margin-top:8px}
+.acd-lesson-map-footer:focus-within>span,.acd-lesson-map-footer:hover>span{display:flex}
+.acd-lesson-map-footer button{border:1px solid #b8d6ff;background:#eef6ff;border-radius:8px;color:#164581;padding:5px 9px;cursor:pointer;font-size:12px}
+@media(max-width:700px){.acd-lesson-map{aspect-ratio:4/5;background-size:cover}.acd-lesson-point{width:34px;height:34px}.acd-lesson-point small{font-size:9px}.acd-lesson-map-heading{padding:0 8px}}
