@@ -1,37 +1,22 @@
-# Ảnh giao diện 4 phần học tập AUNORA
+# AUNORA — Bản đồ 4 phần học tập
 
-Tải ảnh của từng phần vào **thư mục này**. Giữ nguyên tên file dưới đây (chữ thường, đuôi .png):
+Chỉ cần **một ảnh duy nhất** cho bản đồ của cả 4 phần trong mỗi khóa học.
 
-## English Starter
-- english-starter-part-1.png
-- english-starter-part-2.png
-- english-starter-part-3.png
-- english-starter-part-4.png
+## Tên file cần tải lên
 
-## Everyday English
-- everyday-english-part-1.png
-- everyday-english-part-2.png
-- everyday-english-part-3.png
-- everyday-english-part-4.png
+`course-map.png`
 
-## English for Travel
-- english-for-travel-part-1.png
-- english-for-travel-part-2.png
-- english-for-travel-part-3.png
-- english-for-travel-part-4.png
+Đường dẫn đầy đủ: `public/images/aunora/learning-parts/course-map.png`
 
-## Grammar in Action
-- grammar-in-action-part-1.png
-- grammar-in-action-part-2.png
-- grammar-in-action-part-3.png
-- grammar-in-action-part-4.png
+## Vị trí các phần trên ảnh
 
-## Confident Conversations
-- confident-conversations-part-1.png
-- confident-conversations-part-2.png
-- confident-conversations-part-3.png
-- confident-conversations-part-4.png
+- **Đảo trên bên trái:** Phần 1 — Bài 1–10
+- **Đảo trên bên phải:** Phần 2 — Bài 11–20
+- **Đảo dưới bên trái:** Phần 3 — Bài 21–30
+- **Đảo dưới bên phải:** Phần 4 — Bài 31–40
 
-**Đề xuất:** ảnh ngang 16:9, tối thiểu 1600×900 px, không cần chèn chữ tên phần lên ảnh vì website sẽ tự hiển thị tiêu đề và tiến độ. Ảnh có thể mô tả hòn đảo/lâu đài/cảnh fantasy cho mỗi phần.
+Ảnh bản đồ được dùng chung cho 5 khóa học Free. Website tự phủ tên phần, thanh tiến độ và vùng bấm lên đúng từng đảo. Nhấn đảo để mở danh sách 10 bài của phần đó.
 
-Nếu ảnh chưa được tải lên, giao diện sẽ hiển thị hình đảo minh họa dự phòng. Không thay đổi nội dung 200 bài học.
+**Không cần** tạo hoặc tải 20 ảnh `*-part-1.png`, `*-part-2.png`, v.v.
+
+Giữ nguyên nội dung và tiến độ của 200 bài học.
