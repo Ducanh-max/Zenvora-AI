@@ -87,6 +87,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const [carMotion,setCarMotion]=useState<{section:number;index:number}|null>(null);
   const [carArriving,setCarArriving]=useState(false);
   const [carPhase,setCarPhase]=useState<"idle"|"driving"|"waiting"|"entering">("idle");
+  const [arrivedLesson,setArrivedLesson]=useState<LibraryLesson|null>(null);
   const carTimers=useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(()=>()=>{carTimers.current.forEach(clearTimeout)},[]);
   const questions = useMemo(() => selected ? buildQuestionBank(selected).slice(0, quizSize) : [], [selected, quizSize]);
@@ -133,6 +134,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       setCarMotion({section,index});
       setCarArriving(false);
       setCarPhase("idle");
+      setArrivedLesson(null);
       carTimers.current.push(setTimeout(()=>{
         setCarPhase("driving");
         setCarArriving(true);
@@ -142,11 +144,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         setCarArriving(false);
         setCarPhase("waiting");
       },2550));
-      carTimers.current.push(setTimeout(()=>setCarPhase("entering"),5550));
-      carTimers.current.push(setTimeout(()=>{
-        setCarPhase("idle");
-        openLesson(next);
-      },6200));
+      carTimers.current.push(setTimeout(()=>{setCarPhase("idle");setArrivedLesson(next);},5550));
       return;
     }
   }
@@ -266,9 +264,10 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
             const finished=done.includes(lesson.slug);
             const current=offset===Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug)));
             const isTest=offset%4===3;
-            return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>openLesson(lesson)} aria-label={"Bài "+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
+            return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>{setArrivedLesson(null);openLesson(lesson)}} aria-label={"Bài "+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
           })}</div>
           <div className={"acd-car-marker"+(carArriving?" is-driving":"")+(carPhase==="entering"?" is-entering":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/images/aunora/learning-parts/vehicles/aivanta-car.png" alt="Aivanta lái xe"/></div>
+          {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span>🐺 Aivanta đã đến bài tiếp theo!</span><h3>{arrivedLesson.title}</h3><p>⭐ Hoàn thành bài học để nhận +10 EXP</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>Bắt đầu · +10 EXP →</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
           <div className="acd-lesson-chests">{[0,1,2,3].map(group=>{const cleared=sectionLessons.slice(group*4,group*4+4).every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành 4 bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
           <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · 4 rương phần thưởng</strong></div>
         </section>;
