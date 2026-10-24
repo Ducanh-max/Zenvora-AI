@@ -180,7 +180,6 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const heroBackground=`linear-gradient(90deg,rgba(8,38,99,.94),rgba(18,69,137,.77) 48%,rgba(18,69,137,.03) 78%),url("${courseImage}")`;
     const cardBackground=`linear-gradient(90deg,#ffffff 2%,#fffffff2 46%,#ffffff22 100%),url("${courseImage}")`;
     const isMapView=activeCourse.is_free && selectedSection===null;
-    const mapIcons=["🏰","🏛️","⛵","🌿"];
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
       {isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
@@ -190,7 +189,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         const sectionTitle=sectionTitles[sectionIndex]||sectionLessons[0]?.title||"Khám phá tiếng Anh";
         if(selectedSection!==null&&selectedSection!==sectionIndex)return null;
         if(isMapView)return <button type="button" key={sectionIndex} className={"acd-island acd-island-"+sectionIndex} onClick={()=>setSelectedSection(sectionIndex)} aria-label={"Mở phần "+(sectionIndex+1)+": "+sectionTitle}>
-          <span className="acd-island-marker" aria-hidden="true">{mapIcons[sectionIndex%4]}</span>
+          
           <span className="acd-island-panel"><span className="acd-island-label">PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><strong>{sectionTitle}</strong><span className="acd-island-description">{sectionLessons[0]?.title} · {sectionLessons[sectionLessons.length-1]?.title}</span><span className="acd-island-progress"><span><i style={{width:(completed/sectionLessons.length*100)+"%"}}/></span><b>{completed}/{sectionLessons.length}</b></span><span className="acd-island-action">{completed===sectionLessons.length?"Ôn tập phần này":"Khám phá phần "+(sectionIndex+1)} →</span></span>
         </button>;
         return <section className="acd-section" key={sectionIndex}>
