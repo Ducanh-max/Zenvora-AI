@@ -105,24 +105,20 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
     const values=[w[field],...words.filter(x=>x.word!==w.word&&x[field]!==w[field]).map(x=>x[field])];
     return [...new Set(values)].slice(0,4).sort((x,y)=>x.localeCompare(y));
   };
-  if(lesson.review&&!lesson.test){
-    // Lesson 3 revisits both previous lessons: no new-word introductions.
-    // Interleave source halves so neither topic dominates the practice.
-    const midpoint=Math.ceil(words.length/2);
+  if(lesson.review||lesson.test){
+    // Review mixes both source lessons; tests assess more items without introductory cards.
     const mixed:Word[]=[];
-    for(let i=0;i<midpoint;i++){
-      if(words[i])mixed.push(words[i]);
-      if(words[midpoint+i])mixed.push(words[midpoint+i]);
-    }
-    const practice=mixed.slice(0,8);
-    practice.slice(0,2).forEach(w=>a.push({type:"choice",word:w,question:"Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
-    practice.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và chọn từ đúng",answer:w.word,options:choicesFor(w,"word")}));
-    const exampleWord=practice.find(w=>w.example?.trim().split(/\s+/).length>=3);
-    if(exampleWord)a.push({type:"order",word:exampleWord,question:"Ghép câu đã học",answer:exampleWord.example.replace(/[.!?]+$/,"")});
-    a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:[...practice.slice(0,4).flatMap(w=>[w.word,w.meaning])]});
-    practice.slice(4,6).forEach(w=>a.push({type:"choice",word:w,question:"Ôn nhanh: Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
-    practice.slice(6,8).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và nhận biết từ",answer:w.word,options:choicesFor(w,"word")}));
-    // Bài gộp chỉ ôn tập, không có AI Tutor.
+    const midpoint=Math.ceil(words.length/2);
+    for(let i=0;i<midpoint;i++){if(words[i])mixed.push(words[i]);if(words[midpoint+i])mixed.push(words[midpoint+i]);}
+    const practice=mixed.slice(0,10);
+    const questionCount=lesson.test?4:3;
+    practice.slice(0,questionCount).forEach(w=>a.push({type:"choice",word:w,question:"Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
+    practice.slice(questionCount,questionCount+3).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và chọn từ đúng",answer:w.word,options:choicesFor(w,"word")}));
+    a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:practice.slice(0,4).flatMap(w=>[w.word,w.meaning])});
+    const examples=[...new Map(practice.filter(w=>w.example?.trim().split(/\\s+/).length>=3).map(w=>[norm(w.example),w])).values()];
+    examples.slice(0,lesson.test?3:2).forEach(w=>a.push({type:"order",word:w,question:"Sắp xếp từ thành câu tiếng Anh",answer:w.example.replace(/[.!?]+$/,"")}));
+    practice.slice(6).forEach(w=>a.push({type:"choice",word:w,question:"Vận dụng từ vựng đã học",answer:w.meaning,options:choicesFor(w,"meaning")}));
+    practice.slice(0,lesson.test?3:2).forEach(w=>a.push({type:"speak",word:w,question:"Phát âm từ đã học",answer:w.word}));
     return a;
   }
   // Fifteen short, varied activities, followed by the Aivanta conversation.
@@ -131,7 +127,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   words.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe Aivanta đọc rồi chọn từ tương ứng",answer:w.word,options:choicesFor(w,"word")}));
   [...new Map(words.filter(w=>w.example?.trim().split(/\s+/).length>=3).map(w=>[norm(w.example),w])).values()].slice(0,1).forEach(w=>a.push({type:"order",word:w,question:"Ghép các mảnh từ thành câu tiếng Anh",answer:w.example.replace(/[.!?]+$/,"")}));
   a.push({type:"match",question:"Nối các cặp từ Anh – Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
-  words.slice(3,5).forEach(w=>{
+  words.slice(3,5).filter(w=>!a.some(item=>item.type==="order"&&norm(item.answer)===norm(w.example||""))).forEach(w=>{
     const example=w.example||"";
     const index=example.toLowerCase().indexOf(w.word.toLowerCase());
     if(index<0)return; // Avoid asking for a word absent from the displayed sentence.
