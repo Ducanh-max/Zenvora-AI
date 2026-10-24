@@ -68,8 +68,9 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return () => window.removeEventListener("storage", readLanguage);
   }, []);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
+  const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [enteringLesson, setEnteringLesson] = useState<LibraryLesson | null>(null);
-  useEffect(()=>{try{const saved=sessionStorage.getItem("aunora_active_lesson")||localStorage.getItem("aunora_resume_lesson");if(!saved)return;const item=JSON.parse(saved) as {slug:string;course:string};const found=lessons.find(l=>l.slug===item.slug&&courses.some(c=>c.id===l.course_id&&c.slug===item.course));if(found){setSelectedCourseSlug(item.course);setSelected(found);sessionStorage.removeItem("aunora_active_lesson");sessionStorage.removeItem("aunora_returning_to_lesson");localStorage.removeItem("aunora_resume_lesson");}}catch{}},[lessons,courses]);
+  useEffect(()=>{try{const saved=sessionStorage.getItem("aunora_active_lesson")||localStorage.getItem("aunora_resume_lesson");if(!saved)return;const item=JSON.parse(saved) as {slug:string;course:string};const found=lessons.find(l=>l.slug===item.slug&&courses.some(c=>c.id===l.course_id&&c.slug===item.course));if(found){setSelectedCourseSlug(item.course);setSelectedSection(Math.floor(Math.max(0,lessons.filter(l=>l.course_id===found.course_id).sort((a,b)=>a.sort_order-b.sort_order).findIndex(l=>l.id===found.id))/10));setSelected(found);sessionStorage.removeItem("aunora_active_lesson");sessionStorage.removeItem("aunora_returning_to_lesson");localStorage.removeItem("aunora_resume_lesson");}}catch{}},[lessons,courses]);
   useEffect(()=>{if(selected){try{sessionStorage.setItem("aunora_active_lesson",JSON.stringify({slug:selected.slug,course:selectedCourseSlug}));localStorage.setItem("aunora_last_unfinished_lesson",JSON.stringify({slug:selected.slug,course:selectedCourseSlug,id:selected.id,title:selected.title}));}catch{}}},[selected,selectedCourseSlug]);
   function openLesson(lesson: LibraryLesson) {
     setEnteringLesson(lesson);
@@ -179,19 +180,20 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const heroBackground=`linear-gradient(90deg,rgba(8,38,99,.94),rgba(18,69,137,.77) 48%,rgba(18,69,137,.03) 78%),url("${courseImage}")`;
     const cardBackground=`linear-gradient(90deg,#ffffff 2%,#fffffff2 46%,#ffffff22 100%),url("${courseImage}")`;
     return <section className="aunora-course-design">
-      <button className="acd-back" onClick={()=>setSelectedCourseSlug(null)}><ArrowLeft size={18}/> Tất cả khóa học</button>
+      <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
       <header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với sự đồng hành của Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>
       <div className="acd-sections">{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
         const completed=sectionLessons.filter(lesson=>done.includes(lesson.slug)).length;
         const sectionTitle=sectionTitles[sectionIndex]||sectionLessons[0]?.title||"Khám phá tiếng Anh";
+        if(selectedSection!==null&&selectedSection!==sectionIndex)return null;
         return <section className="acd-section" key={sectionIndex}>
           <header className="acd-section-heading"><div><span className="acd-section-kicker">✦ PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><h2>{sectionTitle}</h2><p>{sectionLessons[0]?.title}{sectionLessons.length>1?" · "+sectionLessons[sectionLessons.length-1].title:""}</p></div><strong>{completed}/{sectionLessons.length} bài · {Math.round(completed/sectionLessons.length*100)}%</strong></header>
           <div className="acd-section-track" role="progressbar" aria-label={`Tiến độ phần ${sectionIndex+1}`} aria-valuenow={Math.round(completed/sectionLessons.length*100)} aria-valuemin={0} aria-valuemax={100}><span style={{width:(completed/sectionLessons.length*100)+"%"}}/></div>
-          <div className="acd-grid">{sectionLessons.map((lesson,offset)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
+          {selectedSection===null?<button type="button" className="acd-section-enter" onClick={()=>setSelectedSection(sectionIndex)}>📖 {completed===sectionLessons.length?"Ôn tập phần này":"Học phần "+(sectionIndex+1)} <ArrowRight size={18}/></button>:<div className="acd-grid">{sectionLessons.map((lesson,offset)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
         <div><span className="acd-card-label">BÀI {String(sectionIndex*10+offset+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
         <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
-      </article>)}</div></section>;
+      </article>)}</div>}</section>;
       })}</div>
     </section>;
   }
@@ -208,7 +210,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <div className="als-info"><div className="als-info-top"><h2>{courseNames[index]||course.title}</h2><span className="als-symbol">{["🌱","♧","✈","▤","☏"][index%5]}</span></div>
       <p>{courseSummaries[index]||course.description}</p>
       <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>
-      <button type="button" onClick={()=>setSelectedCourseSlug(course.slug)}>Khám phá khóa học <ArrowRight size={17}/></button></div>
+      <button type="button" onClick={()=>{setSelectedSection(null);setSelectedCourseSlug(course.slug)}}>Khám phá khóa học <ArrowRight size={17}/></button></div>
     </article>;
   })}</section></>;
 }
