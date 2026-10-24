@@ -34,12 +34,12 @@ function playSuccessSound(){
  }catch{/* Audio is optional when the browser blocks playback. */}
 }
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
-export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
+export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
-  const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,5);if(!words.length)return[];
+  const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review?10:5);if(!words.length)return[];
   const a:Activity[]=[];
   words.forEach(w=>a.push({type:"intro",word:w,question:"Làm quen với từ mới",answer:w.word}));
-  words.slice(0,3).forEach((w,i)=>{
+  words.slice(0,lesson.review?6:3).forEach((w,i)=>{
    // Only one valid meaning per question; avoid duplicate meanings in the lesson.
    const key=(value:string)=>norm(value.normalize("NFC"));
    const seen=new Set([key(w.meaning)]);
@@ -53,7 +53,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   const w0=words[0];a.push({type:"listen",word:w0,question:"Nghe và chọn từ bạn nghe được",answer:w0.word,options:words.slice(0,4).map(x=>x.word).reverse()});
   const w1=words[1]||w0;a.push({type:"fill",word:w1,question:"Điền từ tiếng Anh tương ứng với nghĩa",answer:w1.word});
   const w2=words[2]||w0;const phrase=(w2.example||"I like English.").replace(/[.!?]+$/,"");a.push({type:"order",word:w2,question:"Sắp xếp các từ thành câu đúng",answer:phrase});
-  a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
+  a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,lesson.review?8:4).flatMap(w=>[w.word,w.meaning])});
   // Keep vocabulary pronunciation practice in lessons; conversational Speaking stays in the separate studio.
   words.slice(0,Math.min(3,words.length)).forEach(w=>a.push({type:"speak",word:w,question:"Luyện phát âm từ vựng",answer:w.word}));
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
