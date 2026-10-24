@@ -38,24 +38,20 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  const activities=useMemo<Activity[]>(()=>{
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review?10:5);if(!words.length)return[];
   const a:Activity[]=[];
-  words.forEach(w=>a.push({type:"intro",word:w,question:"Làm quen với từ mới",answer:w.word}));
-  words.slice(0,lesson.review?6:3).forEach((w,i)=>{
-   // Only one valid meaning per question; avoid duplicate meanings in the lesson.
-   const key=(value:string)=>norm(value.normalize("NFC"));
-   const seen=new Set([key(w.meaning)]);
-   const distractors=words.filter(x=>x.word!==w.word).map(x=>x.meaning).filter(meaning=>{
-    const k=key(meaning);if(!k||seen.has(k))return false;seen.add(k);return true;
-   }).slice(0,3);
-   const choices=[w.meaning,...distractors];
-   const shift=(i+1)%choices.length;
-   a.push({type:"choice",word:w,question:"Chọn nghĩa đúng của từ sau",answer:w.meaning,options:[...choices.slice(shift),...choices.slice(0,shift)]});
-  });
-  const w0=words[0];a.push({type:"listen",word:w0,question:"Nghe và chọn từ bạn nghe được",answer:w0.word,options:words.slice(0,4).map(x=>x.word).reverse()});
-  const w1=words[1]||w0;a.push({type:"fill",word:w1,question:"Điền từ tiếng Anh tương ứng với nghĩa",answer:w1.word});
-  const w2=words[2]||w0;const phrase=(w2.example||"I like English.").replace(/[.!?]+$/,"");a.push({type:"order",word:w2,question:"Sắp xếp các từ thành câu đúng",answer:phrase});
-  a.push({type:"match",question:"Nối cặp từ tiếng Anh và nghĩa tiếng Việt",answer:"",options:words.slice(0,lesson.review?8:4).flatMap(w=>[w.word,w.meaning])});
-  // Keep vocabulary pronunciation practice in lessons; conversational Speaking stays in the separate studio.
-  words.slice(0,Math.min(3,words.length)).forEach(w=>a.push({type:"speak",word:w,question:"Luyện phát âm từ vựng",answer:w.word}));
+  // Fifteen short, varied activities, followed by the Aivanta conversation.
+  words.slice(0,3).forEach(w=>a.push({type:"intro",word:w,question:"Khám phá từ mới qua thẻ và âm thanh",answer:w.word}));
+  const choicesFor=(w:Word,field:"meaning"|"word")=>{
+    const values=[w[field],...words.filter(x=>x.word!==w.word).map(x=>x[field])];
+    return [...new Set(values)].slice(0,4).sort((x,y)=>x.localeCompare(y));
+  };
+  words.slice(0,2).forEach(w=>a.push({type:"choice",word:w,question:"Aivanta hỏi: Từ này có nghĩa là gì?",answer:w.meaning,options:choicesFor(w,"meaning")}));
+  words.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe Aivanta đọc rồi chọn từ tương ứng",answer:w.word,options:choicesFor(w,"word")}));
+  words.slice(0,2).forEach(w=>a.push({type:"order",word:w,question:"Ghép các mảnh từ thành câu tiếng Anh",answer:(w.example||"I like English.").replace(/[.!?]+$/,"")}));
+  a.push({type:"match",question:"Nối các cặp từ Anh – Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
+  words.slice(3,5).forEach(w=>a.push({type:"fill",word:w,question:"Điền từ còn thiếu vào câu",answer:w.word,sentence:(w.example||"").replace(new RegExp(w.word.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"i"),"_____")}));
+  const reply=words.find(w=>w.example&&w.example.trim().split(/\s+/).length>=3)||words[0];
+  a.push({type:"read",word:reply,question:"Aivanta nói chuyện với bạn. Chọn câu đáp lại phù hợp",sentence:reply?.meaning||"Hello!",answer:reply?.example||reply?.word||"",options:[reply?.example||reply?.word||"",...words.filter(w=>w.word!==reply?.word).slice(0,3).map(w=>w.example||w.word)].sort((x,y)=>x.localeCompare(y))});
+  words.slice(0,2).forEach(w=>a.push({type:"speak",word:w,question:"Tự nói hoặc viết từ tiếng Anh",answer:w.word}));
   a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
