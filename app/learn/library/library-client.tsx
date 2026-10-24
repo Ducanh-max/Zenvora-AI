@@ -84,6 +84,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [done, setDone] = useState(progress.filter(p => p.completed).map(p => p.lesson_id));
+  const [carMotion,setCarMotion]=useState<{section:number;index:number}|null>(null);
+  const [carArriving,setCarArriving]=useState(false);
   const questions = useMemo(() => selected ? buildQuestionBank(selected).slice(0, quizSize) : [], [selected, quizSize]);
   const question = questions[questionIndex];
 
@@ -104,12 +106,29 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       const response = await fetch("/api/lesson-progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lessonId: selected.slug, courseId: selectedCourseSlug || "english-starter", score, totalQuestions: questions.length }) });
       if (!response.ok) throw new Error("Không thể đồng bộ tiến độ. Hãy thử lại.");
       setDone(previous => previous.includes(selected.slug) ? previous : [...previous, selected.slug]);
+      animateCarAfterLesson(selected);
       setNotice("Đã lưu kết quả học tập của bạn.");
       return true;
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Không thể lưu kết quả.");
       return false;
     } finally { setSaving(false); }
+  }
+  function animateCarAfterLesson(lesson:LibraryLesson) {
+    const course=courses.find(c=>c.slug===selectedCourseSlug);
+    if(!course?.is_free)return;
+    const ordered=lessons.filter(item=>item.course_id===course.id).sort((a,b)=>a.sort_order-b.sort_order);
+    for(let section=0;section<Math.ceil(ordered.length/10);section++){
+      const activities=makeSectionActivities(ordered.slice(section*10,section*10+10),section);
+      const index=activities.findIndex(item=>item.slug===lesson.slug);
+      if(index<0)return;
+      setCarArriving(false);setCarMotion({section,index});
+      if(index<activities.length-1){
+        window.setTimeout(()=>{setCarMotion({section,index:index+1});setCarArriving(true)},120);
+        window.setTimeout(()=>setCarArriving(false),2400);
+      }
+      return;
+    }
   }
   function resetLesson() { try{sessionStorage.removeItem("aunora_active_lesson")}catch{} setSelected(null); setMode("learn"); setNotice(""); }
 
@@ -138,7 +157,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return <section className="aunora-loading" aria-live="polite" aria-busy="true"><div className="aunora-loading-card" role="status"><img className="aunora-loading-wolf" src="/brand/aivanta-mascot.webp.png" alt=""/><h1 className="aunora-loading-title">Aivanta đang chuẩn bị bài học...</h1><p className="aunora-loading-desc">Sẵn sàng khám phá: {enteringLesson.title} 🐺</p><div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar"/></div></div></section>;
   }
   if (selected && (selected.content.vocabulary || []).length >= 3) {
-    return <AdventureLesson lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,goal:selected.content.lesson_goal}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug,score:correct,totalQuestions:total})});if(!response.ok)throw new Error("Không thể lưu tiến độ");setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);try{localStorage.removeItem("aunora_lesson_step_"+selected.id);localStorage.removeItem("aunora_last_unfinished_lesson")}catch{}resetLesson();}finally{setSaving(false);}}}/>;
+    return <AdventureLesson lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,goal:selected.content.lesson_goal}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug,score:correct,totalQuestions:total})});if(!response.ok)throw new Error("Không thể lưu tiến độ");setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);animateCarAfterLesson(selected);try{localStorage.removeItem("aunora_lesson_step_"+selected.id);localStorage.removeItem("aunora_last_unfinished_lesson")}catch{}resetLesson();}finally{setSaving(false);}}}/>;
   }
   if (selected) {
     const content = selected.content || {};
@@ -210,7 +229,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
       {isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
-      {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH 10 BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
+      {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH 16 BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
       <div className={isMapView?"acd-world-map":isLessonMap?"acd-lesson-map-wrap":"acd-sections"}>{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sourceSectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
         const sectionLessons=activeCourse.is_free?makeSectionActivities(sourceSectionLessons,sectionIndex):sourceSectionLessons;
@@ -229,6 +248,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
             const isTest=offset%4===3;
             return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>openLesson(lesson)} aria-label={"Bài "+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
           })}</div>
+          <div className={"acd-car-marker"+(carArriving?" is-driving":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/images/aunora/learning-parts/vehicles/aivanta-car.png" alt="Aivanta lái xe"/></div>
           <div className="acd-lesson-chests">{[0,1,2,3].map(group=>{const cleared=sectionLessons.slice(group*4,group*4+4).every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành 4 bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
           <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · 4 rương phần thưởng</strong></div>
         </section>;
