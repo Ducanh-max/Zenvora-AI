@@ -103,3 +103,15 @@
 .adv-feedback.adv-bad{background:#ffe5e5!important;color:#b42332!important;border:2px solid #f36a75!important;border-radius:16px;font-weight:800}
 .adv-screen:has(.adv-feedback.adv-bad) .adv-input input{border:2px solid #e53d50!important;background:#fff1f2!important;color:#b42332!important}
 .adv-input-badge{display:none!important}
+
+/* Tap-to-match: no connecting lines, immediate color feedback. */
+.adv-match-tap .adv-match-board{display:grid;grid-template-columns:1fr 1fr;gap:18px;position:relative}
+.adv-match-tap .adv-match-col{display:flex;flex-direction:column;gap:12px}
+.adv-match-tap .adv-match-col button{transition:background .18s,border-color .18s,transform .18s}
+.adv-match-tap .adv-match-col button.is-correct{background:#d7f9e4!important;border-color:#20b96a!important;color:#116b3e!important;opacity:.75}
+.adv-match-tap .adv-match-col button.is-wrong{background:#ffe0e6!important;border-color:#ef4866!important;color:#ad1835!important;animation:adv-shake .25s ease-in-out}
+.adv-match-tap .adv-match-col button.is-selected{background:#e2efff!important;border-color:#2684e9!important;transform:scale(1.02)}
+@keyframes adv-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.adv-screen .adv-layout{animation:adv-question-enter .32s cubic-bezier(.2,.8,.2,1) both}
+@keyframes adv-question-enter{from{opacity:0;transform:translateY(15px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.adv-screen .adv-layout,.adv-match-tap .adv-match-col button.is-wrong{animation:none!important}}
