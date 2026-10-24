@@ -92,3 +92,13 @@
 .acd-world-view .acd-world-intro{display:none!important}
 .als-page:has(.acd-world-view){padding-top:18px!important}
 .acd-world-view .acd-world-map{margin-top:12px}
+
+/* Compact desktop course map: keep the four island hotspots aligned with artwork. */
+@media(min-width:701px){
+  .acd-world-view .acd-world-map{width:min(100%,1100px);margin:12px auto 0}
+  .acd-world-view .acd-island-panel{max-width:285px;padding:9px 12px;gap:2px}
+  .acd-world-view .acd-island-panel strong{font-size:clamp(14px,1.25vw,18px)}
+  .acd-world-view .acd-island-label{font-size:10px}
+  .acd-world-view .acd-island-action{font-size:11px}
+  .acd-world-view .acd-island-progress>span{height:7px}
+}
