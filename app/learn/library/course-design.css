@@ -26,3 +26,6 @@
 .acd-section-track span{display:block;height:100%;background:linear-gradient(90deg,#37a8ff,#2464ec);border-radius:inherit;transition:width .25s ease}
 .acd-section .acd-grid{margin-top:0}
 @media(max-width:600px){.acd-section{padding:14px;border-radius:18px}.acd-section-heading strong{font-size:13px}}
+
+.acd-section-enter{display:inline-flex;align-items:center;justify-content:center;gap:12px;background:linear-gradient(110deg,#2674f0,#1b54c6);color:white;border:0;border-radius:14px;padding:13px 22px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 7px 18px #1d5cc536;transition:transform .18s ease,box-shadow .18s ease}
+.acd-section-enter:hover{transform:translateY(-2px);box-shadow:0 10px 22px #1d5cc54d}
