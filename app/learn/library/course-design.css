@@ -169,3 +169,12 @@
 @keyframes acd-car-bounce{from{transform:translateY(0)}to{transform:translateY(-5px)}}
 @media(max-width:700px){.acd-car-marker{width:clamp(36px,9vw,65px)}}
 @media(prefers-reduced-motion:reduce){.acd-car-marker{transition:none}.acd-car-marker.is-driving img{animation:none}}
+
+/* After driving, Aivanta waits at the next lesson for 3s, then zooms into it. */
+.acd-car-marker.is-entering{animation:acd-car-enter .65s ease-in forwards;pointer-events:none}
+@keyframes acd-car-enter{
+  0%{opacity:1;transform:translate(-50%,-100%) scale(1)}
+  65%{opacity:1;transform:translate(-50%,-65%) scale(.55)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.05)}
+}
+@media(prefers-reduced-motion:reduce){.acd-car-marker.is-entering{animation:acd-car-fade .15s linear forwards}@keyframes acd-car-fade{to{opacity:0}}}
