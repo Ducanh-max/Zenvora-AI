@@ -67,7 +67,29 @@ function visualElement(word:string,meaning:string){
  const flag=flags[key];
  return flag?<img src={"https://flagcdn.com/w80/"+flag.code+".png"} alt={"Quốc kỳ "+flag.label} style={{width:78,height:52,objectFit:"contain",display:"inline-block",verticalAlign:"middle"}}/>:visualFor(word,meaning);
 }
-function sentenceTranslation(sentence:string,dialogue?:Dialogue[]){const clean=sentence.trim().replace(/[.!?]+$/,"").toLowerCase();const exact=dialogue?.find(d=>d.english.trim().replace(/[.!?]+$/,"").toLowerCase()===clean&&d.vietnamese?.trim());if(exact?.vietnamese)return exact.vietnamese;const countries:Record<string,string>={"vietnam":"Việt Nam","viet nam":"Việt Nam","japan":"Nhật Bản","korea":"Hàn Quốc","south korea":"Hàn Quốc","china":"Trung Quốc","france":"Pháp","england":"Anh","america":"Mỹ","the usa":"Mỹ"};const from=clean.match(/^(?:i'm|i am) from (.+)$/);if(from&&countries[from[1]])return "Tôi đến từ "+countries[from[1]]+".";const templates:Record<string,string>={"hello":"Xin chào.","hi":"Chào bạn.","thank you":"Cảm ơn bạn.","nice to meet you":"Rất vui được gặp bạn.","how are you":"Bạn khỏe không?","what is your name":"Bạn tên là gì?","my name is":"Tên tôi là"};if(templates[clean])return templates[clean];const name=clean.match(/^my name is (.+)$/);if(name)return "Tên tôi là "+sentence.trim().replace(/[.!?]+$/,"").slice(11)+".";return null;}
+function sentenceTranslation(sentence:string,dialogue?:Dialogue[]){const clean=sentence.trim().replace(/[.!?]+$/,"").toLowerCase();const exact=dialogue?.find(d=>d.english.trim().replace(/[.!?]+$/,"").toLowerCase()===clean&&d.vietnamese?.trim());if(exact?.vietnamese)return exact.vietnamese;const countries:Record<string,string>={"vietnam":"Việt Nam","viet nam":"Việt Nam","japan":"Nhật Bản","korea":"Hàn Quốc","south korea":"Hàn Quốc","china":"Trung Quốc","france":"Pháp","england":"Anh","america":"Mỹ","the usa":"Mỹ"};const from=clean.match(/^(?:i'm|i am) from (.+)$/);if(from&&countries[from[1]])return "Tôi đến từ "+countries[from[1]]+".";const templates:Record<string,string>={"hello":"Xin chào.","hi":"Chào bạn.","thank you":"Cảm ơn bạn.","nice to meet you":"Rất vui được gặp bạn.","how are you":"Bạn khỏe không?","what is your name":"Bạn tên là gì?","my name is":"Tên tôi là"};if(templates[clean])return templates[clean];
+ const relationship=clean.match(/^(he|she|this|that) is (my|your|his|her|our|their) (.+)$/);
+ if(relationship){
+  const subjects:Record<string,string>={he:"Anh ấy",she:"Cô ấy",this:"Đây",that:"Đó"};
+  const possessives:Record<string,string>={my:"của tôi",your:"của bạn",his:"của anh ấy",her:"của cô ấy",our:"của chúng tôi",their:"của họ"};
+  const people:Record<string,string>={classmate:"bạn cùng lớp",friend:"bạn",teacher:"giáo viên",student:"học sinh",brother:"anh/em trai",sister:"chị/em gái",father:"bố",mother:"mẹ",dad:"bố",mom:"mẹ",grandfather:"ông",grandmother:"bà",neighbor:"hàng xóm",neighbour:"hàng xóm",cousin:"anh/chị/em họ",uncle:"chú/bác/cậu",aunt:"cô/dì/bác",son:"con trai",daughter:"con gái"};
+  const person=people[relationship[3]];
+  if(person)return subjects[relationship[1]]+(relationship[1]==="this"||relationship[1]==="that"?" là ":" là ")+person+" "+possessives[relationship[2]]+".";
+ }
+ const introductions:Record<string,string>={
+  "he is my classmate":"Anh ấy là bạn cùng lớp của tôi.",
+  "she is my classmate":"Cô ấy là bạn cùng lớp của tôi.",
+  "he is my friend":"Anh ấy là bạn của tôi.",
+  "she is my friend":"Cô ấy là bạn của tôi.",
+  "this is my friend":"Đây là bạn của tôi.",
+  "this is my family":"Đây là gia đình của tôi.",
+  "i love my family":"Tôi yêu gia đình của mình.",
+  "i have a brother":"Tôi có một người anh/em trai.",
+  "i have a sister":"Tôi có một người chị/em gái.",
+  "i am a student":"Tôi là học sinh.",
+  "i'm a student":"Tôi là học sinh."
+ };
+ if(introductions[clean])return introductions[clean];const name=clean.match(/^my name is (.+)$/);if(name)return "Tên tôi là "+sentence.trim().replace(/[.!?]+$/,"").slice(11)+".";return null;}
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
 export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
