@@ -179,21 +179,27 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const courseImage=activeCourse.is_free?"/images/aunora/"+courseImageFiles[Math.max(0,courseIndex)%courseImageFiles.length]:"/images/courses/"+activeCourse.slug+".webp.png";
     const heroBackground=`linear-gradient(90deg,rgba(8,38,99,.94),rgba(18,69,137,.77) 48%,rgba(18,69,137,.03) 78%),url("${courseImage}")`;
     const cardBackground=`linear-gradient(90deg,#ffffff 2%,#fffffff2 46%,#ffffff22 100%),url("${courseImage}")`;
-    return <section className="aunora-course-design">
+    const isMapView=activeCourse.is_free && selectedSection===null;
+    const mapIcons=["🌱","🏡","💬","🏆"];
+    return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
-      <header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với sự đồng hành của Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>
-      <div className="acd-sections">{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
+      {isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
+      <div className={isMapView?"acd-world-map":"acd-sections"}>{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
         const completed=sectionLessons.filter(lesson=>done.includes(lesson.slug)).length;
         const sectionTitle=sectionTitles[sectionIndex]||sectionLessons[0]?.title||"Khám phá tiếng Anh";
         if(selectedSection!==null&&selectedSection!==sectionIndex)return null;
+        if(isMapView)return <button type="button" key={sectionIndex} className={"acd-island acd-island-"+sectionIndex} onClick={()=>setSelectedSection(sectionIndex)} aria-label={"Mở phần "+(sectionIndex+1)+": "+sectionTitle}>
+          <span className="acd-island-art" aria-hidden="true"><span className="acd-island-symbol">{mapIcons[sectionIndex%4]}</span><span className="acd-island-rock"/></span>
+          <span className="acd-island-panel"><span className="acd-island-label">PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><strong>{sectionTitle}</strong><span className="acd-island-description">{sectionLessons[0]?.title} · {sectionLessons[sectionLessons.length-1]?.title}</span><span className="acd-island-progress"><span><i style={{width:(completed/sectionLessons.length*100)+"%"}}/></span><b>{completed}/{sectionLessons.length}</b></span><span className="acd-island-action">{completed===sectionLessons.length?"Ôn tập phần này":"Khám phá phần "+(sectionIndex+1)} →</span></span>
+        </button>;
         return <section className="acd-section" key={sectionIndex}>
           <header className="acd-section-heading"><div><span className="acd-section-kicker">✦ PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><h2>{sectionTitle}</h2><p>{sectionLessons[0]?.title}{sectionLessons.length>1?" · "+sectionLessons[sectionLessons.length-1].title:""}</p></div><strong>{completed}/{sectionLessons.length} bài · {Math.round(completed/sectionLessons.length*100)}%</strong></header>
           <div className="acd-section-track" role="progressbar" aria-label={`Tiến độ phần ${sectionIndex+1}`} aria-valuenow={Math.round(completed/sectionLessons.length*100)} aria-valuemin={0} aria-valuemax={100}><span style={{width:(completed/sectionLessons.length*100)+"%"}}/></div>
           {selectedSection===null?<button type="button" className="acd-section-enter" onClick={()=>setSelectedSection(sectionIndex)}>📖 {completed===sectionLessons.length?"Ôn tập phần này":"Học phần "+(sectionIndex+1)} <ArrowRight size={18}/></button>:<div className="acd-grid">{sectionLessons.map((lesson,offset)=><article className="acd-card" key={lesson.id} style={{backgroundImage:cardBackground}}>
-        <div><span className="acd-card-label">BÀI {String(sectionIndex*10+offset+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
-        <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
-      </article>)}</div>}</section>;
+          <div><span className="acd-card-label">BÀI {String(sectionIndex*10+offset+1).padStart(2,"0")}</span><h2>{lesson.title}</h2><p>5 từ vựng, mẫu câu, hội thoại và luyện tập cùng Aivanta.</p></div>
+          <div><div className="acd-pills"><span>📖 {(lesson.content.vocabulary||[]).length} từ vựng</span><span>💬 Luyện với Aivanta</span>{done.includes(lesson.slug)&&<span>✓ Đã học</span>}</div><button type="button" className="acd-enter" onClick={()=>openLesson(lesson)}>{done.includes(lesson.slug)?"Ôn tập lại":"Vào học"} <ArrowRight size={19}/></button></div>
+          </article>)}</div>}</section>;
       })}</div>
     </section>;
   }
