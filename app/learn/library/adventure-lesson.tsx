@@ -4,6 +4,7 @@ import {ArrowLeft,ArrowRight,Lightbulb,Volume2,Mic,CheckCircle2,RotateCcw} from 
 import GuidedLessonTutor from "./guided-lesson-tutor";
 import MatchPairs from "./match-pairs";
 type Word={word:string;meaning:string;example:string;pronunciation?:string};
+type ExampleTranslation={english:string;vietnamese:string};
 type Dialogue={speaker:string;english:string;vietnamese?:string};
 type Activity={type:"intro"|"picture"|"choice"|"listen"|"fill"|"order"|"match"|"speak"|"chat"|"read";word?:Word;question:string;answer:string;options?:string[];sentence?:string};
 const wolf="/brand/aivanta-mascot.webp.png";
@@ -90,8 +91,13 @@ function sentenceTranslation(sentence:string,dialogue?:Dialogue[]){const clean=s
   "i'm a student":"Tôi là học sinh."
  };
  if(introductions[clean])return introductions[clean];const name=clean.match(/^my name is (.+)$/);if(name)return "Tên tôi là "+sentence.trim().replace(/[.!?]+$/,"").slice(11)+".";return null;}
+function sourceSentenceTranslation(sentence:string,lesson:{dialogue?:Dialogue[];examples?:ExampleTranslation[]}){
+ const normalized=(value:string)=>value.toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\\s+/g," ");
+ const found=[...(lesson.examples||[]),...(lesson.dialogue||[])].find(item=>normalized(item.english)===normalized(sentence)&&item.vietnamese?.trim());
+ return found?.vietnamese?.trim()||sentenceTranslation(sentence,lesson.dialogue);
+}
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
-export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
+export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];examples?:ExampleTranslation[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review||lesson.test?10:5);if(!words.length)return[];
   const a:Activity[]=[];
@@ -147,7 +153,25 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  useEffect(()=>{try{localStorage.setItem("aunora_lesson_step_"+lesson.id,JSON.stringify({step,chatCompleted,total:activities.length,title:lesson.title}));}catch{}},[lesson.id,step,chatCompleted]);
  const sceneInfo:Record<string,{icon:string;name:string;mission:string}>={intro:{icon:"✨",name:"KHÁM PHÁ",mission:"Mở thẻ bí mật và nghe từ mới"},picture:{icon:"🖼️",name:"CHỌN HÌNH",mission:"Quan sát các hình và chọn đáp án"},choice:{icon:"🎯",name:"THỬ THÁCH",mission:"Chọn chiếc thẻ đúng để vượt ải"},listen:{icon:"🎧",name:"TRẠM ÂM THANH",mission:"Nghe tín hiệu và giải mã từ"},order:{icon:"🧩",name:"XƯỞNG GHÉP CÂU",mission:"Thu thập mảnh ghép để tạo câu"},match:{icon:"🔗",name:"CẦU KẾT NỐI",mission:"Nối hai thế giới Anh – Việt"},fill:{icon:"🎧",name:"NGHE VÀ VIẾT",mission:"Hoàn thành câu tiếng Anh"},read:{icon:"💬",name:"GẶP GỠ NHÂN VẬT",mission:"Chọn lời đáp phù hợp với câu chuyện"},speak:{icon:"🎤",name:"LUYỆN PHÁT ÂM",mission:"Nghe Aivanta đọc mẫu và nói theo"},chat:{icon:"🐺",name:"HỘI THOẠI AIVANTA",mission:"Cùng Aivanta trò chuyện thực tế"}};
  const activityIndex=reviewMode?reviewQueue[reviewIndex]:step;
- const activity=activities[activityIndex];const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
+ const activity=activities[activityIndex];
+ const [translatedSentence,setTranslatedSentence]=useState<{english:string;vietnamese:string|null;loading:boolean}|null>(null);
+ const translationCache=useRef(new Map<string,string>());
+ const translationTarget=checked&&activity?.type==="order"&&correct?activity.answer:null;
+ useEffect(()=>{
+  if(!translationTarget)return;
+  const local=sourceSentenceTranslation(translationTarget,lesson);
+  if(local){setTranslatedSentence({english:translationTarget,vietnamese:local,loading:false});return;}
+  const cached=translationCache.current.get(translationTarget);
+  if(cached){setTranslatedSentence({english:translationTarget,vietnamese:cached,loading:false});return;}
+  const controller=new AbortController();
+  setTranslatedSentence({english:translationTarget,vietnamese:null,loading:true});
+  fetch("/api/translate-sentence?text="+encodeURIComponent(translationTarget),{signal:controller.signal})
+   .then(r=>r.ok?r.json():{translation:null})
+   .then(data=>{if(controller.signal.aborted)return;const value=typeof data.translation==="string"?data.translation:null;if(value)translationCache.current.set(translationTarget,value);setTranslatedSentence({english:translationTarget,vietnamese:value,loading:false});})
+   .catch(()=>{if(!controller.signal.aborted)setTranslatedSentence({english:translationTarget,vietnamese:null,loading:false});});
+  return ()=>controller.abort();
+ },[translationTarget,lesson]);
+const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
  const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
  const orderWords=(activity?.answer||"").split(" ").filter(Boolean);
  const options=activity?.type==="order"?orderWords.map((w,i)=>({id:i,word:w})).sort((a,b)=>((a.id*7+3)%Math.max(orderWords.length,1))-((b.id*7+3)%Math.max(orderWords.length,1))):[];
@@ -209,7 +233,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  {activity.type==="speak"&&<div className="adv-speak-studio"><div className="adv-speak-intro"><h2>Nghe và đọc lại</h2><p>Nghe mẫu, sau đó chạm micro để đọc theo</p></div><div className="adv-speak-character"><img src={wolf} alt="Aivanta đọc mẫu"/><div className="adv-speak-bubble"><strong>{activity.answer}</strong>{activity.word?.pronunciation&&<span>{activity.word.pronunciation}</span>}<button type="button" aria-label="Nghe Aivanta đọc mẫu" onClick={()=>say(activity.answer)}><Volume2 size={28}/></button></div></div><span className="adv-speak-sample">Nghe mẫu</span><button type="button" className={"adv-speak-micro"+(listening?" is-listening":"")} onClick={listen} disabled={listening||checked} aria-label={listening?"Đang nghe giọng nói":"Chạm để đọc lại"}><Mic size={68}/></button><strong className="adv-speak-micro-label">{listening?"Đang nghe bạn nói...":"Chạm để đọc lại"}</strong><div className={"adv-speak-wave"+(listening?" is-active":"")} aria-hidden="true">{Array.from({length:19},(_,i)=><i key={i} style={{height:(9+(i*13%34))+"px"}}/>)}</div>{recognized&&<p className="adv-speak-heard">Đã nghe: <strong>{recognized}</strong></p>}{!checked&&<button type="button" className="adv-skip-speech" onClick={skipSpeaking}>Tạm thời không nói được →</button>}{error&&<small role="alert">{error}</small>}{error&&<input className="adv-speak-fallback" value={recognized} onChange={e=>setRecognized(e.target.value)} placeholder="Hoặc nhập từ tiếng Anh tại đây"/>}</div>}
  {activity.type==="chat"&&<GuidedLessonTutor key={lesson.id} words={lesson.words} title={lesson.title} onComplete={()=>setChatCompleted(true)}/>}
  
- {checked&&activity.type==="order"&&correct&&<div className="adv-translation" role="status"><strong>🇻🇳 Nghĩa tiếng Việt:</strong> {sentenceTranslation(activity.answer,lesson.dialogue)||"Chưa có bản dịch xác thực cho câu này."}<button type="button" onClick={()=>say(activity.answer)}><Volume2 size={17}/> Nghe lại câu</button></div>}
+ {checked&&activity.type==="order"&&correct&&<div className="adv-translation" role="status"><strong>🇻🇳 Nghĩa tiếng Việt:</strong> {translatedSentence?.english===activity.answer?(translatedSentence.loading?"Đang dịch câu…":translatedSentence.vietnamese||"Chưa thể dịch câu này, hãy thử lại sau."):"Đang dịch câu…"}<button type="button" onClick={()=>say(activity.answer)}><Volume2 size={17}/> Nghe lại câu</button></div>}
  {checked&&<div role="status" className={"adv-feedback "+(correct||easy?"adv-good":"adv-bad")}>{correct||easy?"🎉 Làm tốt lắm!":speechSkipped?"Bạn có thể luyện phát âm từ này vào cuối bài.":"❌ Chưa chính xác. Đáp án: "+(activity.type==="match"?"Có cặp nối sai (đường màu đỏ). Nhấn vào từ đã nối để gỡ và nối lại.":activity.answer)}</div>}
  <div className="adv-actions">{activity.type!=="match"&&<button className="adv-primary" disabled={!checked&&!canCheck} onClick={next}>{activity.type==="chat"?"Hoàn thành hội thoại":activity.type==="intro"?"Tiếp theo":checked?"Tiếp tục":"Kiểm tra"} <ArrowRight size={19}/></button>}</div></main><aside className="adv-companion"><div className={"adv-wolf "+(checked?(correct?"adv-wolf-happy":"adv-wolf-try"):hint?"adv-wolf-help":"")}><div className="adv-companion-tag">🐺 ĐỒNG ĐỘI AIVANTA</div><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div></aside></div>}</section>;
 }
