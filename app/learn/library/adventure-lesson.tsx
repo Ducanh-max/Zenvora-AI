@@ -63,7 +63,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
     a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:[...practice.slice(0,4).flatMap(w=>[w.word,w.meaning])]});
     practice.slice(4,6).forEach(w=>a.push({type:"choice",word:w,question:"Ôn nhanh: Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
     practice.slice(6,8).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và nhận biết từ",answer:w.word,options:choicesFor(w,"word")}));
-    a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
+    // Bài gộp chỉ ôn tập, không có AI Tutor.
     return a;
   }
   // Fifteen short, varied activities, followed by the Aivanta conversation.
@@ -81,7 +81,7 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   // Do not fabricate multiple-choice conversation answers from vocabulary examples.
   // The guided Aivanta conversation at the end handles contextual responses.
   words.slice(0,2).forEach(w=>a.push({type:"speak",word:w,question:"Nghe và đọc lại",answer:w.word}));
-  a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
+  if(!lesson.test)a.push({type:"chat",question:"Trò chuyện thực tế với Aivanta",answer:""});
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
  },[lesson]);
