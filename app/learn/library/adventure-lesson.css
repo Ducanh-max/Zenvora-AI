@@ -98,3 +98,8 @@
 .adv-feedback{margin:18px 0 8px}
 .adv-done{background:#ffffffef;border:2px solid #e4edfa;box-shadow:0 15px 45px #244a8520;padding:40px}
 @media(max-width:600px){.adv-screen{padding:12px 13px 100px}.adv-top{margin-bottom:8px}.adv-main{padding:10px 2px 120px}.adv-choices-listen{grid-template-columns:repeat(2,minmax(0,1fr))}.adv-choices-listen button{min-height:130px}.adv-character-prompt img{width:95px;height:112px}.adv-character-speech{padding:14px 17px}.adv-actions{padding:14px 18px}.adv-actions button{width:100%}.adv-mission-label span+span{font-size:10px}}
+
+/* Incorrect answers must be unmistakably red, including fill-in responses. */
+.adv-feedback.adv-bad{background:#ffe5e5!important;color:#b42332!important;border:2px solid #f36a75!important;border-radius:16px;font-weight:800}
+.adv-screen:has(.adv-feedback.adv-bad) .adv-input input{border:2px solid #e53d50!important;background:#fff1f2!important;color:#b42332!important}
+.adv-input-badge{display:none!important}
