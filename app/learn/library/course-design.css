@@ -65,3 +65,21 @@
 /* User-provided art takes over the island illustration while retaining text/progress cards. */
 .acd-island-upload{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;z-index:2}
 .acd-island-upload:not([style*="display: none"])~.acd-island-symbol{visibility:hidden}
+
+/* One illustrated map, four clickable islands; place image at public/images/aunora/learning-parts/course-map.png */
+.aunora-course-design.acd-world-view{background:linear-gradient(180deg,#dceeff 0%,#eff7ff 100%);min-height:0}
+.acd-world-view .acd-world-map{max-width:1400px;min-height:0;aspect-ratio:1536/1024;display:block;position:relative;margin:20px auto 0;border-radius:24px;overflow:hidden;background:#a8d6ff url('/images/aunora/learning-parts/course-map.png') center/100% 100% no-repeat;box-shadow:0 15px 40px #0b407b3b}
+.acd-world-view .acd-world-map:before{display:none}
+.acd-world-view .acd-island{position:absolute;display:block;min-height:0;width:33%;height:35%;padding:0;transform:none}
+.acd-world-view .acd-island:hover{transform:none}
+.acd-world-view .acd-island-0{left:9%;top:18%}
+.acd-world-view .acd-island-1{right:5%;top:18%}
+.acd-world-view .acd-island-2{left:7%;bottom:6%}
+.acd-world-view .acd-island-3{right:8%;bottom:5%}
+.acd-world-view .acd-island-marker{position:absolute;left:50%;top:10%;transform:translateX(-50%);font-size:32px;filter:drop-shadow(0 3px 3px #153e77)}
+.acd-world-view .acd-island-panel{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);width:100%;max-width:340px;margin:0;padding:12px 14px;border-radius:14px;border:2px solid #d7b676;background:#fff9e9ed;box-shadow:0 5px 15px #123a7480;gap:3px}
+.acd-world-view .acd-island-panel strong{font-size:clamp(13px,1.5vw,21px)}
+.acd-world-view .acd-island-description{display:none}
+.acd-world-view .acd-island-label{font-size:clamp(9px,.9vw,12px)}
+.acd-world-view .acd-island-action{font-size:clamp(10px,.95vw,13px)}
+@media(max-width:700px){.acd-world-view .acd-world-map{aspect-ratio:3/4;background-size:cover;background-position:center}.acd-world-view .acd-island{width:45%;height:37%}.acd-world-view .acd-island-0{left:3%;top:9%}.acd-world-view .acd-island-1{right:3%;top:9%}.acd-world-view .acd-island-2{left:3%;bottom:8%}.acd-world-view .acd-island-3{right:3%;bottom:8%}.acd-world-view .acd-island-panel{padding:8px 9px;gap:3px}.acd-world-view .acd-island-panel strong{font-size:13px}.acd-world-view .acd-island-marker{font-size:24px;top:3%}.acd-world-view .acd-island-progress{gap:4px}.acd-world-view .acd-island-progress b{font-size:11px}}
