@@ -48,7 +48,7 @@ function visualFor(word:string,meaning:string){
  pencil:"✏️",pen:"🖊️",table:"🪵",chair:"🪑",teacher:"👩‍🏫",student:"🧑‍🎓",school:"🏫",book:"📚",phone:"📱",computer:"💻",music:"🎵",
  rice:"🍚",bread:"🍞",egg:"🥚",orange:"🍊",coffee:"☕",tea:"🍵",milk:"🥛",water:"💧",apple:"🍎",banana:"🍌",food:"🍱",cake:"🎂",
  blue:"🔵",red:"🔴",green:"🟢",yellow:"🟡",black:"⚫",white:"⚪",pink:"🩷",
- cat:"🐱",dog:"🐶",car:"🚗",plane:"✈️",airplane:"✈️",house:"🏠",home:"🏠",sun:"☀️",moon:"🌙",hello:"👋",hi:"👋",meet:"🤝",meeting:"🤝",greet:"👋",greeting:"👋",goodbye:"👋",bye:"👋",welcome:"🙌",introduce:"🗣️",introduction:"🗣️",nice:"😊",please:"🙏",thanks:"🙏",thank:"🙏",sorry:"😔",yes:"✅",no:"❌",happy:"😊",sad:"😢",love:"❤️",
+ cat:"🐱",dog:"🐶",car:"🚗",plane:"✈️",airplane:"✈️",house:"🏠",home:"🏠",sun:"☀️",moon:"🌙",fine:"🙂",great:"😄",okay:"👌",ok:"👌",good:"👍",excellent:"🌟",wonderful:"🤩",amazing:"🤩",fantastic:"🎉",awesome:"🔥",well:"🙂",bad:"👎",terrible:"😞",tired:"😴",hungry:"🍽️",thirsty:"🥤",busy:"📋",bored:"🥱",excited:"🤩",nervous:"😰",angry:"😠",scared:"😨",sick:"🤒",healthy:"💪",hello:"👋",hi:"👋",meet:"🤝",meeting:"🤝",greet:"👋",greeting:"👋",goodbye:"👋",bye:"👋",welcome:"🙌",introduce:"🗣️",introduction:"🗣️",nice:"😊",please:"🙏",thanks:"🙏",thank:"🙏",sorry:"😔",yes:"✅",no:"❌",happy:"😊",sad:"😢",love:"❤️",
  hand:"✋",eye:"👁️",ear:"👂",nose:"👃",mouth:"👄",head:"🧑",foot:"🦶",feet:"🦶",run:"🏃",walk:"🚶",sleep:"😴",read:"📖",write:"✍️",listen:"👂",speak:"🗣️"
  };
  return icons[key]||"";
