@@ -190,7 +190,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
         const sectionTitle=sectionTitles[sectionIndex]||sectionLessons[0]?.title||"Khám phá tiếng Anh";
         if(selectedSection!==null&&selectedSection!==sectionIndex)return null;
         if(isMapView)return <button type="button" key={sectionIndex} className={"acd-island acd-island-"+sectionIndex} onClick={()=>setSelectedSection(sectionIndex)} aria-label={"Mở phần "+(sectionIndex+1)+": "+sectionTitle}>
-          <span className="acd-island-art" aria-hidden="true"><span className="acd-island-symbol">{mapIcons[sectionIndex%4]}</span><span className="acd-island-rock"/></span>
+          <span className="acd-island-art" aria-hidden="true"><img className="acd-island-upload" src={"/images/aunora/learning-parts/"+activeCourse.slug+"-part-"+(sectionIndex+1)+".png"} alt="" loading="lazy" onError={event=>{event.currentTarget.style.display="none"}}/><span className="acd-island-symbol">{mapIcons[sectionIndex%4]}</span><span className="acd-island-rock"/></span>
           <span className="acd-island-panel"><span className="acd-island-label">PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><strong>{sectionTitle}</strong><span className="acd-island-description">{sectionLessons[0]?.title} · {sectionLessons[sectionLessons.length-1]?.title}</span><span className="acd-island-progress"><span><i style={{width:(completed/sectionLessons.length*100)+"%"}}/></span><b>{completed}/{sectionLessons.length}</b></span><span className="acd-island-action">{completed===sectionLessons.length?"Ôn tập phần này":"Khám phá phần "+(sectionIndex+1)} →</span></span>
         </button>;
         return <section className="acd-section" key={sectionIndex}>
