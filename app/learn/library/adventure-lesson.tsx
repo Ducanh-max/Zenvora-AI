@@ -109,8 +109,8 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   if(!checked){
    if(!canCheck)return;
    setChecked(true);
-   if(correct){setRight(n=>n+1);playSuccessSound();}else{playErrorSound();}
-   else if(activity.type!=="match"&&!reviewMode){setReviewQueue(prev=>prev.includes(activityIndex)?prev:[...prev,activityIndex]);}
+   if(correct){setRight(n=>n+1);playSuccessSound();}
+   else {playErrorSound();if(activity.type!=="match"&&!reviewMode){setReviewQueue(prev=>prev.includes(activityIndex)?prev:[...prev,activityIndex]);}}
    return;
   }
   advance();
