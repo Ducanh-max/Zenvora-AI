@@ -109,7 +109,7 @@
 .acd-lesson-map-heading h2{font-size:clamp(23px,3vw,35px);margin:6px 0}
 .acd-lesson-map-heading p{margin:0 0 12px;color:#43638d}
 .acd-lesson-map-wrap{max-width:1100px;margin:auto}
-.acd-lesson-map{position:relative;aspect-ratio:1661/927;overflow:hidden;border-radius:24px;background:#b9dafa url('/images/aunora/learning-parts/part-1-lesson-map.png') center/100% 100% no-repeat;box-shadow:0 16px 45px #0a397044;border:3px solid #b7d8ff}
+.acd-lesson-map{position:relative;aspect-ratio:1661/927;overflow:hidden;border-radius:24px;background:#b9dafa url('/images/aunora/learning-parts/course-map.png') center/100% 100% no-repeat;box-shadow:0 16px 45px #0a397044;border:3px solid #b7d8ff}
 .acd-lesson-map-points{position:absolute;inset:0}
 .acd-lesson-point{position:absolute;transform:translate(-50%,-50%);width:clamp(32px,4.6vw,56px);height:clamp(32px,4.6vw,56px);display:flex;flex-direction:column;justify-content:center;align-items:center;border:3px solid #fff;border-radius:50%;background:linear-gradient(145deg,#3cafff,#1b5dcb);color:#fff;box-shadow:0 4px 0 #164b94,0 5px 15px #05295a7c;cursor:pointer;z-index:2}
 .acd-lesson-point span{font-size:clamp(13px,1.5vw,21px);font-weight:900;line-height:1}
