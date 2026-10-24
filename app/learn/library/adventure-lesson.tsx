@@ -63,10 +63,10 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  const [reviewQueue,setReviewQueue]=useState<number[]>([]),[reviewIndex,setReviewIndex]=useState(0),[reviewMode,setReviewMode]=useState(false),[speechSkipped,setSpeechSkipped]=useState(false);const [matchComplete,setMatchComplete]=useState(false),[matchCorrect,setMatchCorrect]=useState(false);const [chatCompleted,setChatCompleted]=useState(false);const [step,setStep]=useState(0),[selected,setSelected]=useState(""),[checked,setChecked]=useState(false),[hint,setHint]=useState(false),[matched,setMatched]=useState<string[]>([]),[first,setFirst]=useState(""),[tokens,setTokens]=useState<string[]>([]),[recognized,setRecognized]=useState(""),[listening,setListening]=useState(false),[right,setRight]=useState(0),[saving,setSaving]=useState(false),[error,setError]=useState("");
  useEffect(()=>{
   let savedStep=0;let savedChat=false;
-  try{const raw=sessionStorage.getItem("aunora_lesson_step_"+lesson.id);if(raw){const state=JSON.parse(raw);savedStep=Math.max(0,Math.min(activities.length,Number(state.step)||0));savedChat=Boolean(state.chatCompleted);}}catch{}
+  try{const raw=localStorage.getItem("aunora_lesson_step_"+lesson.id);if(raw){const state=JSON.parse(raw);savedStep=Math.max(0,Math.min(activities.length,Number(state.step)||0));savedChat=Boolean(state.chatCompleted);}}catch{}
   setStep(savedStep);setSelected("");setChecked(false);setHint(false);setMatched([]);setFirst("");setMatchComplete(false);setMatchCorrect(false);setTokens([]);setRecognized("");setRight(0);setReviewQueue([]);setReviewIndex(0);setReviewMode(false);setSpeechSkipped(false);setChatCompleted(savedChat);
  },[lesson.id,activities.length]);
- useEffect(()=>{try{sessionStorage.setItem("aunora_lesson_step_"+lesson.id,JSON.stringify({step,chatCompleted,total:activities.length,title:lesson.title}));}catch{}},[lesson.id,step,chatCompleted]);
+ useEffect(()=>{try{localStorage.setItem("aunora_lesson_step_"+lesson.id,JSON.stringify({step,chatCompleted,total:activities.length,title:lesson.title}));}catch{}},[lesson.id,step,chatCompleted]);
  const activityIndex=reviewMode?reviewQueue[reviewIndex]:step;
  const activity=activities[activityIndex];const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
  const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
