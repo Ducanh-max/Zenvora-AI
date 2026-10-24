@@ -3,3 +3,14 @@
 .adv-match{margin-top:22px}.adv-match-board{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(48px,11vw,160px);isolation:isolate}.adv-match-col{display:flex;flex-direction:column;gap:14px;min-width:0}.adv-match-col h3{margin:0 0 5px;text-align:center;font-size:18px;color:#2759ad}.adv-match-col button{position:relative;z-index:2;min-height:67px;padding:12px;border:2px solid #d6e2f7;border-radius:15px;background:#fff;color:#123275;font-size:clamp(15px,1.6vw,19px);font-weight:800;cursor:pointer;overflow-wrap:anywhere;transition:background .15s,border-color .15s}.adv-match-col button.is-selected{border-color:#1669ff;background:#e6f0ff;box-shadow:0 0 0 3px #1670ff25}.adv-match-col button.is-correct{border-color:#19b970;background:#e0f8eb}.adv-match-col button.is-wrong{border-color:#ed525b;background:#ffebed}.adv-match-col button:disabled{cursor:default}.adv-match-lines{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible}.adv-match-status{min-height:27px;font-weight:750;color:#23559e;margin:17px 0 5px}.adv-match-count{font-size:14px;color:#6179a8;margin:0}@media(max-width:600px){.adv-match-board{gap:40px}.adv-match-col{gap:11px}.adv-match-col h3{font-size:14px}.adv-match-col button{min-height:65px;font-size:14px;padding:7px}}
 
 .adv-speak .adv-skip-speech{background:#eaf1ff;color:#2558a5;border:1px solid #cddbf6;margin-top:12px;font-size:15px}.adv-review-label{display:inline-block;margin:7px 0;padding:7px 12px;border-radius:10px;background:#fff2d8;color:#9b5d0b;font-weight:800}
+
+/* Distinct visual presentation for each learning activity. */
+.adv-picture-card{position:relative;overflow:hidden;background:linear-gradient(145deg,#f3faff,#d8eaff);border:2px solid #b7d8ff;border-radius:24px}
+.adv-picture-illustration{font-size:54px;letter-spacing:12px;text-align:center;padding:12px;filter:drop-shadow(0 4px 4px #7eadd855)}
+.adv-listen-choice{background:linear-gradient(125deg,#edf9ff,#e0eeff)!important;border-color:#a7d4f5!important}
+.adv-dialogue-choice{border-radius:22px!important;background:#f1f7ff!important;text-align:left}
+.adv-animated-tiles button,.adv-order-pool button{transition:transform .2s ease,box-shadow .2s ease}
+.adv-animated-tiles button{animation:adv-tile-pop .2s ease-out}
+.adv-order-pool button:hover{transform:translateY(-3px)}
+@keyframes adv-tile-pop{from{transform:scale(.85);opacity:.5}to{transform:scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.adv-animated-tiles button{animation:none}.adv-order-pool button{transition:none}}
