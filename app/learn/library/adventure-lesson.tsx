@@ -156,7 +156,6 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
  const activity=activities[activityIndex];
  const [translatedSentence,setTranslatedSentence]=useState<{english:string;vietnamese:string|null;loading:boolean}|null>(null);
  const translationCache=useRef(new Map<string,string>());
- const translationTarget=checked&&activity?.type==="order"&&correct?activity.answer:null;
  useEffect(()=>{
   if(!translationTarget)return;
   const local=sourceSentenceTranslation(translationTarget,lesson);
