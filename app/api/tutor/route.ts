@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     }
 
     const relevantTurns = conversation && !hintMode ? Math.max(0, Math.min(5, Number(body.relevantTurns) || 0)) : 0;
-    const extraRules = conversation && !hintMode ? "Count only a learner response relevant to the current lesson and the previous question. Relevant imperfect English still counts. Off-topic answers do not count. Current valid answers: " + relevantTurns + "/5. Return JSON with reply (string) and onTopic (boolean). For off-topic, redirect gently to the lesson with a question and set onTopic false. For a relevant response when current count is 4, this is the FINAL exchange: say goodbye naturally and ask NO further question. Otherwise ask one relevant follow-up. Return JSON only." : "";
+    const extraRules = conversation && !hintMode ? "Every learner message counts as one conversation exchange, including off-topic messages and imperfect English. Exchanges completed before this message: " + relevantTurns + "/5. You may gently redirect off-topic replies to the lesson. If relevantTurns is 4, this is the FIFTH and FINAL learner message: give a warm, natural closing, do not ask another question, even if the message is off-topic. Otherwise ask one short follow-up related to the lesson. Return only a JSON object with reply (string) and onTopic (boolean)." : "";
     const messages = valid.map((message, index) => {
       const parts: any[] = [{ type: "text", text: message.content.trim().slice(0, 3500) }];
       if (index === valid.length - 1 && message.role === "user" && message.imageData) {
