@@ -19,6 +19,7 @@ export default function ChessRooms(){
  const clock=(side:"w"|"b")=>{if(!room?.time_control)return 0;const stored=(side==="w"?room.white_ms:room.black_ms)??room.time_control*1000;return Math.max(0,stored-(room.status==="playing"&&position?.turn===side&&room.turn_started_at?Math.max(0,now-new Date(room.turn_started_at).getTime()):0));};
  const formatClock=(n:number)=>Math.floor(n/60000)+":"+String(Math.floor(n/1000)%60).padStart(2,"0");
  const check=position?attacked(position,position.board.indexOf(position.turn==="w"?"K":"k"),other(position.turn)):false;
+ useEffect(()=>{if(room?.status!=="playing"||!room.time_control||!room.turn_started_at||clock(room.position.turn)>0||busy)return;void action("timeout");},[room?.code,room?.version,room?.status,now]);
  async function action(kind:string,m?:Move){
   if(busy)return;setBusy(true);setError("");
   try{
