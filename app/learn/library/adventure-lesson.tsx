@@ -88,6 +88,24 @@ function visualElement(word:string,meaning:string){
  return flag?<img src={"https://flagcdn.com/w80/"+flag.code+".png"} alt={"Quốc kỳ "+flag.label} style={{width:78,height:52,objectFit:"contain",display:"inline-block",verticalAlign:"middle"}}/>:(visualFor(word,meaning)||"");
 }
 function sentenceTranslation(sentence:string,dialogue?:Dialogue[]){const clean=sentence.trim().replace(/[.!?]+$/,"").toLowerCase();const exact=dialogue?.find(d=>d.english.trim().replace(/[.!?]+$/,"").toLowerCase()===clean&&d.vietnamese?.trim());if(exact?.vietnamese)return exact.vietnamese;const countries:Record<string,string>={"vietnam":"Việt Nam","viet nam":"Việt Nam","japan":"Nhật Bản","korea":"Hàn Quốc","south korea":"Hàn Quốc","china":"Trung Quốc","france":"Pháp","england":"Anh","america":"Mỹ","the usa":"Mỹ"};const from=clean.match(/^(?:i'm|i am) from (.+)$/);if(from&&countries[from[1]])return "Tôi đến từ "+countries[from[1]]+".";const templates:Record<string,string>={"hello":"Xin chào.","hi":"Chào bạn.","thank you":"Cảm ơn bạn.","nice to meet you":"Rất vui được gặp bạn.","how are you":"Bạn khỏe không?","what is your name":"Bạn tên là gì?","my name is":"Tên tôi là"};if(templates[clean])return templates[clean];
+ const directions:Record<string,string>={
+  "turn left at the corner":"Rẽ trái ở góc đường.",
+  "turn right at the corner":"Rẽ phải ở góc đường.",
+  "turn left":"Rẽ trái.",
+  "turn right":"Rẽ phải.",
+  "go straight":"Đi thẳng.",
+  "go straight ahead":"Tiếp tục đi thẳng.",
+  "go straight and turn left":"Đi thẳng rồi rẽ trái.",
+  "go straight and turn right":"Đi thẳng rồi rẽ phải.",
+  "turn left at the traffic lights":"Rẽ trái ở chỗ đèn giao thông.",
+  "turn right at the traffic lights":"Rẽ phải ở chỗ đèn giao thông.",
+  "the bank is on your left":"Ngân hàng ở bên trái của bạn.",
+  "the bank is on your right":"Ngân hàng ở bên phải của bạn.",
+  "where is the station":"Nhà ga ở đâu?",
+  "how can i get to the station":"Tôi có thể đến nhà ga bằng cách nào?",
+  "excuse me, where is the bank":"Xin lỗi, ngân hàng ở đâu?"
+ };
+ if(directions[clean])return directions[clean];
  const relationship=clean.match(/^(he|she|this|that) is (my|your|his|her|our|their) (.+)$/);
  if(relationship){
   const subjects:Record<string,string>={he:"Anh ấy",she:"Cô ấy",this:"Đây",that:"Đó"};
@@ -205,7 +223,8 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
  const dictationPool=useMemo(()=>{if(activity?.type!=="fill")return [] as {id:number;word:string}[];const correctWords=activity.answer.trim().replace(/[.!?]+$/,"").split(/\s+/).filter(Boolean);const used=new Set(correctWords.map(w=>w.toLowerCase().replace(/[^a-z']/g,"")));const distractors=[...lesson.words.flatMap(w=>[w.word,...(w.example||"").split(/\s+/)]),"ball","same","next","please","where","they","good","book","school","tomorrow","friend"].map(w=>w.replace(/^[^a-zA-Z]+|[^a-zA-Z']+$/g,"")).filter(w=>w&&!used.has(w.toLowerCase())&&/^[a-zA-Z']+$/.test(w));const unique=[...new Set(distractors.map(w=>w.toLowerCase()))].slice(0,3);const tiles=[...correctWords,...unique].map((word,id)=>({id,word}));let seed=Array.from(activity.answer).reduce((a,c)=>a*31+c.charCodeAt(0),17)>>>0;for(let i=tiles.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]];}return tiles;},[activity?.type,activity?.answer,lesson.words]);
  const dictationAnswer=dictationMode==="keyboard"?selected:dictationIds.map(id=>dictationPool.find(t=>t.id===id)?.word||"").join(" ");
  const correct=activity?.type==="fill"?norm(dictationAnswer)===norm(activity.answer):activity?.type==="speak"&&speechSkipped?false:(activity?.type==="order"||activity?.type==="hearorder")?norm(tokens.join(" "))===norm(activity.answer):activity?.type==="speak"?norm(recognized)===norm(activity.answer):activity?.type==="match"?matchCorrect:norm(selected)===norm(activity?.answer||"");
- const translationTarget=checked&&activity&&["order","hearorder","fill","read"].includes(activity.type)?activity.answer:null;
+ // Prepare the translation while answering; reveal it only in the checked feedback.
+ const translationTarget=activity&&["order","hearorder","fill","read"].includes(activity.type)?activity.answer:null;
  const feedbackWord=activity?.word||lesson.words.find(word=>norm(word.word)===norm(activity?.answer||""));
  useEffect(()=>{
   if(!translationTarget)return;
