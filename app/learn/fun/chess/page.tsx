@@ -4,6 +4,7 @@ import {useCallback,useEffect,useMemo,useRef,useState} from "react";
 import {legal,attacked,other,type Move} from "@/lib/chess-engine";
 import {newMatch,chargeClock,playMove,resultMessage,type Match,type Difficulty} from "@/lib/chess-match";
 import {explainResult,replayPositions} from "@/lib/chess-review";
+import {createChessAudio,chessCue} from "@/lib/chess-audio";
 import "./chess.css";
 const pieceNames:Record<string,string>={k:"Vua",q:"Hậu",r:"Xe",b:"Tượng",n:"Mã",p:"Tốt"};
 const pieceFiles:Record<string,string>={k:"king",q:"queen",r:"rook",b:"bishop",n:"knight",p:"pawn"};
@@ -19,11 +20,15 @@ export default function ChessPage(){
  const [busy,setBusy]=useState(false),[error,setError]=useState(""),[saved,setSaved]=useState<Saved>(null),[ranked,setRanked]=useState(false),[leaders,setLeaders]=useState<Leader[]>([]);
  const [reviewing,setReviewing]=useState(false),[reviewPly,setReviewPly]=useState(0);
  const replayTitleRef=useRef<HTMLHeadingElement|null>(null);
+ const audioRef=useRef<ReturnType<typeof createChessAudio>|null>(null),previousSoundMatch=useRef<Match|null>(null);
+ const unlockSound=()=>{audioRef.current??=createChessAudio();audioRef.current.unlock();};
+ useEffect(()=>()=>{audioRef.current?.dispose();audioRef.current=null;},[]);
  const dialogRef=useRef<HTMLElement|null>(null);
  const ticket=useRef(""),inFlight=useRef(false),pending=useRef<Record<string,unknown>|null>(null),requestId=useRef(0);
  const position=match.position,moves=useMemo(()=>legal(position),[position]);
  const king=position.board.indexOf(position.turn==="w"?"K":"k"),check=attacked(position,king,other(position.turn));
  const finished=!!match.result;
+ useEffect(()=>{if(stage!=="play"){previousSoundMatch.current=null;return;}const previous=previousSoundMatch.current;previousSoundMatch.current=match;if(previous){const cue=chessCue(previous,match,mode==="ai"?"w":undefined);if(cue)audioRef.current?.play(cue);}},[stage,match,mode]);
  useEffect(()=>{if(reviewing&&finished)replayTitleRef.current?.focus();},[reviewing,finished]);
  const review=useMemo(()=>explainResult(match),[match]);
  const replay=useMemo(()=>finished?replayPositions(position.history):[],[finished,position.history]);
@@ -50,8 +55,8 @@ export default function ChessPage(){
   const trap=(event:KeyboardEvent)=>{if(event.key!=="Tab")return;const items=controls();if(!items.length)return;const first=items[0],last=items[items.length-1];if(event.shiftKey&&(document.activeElement===first||!dialog.contains(document.activeElement))){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}};
   dialog.addEventListener("keydown",trap);return()=>{dialog.removeEventListener("keydown",trap);if(previous?.isConnected)previous.focus();};
  },[finished,reviewing,promotion,error]);
- function begin(){setReviewing(false);setReviewPly(0);setError("");setSaved(null);setSelected(-1);setPromotion(null);if(mode==="ai")void request({action:"start",difficulty});else{setMatch(newMatch());setStage("play");}}
- function commit(move:Move){if(finished||inFlight.current)return;setSelected(-1);setPromotion(null);if(mode==="local"){setMatch(playMove(match,move));return;}
+ function begin(){unlockSound();setReviewing(false);setReviewPly(0);setError("");setSaved(null);setSelected(-1);setPromotion(null);if(mode==="ai")void request({action:"start",difficulty});else{setMatch(newMatch());setStage("play");}}
+ function commit(move:Move){if(finished||inFlight.current)return;unlockSound();setSelected(-1);setPromotion(null);if(mode==="local"){setMatch(playMove(match,move));return;}
   // Show the human move immediately; only the server decides the bot move and result.
   const optimistic=playMove(match,move);setMatch({...optimistic,result:null});void request({action:"move",ticket:ticket.current,from:move.from,to:move.to,promotion:move.promotion});
  }
