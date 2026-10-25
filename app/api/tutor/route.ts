@@ -85,6 +85,8 @@ export async function POST(request: Request) {
       }, { status: 429 });
     }
 
+    const relevantTurns = conversation && !hintMode ? Math.max(0, Math.min(5, Number(body.relevantTurns) || 0)) : 0;
+    const extraRules = conversation && !hintMode ? "Count only a learner response relevant to the current lesson and the previous question. Relevant imperfect English still counts. Off-topic answers do not count. Current valid answers: " + relevantTurns + "/5. Return JSON with reply (string) and onTopic (boolean). For off-topic, redirect gently to the lesson with a question and set onTopic false. For a relevant response when current count is 4, this is the FINAL exchange: say goodbye naturally and ask NO further question. Otherwise ask one relevant follow-up. Return JSON only." : "";
     const messages = valid.map((message, index) => {
       const parts: any[] = [{ type: "text", text: message.content.trim().slice(0, 3500) }];
       if (index === valid.length - 1 && message.role === "user" && message.imageData) {
@@ -106,7 +108,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model,
-        messages: [{ role: "system", content: lessonContext }, ...messages],
+        messages: [{ role: "system", content: lessonContext + "\n" + extraRules }, ...messages],
         temperature: 0.7,
         max_completion_tokens: 1200
       })
@@ -127,6 +129,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Gia sư AI chưa tạo được câu trả lời. Bạn thử hỏi lại nhé." }, { status: 502 });
     }
 
+    if (conversation && !hintMode) {
+      try {
+        const parsed = JSON.parse(reply);
+        if (typeof parsed.reply === "string" && typeof parsed.onTopic === "boolean") {
+          return NextResponse.json({ reply: parsed.reply, onTopic: parsed.onTopic, quota });
+        }
+      } catch { /* Invalid model format: do not credit the exchange. */ }
+      return NextResponse.json({ reply, onTopic: false, quota });
+    }
     return NextResponse.json({ reply, quota });
   } catch (error) {
     console.error("AUNORA tutor route error:", error);
