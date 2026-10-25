@@ -7,7 +7,7 @@ type Word={word:string;meaning:string;example:string;pronunciation?:string};
 type ExampleTranslation={english:string;vietnamese:string};
 type Dialogue={speaker:string;english:string;vietnamese?:string};
 type Activity={type:"intro"|"picture"|"choice"|"listen"|"fill"|"order"|"hearorder"|"match"|"speak"|"chat"|"read";word?:Word;question:string;answer:string;options?:string[];sentence?:string};
-const wolf="/brand/aivanta-mascot.webp.png";
+const wolf="/brand/wolf-face/aivanta-face.png";
 function say(t:string,rate=.85){if(typeof window!=="undefined"&&"speechSynthesis"in window){window.speechSynthesis.cancel();const s=new SpeechSynthesisUtterance(t);s.lang="en-US";s.rate=rate;window.speechSynthesis.speak(s);}}
 function playErrorSound(){if(typeof window==="undefined")return;try{const ctx=new AudioContext();const oscillator=ctx.createOscillator();const gain=ctx.createGain();oscillator.type="sine";oscillator.frequency.setValueAtTime(320,ctx.currentTime);oscillator.frequency.exponentialRampToValueAtTime(205,ctx.currentTime+.2);gain.gain.setValueAtTime(.13,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.25);oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start();oscillator.stop(ctx.currentTime+.26);setTimeout(()=>void ctx.close(),500);}catch{}}
 function playSuccessSound(){
