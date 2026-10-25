@@ -1,0 +1,17 @@
+import Link from "next/link";
+import {redirect} from "next/navigation";
+import {createClient} from "@/lib/supabase/server";
+import LearningTrend,{type TrendDay} from "@/app/components/learning-trend";
+import ResumeLesson from "./resume-lesson";
+import styles from "@/app/admin/learning-console.module.css";
+export const dynamic="force-dynamic";
+type Summary={completed_total:number;average_score:number;study_days:number;streak:number;trend:TrendDay[]};
+export default async function ProgressPage(){
+ const client=await createClient();const {data:{user}}=await client.auth.getUser();if(!user)redirect('/login');
+ const [summary,progress,activity,courses]=await Promise.all([client.rpc('aunora_my_learning_summary'),client.from('aunora_lesson_progress').select('lesson_id,course_id,score,total_questions,completed,updated_at').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(50),client.from('aunora_learning_activity').select('lesson_id,course_id,last_seen_at').eq('user_id',user.id).maybeSingle(),client.from('zenvora_courses').select('slug,title')]);
+ const slugs=[...new Set([...(progress.data??[]).map(p=>p.lesson_id),...(activity.data?[activity.data.lesson_id]:[])])];
+ const lessons=slugs.length?await client.from('zenvora_lessons').select('slug,title').in('slug',slugs):{data:[],error:null};
+ const s=summary.data as Summary|null;const errors=[summary.error,progress.error,activity.error,courses.error,lessons.error].some(Boolean);
+ return <main style={{minHeight:'100vh',padding:'30px 20px 100px',background:'#0c111b',color:'#edf2fa'}}><div style={{maxWidth:1080,margin:'auto'}}><Link href="/learn" style={{color:'#afc6ff'}}>← Về trang học tập</Link><section className={styles.panel} style={{marginTop:22}}><span className={styles.eyebrow}>HÀNH TRÌNH CỦA BẠN</span><h1>Tiến độ học tập</h1><p>Mỗi bước tiến đều được ghi nhận vào tài khoản của bạn.</p>{errors?<p role="alert" className={styles.error}>Chưa tải được một phần tiến độ. Bạn hãy thử tải lại trang.</p>:null}{s?<><div className={styles.stats}>{[['Bài đã hoàn thành',s.completed_total],['Điểm trung bình (%)',s.average_score],['Ngày đã học',s.study_days],['Chuỗi ngày học',s.streak]].map(([label,value])=><article key={String(label)}><small>{label}</small><strong>{value}</strong></article>)}</div><LearningTrend days={s.trend}/></>:null}{activity.data?<article className={styles.record}><h2>Bài học gần nhất</h2><strong>{lessons.data?.find(l=>l.slug===activity.data?.lesson_id)?.title??activity.data.lesson_id}</strong><p>{courses.data?.find(c=>c.slug===activity.data?.course_id)?.title??activity.data.course_id}</p><ResumeLesson slug={activity.data.lesson_id} course={activity.data.course_id}/></article>:null}<h2>Kết quả gần đây</h2><div className={styles.table}><table><thead><tr><th>Bài học</th><th>Khóa học</th><th>Điểm</th><th>Cập nhật</th></tr></thead><tbody>{(progress.data??[]).map(p=><tr key={p.lesson_id}><td>{lessons.data?.find(l=>l.slug===p.lesson_id)?.title??p.lesson_id}</td><td>{courses.data?.find(c=>c.slug===p.course_id)?.title??p.course_id}</td><td>{p.score}/{p.total_questions}</td><td>{new Date(p.updated_at).toLocaleDateString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh'})}</td></tr>)}</tbody></table></div>{!progress.data?.length?<p>Bạn chưa lưu kết quả bài học. <Link href="/learn/library">Bắt đầu học →</Link></p>:<p className={styles.muted}>Hiển thị tối đa 50 kết quả gần nhất. Các chỉ số tổng hợp tính toàn bộ tiến độ đã lưu.</p>}</section></div></main>;
+}
+

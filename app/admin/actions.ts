@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import {publishAnnouncement} from "@/lib/web-push-server";
 import { createClient } from "@/lib/supabase/server";
 
 async function requireAdmin() {
@@ -29,6 +30,7 @@ export async function createCourse(formData: FormData) {
     sort_order: Number(field(formData, "sort_order") || 0),
   });
   if (error) throw new Error(error.message);
+  try { const {data:{user}}=await supabase.auth.getUser(); if(user && formData.get("notify_learners")==="on") await publishAnnouncement(supabase,user.id,`Khóa học mới: ${title}`.slice(0,120),"AUNORA vừa thêm một khóa học mới. Mở thư viện để khám phá.","/learn/library"); } catch(error) { console.error("Course notification:",error); }
   revalidatePath("/admin");
   revalidatePath("/courses");
 }
@@ -114,3 +116,4 @@ export async function giftTutorCredits(userId:string,amount:number){
  if(error)throw new Error(error.message);
  return Number(data);
 }
+

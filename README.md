@@ -63,3 +63,49 @@ connection and message quotas apply.
 
 Verify lifecycle behavior with: node --test scripts/test-site-presence.cjs
 
+
+## Learning services and operations
+
+The `/admin` learning console includes 14-day completion statistics, per-learner
+progress, feedback status/replies, feature toggles, announcement delivery, and
+poor Web Vitals reports. `/learn/progress` shows personal progress and resumes
+the latest lesson. The floating support panel in `/learn` contains announcements,
+browser-notification subscription and feedback.
+
+Database setup is versioned in `supabase/schema/`: apply learning-services.sql,
+notification-delivery.sql, personal-progress.sql, then learning-services-policies.sql.
+The files describe the deployed schema; they are not repeatable seed scripts.
+Existing progress was backfilled from remaining completion timestamps; older
+attempts cannot be reconstructed. New completions are counted once per learner,
+lesson and Vietnam calendar day. The latest open lesson is reported while visible,
+at most once per minute. The online presence counter remains separate.
+
+All new tables use RLS. Learners access their own progress, activity, feedback,
+and device subscription. Admin APIs verify `app_metadata.role` with `getUser()`;
+RPCs also check the trusted app metadata. No service-role credential is added.
+Feedback is limited to 5 submissions per learner/day. Poor-vitals reports are
+limited to 20 per learner/day and deduplicated per route/metric/day.
+
+Browser push uses standard Web Push and `public/aunora-push-sw.js`. Configure
+NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY as public production config and
+WEB_PUSH_PRIVATE_KEY as a production secret. Never commit the private key.
+Visitors must voluntarily enable notifications using their browser; there is no
+automatic permission prompt. Some iOS browsers require installing the web app.
+Announcements are stored on the website even without a device subscription.
+Sending claims batches of up to 25 devices, avoids retrying successes, retries
+failures up to 3 times and removes expired endpoints. Admin can send the next
+batch. Creating a course has a checked notification option that can be disabled.
+Push delivery is best effort; no physical-device receipt has been confirmed until
+an opted-in recipient receives one. Tests never send notifications to real users.
+
+Feature toggles gate AI/game pages on the next navigation/reload and validate
+AI/chess API calls on the server. A toggle is operational configuration, not an
+entitlement/security boundary for already-connected game sockets.
+
+Performance alerts are visible in Admin and record poor LCP/FCP/TTFB/INP/CLS
+from signed-in learning pages. They are not an external uptime monitor or an
+email alert service. Firebase Performance Monitoring remains active separately.
+
+Validation: node --test tests/learner-services.cjs; npx tsc --noEmit; npm run build.
+RLS, completion deduplication and delivery-claim logic were also tested in
+rolled-back database transactions; no QA submissions or device tokens remain.

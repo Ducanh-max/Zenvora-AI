@@ -1,3 +1,4 @@
+import {feature} from "@/lib/learner-services-server";
 import { NextResponse } from "next/server";
 import { createClient as createSupabaseAdmin } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Vui lòng đăng nhập để sử dụng Gia sư AI." }, { status: 401 });
     }
 
+    if(!await feature(supabase,"ai_tutor_enabled")) return NextResponse.json({error:"Gia sư AI đang tạm ngưng."},{status:503});
     const apiKey = process.env.GROQ_API_KEY;
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -144,3 +146,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Đã xảy ra lỗi. Vui lòng thử lại sau." }, { status: 500 });
   }
 }
+
