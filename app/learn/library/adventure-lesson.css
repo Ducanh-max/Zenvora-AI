@@ -264,3 +264,39 @@
  .adv-screen .adv-dictation-audio{padding:8px 0 4px}
  .adv-screen .adv-order-answer{min-height:56px;margin:8px 0;padding:8px 12px}
 }
+
+/* Compact speaking studio, including full-sentence prompts. */
+.adv-screen.adv-scene-speak .adv-exercise{padding-top:4px;padding-bottom:8px}
+.adv-screen .adv-speak-studio{width:min(100%,760px);margin:0 auto;gap:6px}
+.adv-screen .adv-speak-intro h2{font-size:clamp(24px,2.6vw,32px);line-height:1.2;margin:2px 0 4px}
+.adv-screen .adv-speak-intro p{font-size:15px;line-height:1.4;margin:0}
+.adv-screen .adv-speak-character{width:100%;gap:16px;margin-top:8px;min-width:0}
+.adv-screen .adv-speak-character>img{width:72px;height:84px;flex-shrink:0}
+.adv-screen .adv-speak-bubble{min-width:0;max-width:calc(100% - 88px);padding:12px 16px;gap:10px;border-radius:20px;box-shadow:0 3px 10px #8ba8d82a}
+.adv-screen .adv-speak-bubble strong{min-width:0;flex:1;font-size:clamp(20px,2.3vw,28px);line-height:1.35;overflow-wrap:anywhere}
+.adv-screen .adv-speak-bubble button{width:44px;height:44px;flex-shrink:0}
+.adv-screen .adv-speak-bubble button svg{width:24px;height:24px}
+.adv-screen .adv-speak-sample{font-size:14px}
+.adv-screen .adv-speak-micro{width:88px;height:88px;min-height:44px;border-width:4px;outline-width:8px;margin:16px 0 8px;box-shadow:0 6px 16px #277ee140}
+.adv-screen .adv-speak-micro svg{width:42px;height:42px}
+.adv-screen .adv-speak-micro-label{font-size:18px;line-height:1.3}
+.adv-screen .adv-speak-wave{height:28px;gap:4px;transform:scaleY(.65);transform-origin:center}
+.adv-screen .adv-speak-wave i{width:4px}
+.adv-screen .adv-skip-speech{padding:8px 12px;font-size:14px;min-height:40px}
+.adv-screen .adv-speak-heard{font-size:15px;line-height:1.4}
+@media(max-width:650px){
+ .adv-screen .adv-speak-intro h2{font-size:24px}
+ .adv-screen .adv-speak-intro p{font-size:14px}
+ .adv-screen .adv-speak-character{gap:12px}
+ .adv-screen .adv-speak-character>img{width:54px;height:64px}
+ .adv-screen .adv-speak-bubble{max-width:calc(100% - 66px);padding:10px 12px}
+ .adv-screen .adv-speak-micro{width:80px;height:80px;margin:14px 0 6px}
+}
+@media(max-height:650px){
+ .adv-screen .adv-speak-studio{gap:4px}
+ .adv-screen .adv-speak-intro h2{font-size:24px}
+ .adv-screen .adv-speak-character>img{width:50px;height:58px}
+ .adv-screen .adv-speak-micro{width:72px;height:72px;margin:12px 0 6px;outline-width:6px}
+ .adv-screen .adv-speak-micro svg{width:36px;height:36px}
+ .adv-screen .adv-speak-wave{display:none}
+}
