@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test:chess": "node tests/chess.cjs"
+    "test:chess": "node tests/chess.cjs",
+    "test:chess-rooms": "node tests/chess-room-sync.cjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.7.0",
