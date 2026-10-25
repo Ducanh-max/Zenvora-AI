@@ -31,8 +31,8 @@ export async function POST(request:Request){
   const options=legal(position);
   if(!options.length&&attacked(position,position.board.indexOf(position.turn==="w"?"K":"k"),other(position.turn)))winner=user.id;
  }
- if(!["create","join","start","move","resign","close"].includes(action))return NextResponse.json({error:"Hành động không hợp lệ."},{status:400});
- const {data,error}=await admin.rpc("aunora_chess_action",{p_action:action,p_code:code,p_actor:user.id,p_name:name,p_position:position,p_version:version,p_winner:winner});
+ if(!["create","join","start","move","resign","close","timeout"].includes(action))return NextResponse.json({error:"Hành động không hợp lệ."},{status:400});
+ const {data,error}=await admin.rpc("aunora_chess_action",{p_action:action,p_code:code,p_actor:user.id,p_name:name,p_position:position,p_version:version,p_winner:winner,p_time_control:action==="create"?Number(body.timeControl||0):0});
  if(error)return NextResponse.json({error:error.message},{status:400});
  return NextResponse.json({room:data});
  }catch{return NextResponse.json({error:"Không thể xử lý yêu cầu."},{status:500});}
