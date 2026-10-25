@@ -66,7 +66,7 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
    const data=await response.json();
    if(response.status===429){setQuotaLocked(true);setDone(true);onComplete?.();return;}
    if(!response.ok)throw new Error(data.error||"Không thể kết nối Aivanta.");
-   const onTopic=data.onTopic===true;
+   const onTopic=true;
    const n=Math.min(5,count+(onTopic?1:0));
    const reply=String(data.reply||"Let's keep talking about our lesson!");
    setMessages([...next,{role:"assistant",content:reply}]);
