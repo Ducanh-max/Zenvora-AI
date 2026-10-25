@@ -1,3 +1,4 @@
+import OnlineVisitors from "./online-visitors";
 import AdminMemberships from "./admin-memberships";
 import AdminScores from "./admin-scores";
 import Link from "next/link";
@@ -74,6 +75,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
+      <section className="admin-section"><OnlineVisitors/></section>
       <section id="leaderboard-scores" className="admin-section"><AdminScores/></section>
 
       <section id="users" className="admin-section"><div className="admin-section-heading"><div><span className="admin-eyebrow">CỘNG ĐỒNG · GÓI HỌC</span><h2>Danh sách người dùng & tặng gói 🎁</h2><p>Tìm kiếm người dùng và cấp quyền sử dụng gói Explorer, Achiever hoặc Mastery.</p></div></div><AdminMemberships/></section>
@@ -117,3 +119,5 @@ export default async function AdminPage() {
     </div>
   </main>;
 }
+
+

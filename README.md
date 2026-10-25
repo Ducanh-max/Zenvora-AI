@@ -15,14 +15,7 @@ Không commit `.env.local`, mật khẩu hoặc secret key. Chỉ publishable ke
 
 ## Firebase services on the web
 
-- **Analytics:** property `560698885`, stream `16198172601`, measurement ID
-  `G-C93HJX9EWQ`. The website asks for optional analytics consent before
-  initializing Analytics. Advertising consent stays denied. Browser Do Not Track
-  and Global Privacy Control opt out. The settings button allows later changes.
-  Only page views for public/learning routes are sent, with query strings and
-  referrers removed. Profile, payment and callback pages are excluded. Enhanced
-  measurement is disabled in the stream; keep it disabled to avoid automatic
-  URL/form collection outside this implementation.
+- **Live presence:** automatic anonymous online sessions replace the Analytics consent UI. The frontend no longer initializes Google Analytics or sends page-view events. Existing Analytics reports remain available as historical data.
 - **Remote Config:** `web_announcement` (string, default empty) and
   `web_announcement_enabled` (boolean, default false) control the optional site
   notice. Text is rendered as plain text, limited to 300 characters. No secrets
@@ -31,11 +24,42 @@ Không commit `.env.local`, mật khẩu hoặc secret key. Chỉ publishable ke
   existing browser can take up to 12 hours to fetch changes.
 - **Performance Monitoring:** production-only monitoring continues to run and
   respects browser privacy opt-outs. This is operational performance telemetry,
-  separate from optional Analytics consent.
+  independent of the automatic online-session counter.
 
 All integrations target the existing Spark project `aunora-81dcc`. Billing is
 not enabled. Supabase and Vercel remain responsible for existing authentication,
 learning data and hosting. No extra database or authentication system is added.
 Firebase quotas still apply; the website retains its defaults if Remote Config
 cannot be fetched. Do not upgrade to Blaze just to use these integrations.
+
+
+
+
+## Automatic online/offline sessions
+
+The root `OnlinePresenceProvider` tracks production website connections through
+Supabase Realtime Presence on `aunora:site-presence:v1`, independently of login.
+The admin dashboard `/admin` contains a live count and anonymous session list;
+the existing server-side admin authorization remains in place.
+
+Only a temporary sessionStorage UUID and connection timestamp are published.
+No name, email, account ID, page path, IP address or learning content is added
+to the presence payload. This is a count of connected sessions, not a count of
+unique humans. Tabs sharing a session key are counted once. It is not a history
+of visits or a record of users who previously went offline.
+
+Normal page closure leaves the channel. Abrupt network loss uses the Realtime
+server timeout, so offline detection is eventual, not instantaneous. The client
+reconnects on restored connectivity and after interrupted subscriptions. A
+background tab stays online while its WebSocket remains connected. The display
+shows an unavailable state instead of stale or fake zero counts when it cannot
+reach Realtime. Development and preview domains do not join the live channel.
+
+Presence uses the existing Supabase public client configuration; no new database,
+RLS policy, secret, table, authentication system or paid plan is required. The
+public channel contains no personal user identifiers; its totals are advisory
+and client-reported, never a basis for authorization or billing. Existing plan
+connection and message quotas apply.
+
+Verify lifecycle behavior with: node --test scripts/test-site-presence.cjs
 
