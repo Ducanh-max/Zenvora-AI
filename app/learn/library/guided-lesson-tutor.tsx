@@ -30,9 +30,13 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
  const remainingSeconds=Math.max(0,Math.ceil((new Date(resetAt).getTime()-clock)/1000)||0);
  const waitTime=[Math.floor(remainingSeconds/3600),Math.floor(remainingSeconds%3600/60),remainingSeconds%60].map(n=>String(n).padStart(2,"0")).join(":");
  const bottom=useRef<HTMLDivElement>(null);
- const restored=useRef(false);
- useEffect(()=>{if(!restored.current)return;try{localStorage.setItem("aunora_conversation_progress",JSON.stringify({title,count,done,total:5,messages,updatedAt:Date.now()}));window.dispatchEvent(new Event("aunora-progress-updated"));}catch{}},[title,count,done,messages]);
- useEffect(()=>{restored.current=false;try{const raw=localStorage.getItem("aunora_conversation_progress");const saved=raw?JSON.parse(raw):null;if(saved?.title===title&&Array.isArray(saved.messages)){setMessages(saved.messages);setCount(Math.max(0,Math.min(5,Number(saved.count)||0)));setDone(Boolean(saved.done));}else{setMessages([{role:"assistant",content:first}]);setCount(0);setDone(false);}}catch{setMessages([{role:"assistant",content:first}]);setCount(0);setDone(false);}setInput("");setError("");setHelp(false);setHintText("");setTranslations({});setShowTranslation(false);restored.current=true;},[title,first]);
+ useEffect(()=>{
+  setMessages([{role:"assistant",content:first}]);setCount(0);setDone(false);
+  setInput("");setError("");setHelp(false);setHintText("");setTranslations({});setShowTranslation(false);
+  const clearSavedConversation=()=>{try{localStorage.removeItem("aunora_conversation_progress");window.dispatchEvent(new Event("aunora-progress-updated"));}catch{}};
+  clearSavedConversation();
+  return clearSavedConversation;
+ },[title,first]);
  useEffect(()=>{const chat=bottom.current?.parentElement;if(chat)chat.scrollTo({top:chat.scrollHeight,behavior:"instant"});},[messages,busy]);
  async function translateMessage(index:number,content:string){
   if((translations[index]&&!translations[index].startsWith("⚠️"))||translating!==null)return;
