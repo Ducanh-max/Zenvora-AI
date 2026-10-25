@@ -189,7 +189,19 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
 const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.length&&reviewQueue.length===0;
  const reviewPrompt=step>=activities.length&&!reviewMode&&reviewQueue.length>0;
  const orderWords=(activity?.answer||"").split(" ").filter(Boolean);
- const options=(activity?.type==="order"||activity?.type==="hearorder")?orderWords.map((w,i)=>({id:i,word:w})).sort((a,b)=>((a.id*7+3)%Math.max(orderWords.length,1))-((b.id*7+3)%Math.max(orderWords.length,1))):[];
+ const options=useMemo(()=>{
+  if(activity?.type!=="order"&&activity?.type!=="hearorder")return [];
+  const tiles=activity.answer.trim().split(/\s+/).filter(Boolean).map((word,id)=>({id,word}));
+  let seed=Array.from(lesson.id+":"+activityIndex+":"+activity.answer).reduce((value,char)=>(Math.imul(value,31)+char.charCodeAt(0))>>>0,17);
+  for(let i=tiles.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]];}
+  const original=activity.answer.trim().split(/\s+/).filter(Boolean);
+  // A shuffle can land on the answer, especially for short sentences.
+  if(tiles.every((tile,index)=>norm(tile.word)===norm(original[index]))){
+   const other=tiles.findIndex(tile=>norm(tile.word)!==norm(tiles[0].word));
+   if(other>0)[tiles[0],tiles[other]]=[tiles[other],tiles[0]];
+  }
+  return tiles;
+ },[activity?.type,activity?.answer,lesson.id,activityIndex]);
  const dictationPool=useMemo(()=>{if(activity?.type!=="fill")return [] as {id:number;word:string}[];const correctWords=activity.answer.trim().replace(/[.!?]+$/,"").split(/\s+/).filter(Boolean);const used=new Set(correctWords.map(w=>w.toLowerCase().replace(/[^a-z']/g,"")));const distractors=[...lesson.words.flatMap(w=>[w.word,...(w.example||"").split(/\s+/)]),"ball","same","next","please","where","they","good","book","school","tomorrow","friend"].map(w=>w.replace(/^[^a-zA-Z]+|[^a-zA-Z']+$/g,"")).filter(w=>w&&!used.has(w.toLowerCase())&&/^[a-zA-Z']+$/.test(w));const unique=[...new Set(distractors.map(w=>w.toLowerCase()))].slice(0,3);const tiles=[...correctWords,...unique].map((word,id)=>({id,word}));let seed=Array.from(activity.answer).reduce((a,c)=>a*31+c.charCodeAt(0),17)>>>0;for(let i=tiles.length-1;i>0;i--){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const j=seed%(i+1);[tiles[i],tiles[j]]=[tiles[j],tiles[i]];}return tiles;},[activity?.type,activity?.answer,lesson.words]);
  const dictationAnswer=dictationMode==="keyboard"?selected:dictationIds.map(id=>dictationPool.find(t=>t.id===id)?.word||"").join(" ");
  const correct=activity?.type==="fill"?norm(dictationAnswer)===norm(activity.answer):activity?.type==="speak"&&speechSkipped?false:(activity?.type==="order"||activity?.type==="hearorder")?norm(tokens.join(" "))===norm(activity.answer):activity?.type==="speak"?norm(recognized)===norm(activity.answer):activity?.type==="match"?matchCorrect:norm(selected)===norm(activity?.answer||"");
