@@ -1,0 +1,5 @@
+import {createHmac,timingSafeEqual} from "node:crypto";
+import type {Match,Difficulty} from "./chess-match";
+export type BotTicket={version:1;id:string;actor:string|null;name:string;difficulty:Difficulty;created:number;match:Match};
+export function signTicket(game:BotTicket,key:string){const body=Buffer.from(JSON.stringify(game)).toString("base64url");return body+"."+createHmac("sha256",key).update(body).digest("base64url");}
+export function readTicket(ticket:unknown,key:string):BotTicket{if(typeof ticket!=="string"||ticket.length>200000)throw Error("Vé trận đấu không hợp lệ.");const [body,signature,...extra]=ticket.split(".");if(!body||!signature||extra.length)throw Error("Vé trận đấu không hợp lệ.");const expected=createHmac("sha256",key).update(body).digest(),actual=Buffer.from(signature,"base64url");if(actual.length!==expected.length||!timingSafeEqual(actual,expected))throw Error("Vé trận đấu không hợp lệ.");const game=JSON.parse(Buffer.from(body,"base64url").toString()) as BotTicket;if(game.version!==1||Date.now()-game.created>2*60*60*1000)throw Error("Ván đấu đã hết hạn.");return game;}
