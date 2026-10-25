@@ -193,6 +193,13 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   // Hội thoại với Aivanta là hoạt động cuối cùng; không lặp lại câu hỏi đã làm.
   return a;
  },[lesson]);
+ const [showExitConfirm,setShowExitConfirm]=useState(false);
+ const exitDialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{
+  const dialog=exitDialog.current;
+  if(showExitConfirm){if(dialog&&!dialog.open)dialog.showModal();}
+  else if(dialog?.open)dialog.close();
+ },[showExitConfirm]);
  const [dictationMode,setDictationMode]=useState<"tiles"|"keyboard">("keyboard");const [dictationIds,setDictationIds]=useState<number[]>([]);const [reviewQueue,setReviewQueue]=useState<number[]>([]),[reviewIndex,setReviewIndex]=useState(0),[reviewMode,setReviewMode]=useState(false),[speechSkipped,setSpeechSkipped]=useState(false);const [matchComplete,setMatchComplete]=useState(false),[matchCorrect,setMatchCorrect]=useState(false);const [chatCompleted,setChatCompleted]=useState(false);const [step,setStep]=useState(0),[selected,setSelected]=useState(""),[checked,setChecked]=useState(false),[hint,setHint]=useState(false),[matched,setMatched]=useState<string[]>([]),[first,setFirst]=useState(""),[tokens,setTokens]=useState<string[]>([]),[recognized,setRecognized]=useState(""),[listening,setListening]=useState(false),[right,setRight]=useState(0),[saving,setSaving]=useState(false),[error,setError]=useState("");
  useEffect(()=>{
   // Incomplete attempts live only in this mounted lesson; discard older saved attempts.
@@ -265,6 +272,7 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
  nextRef.current=next;
  useEffect(()=>{
   const handleEnter=(event:KeyboardEvent)=>{
+   if(showExitConfirm)return;
    if(event.key!=="Enter"||event.repeat||event.isComposing||event.ctrlKey||event.altKey||event.metaKey||event.shiftKey)return;
    const target=event.target;
    if(target instanceof HTMLElement){
@@ -281,12 +289,12 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
   };
   document.addEventListener("keydown",handleEnter,true);
   return()=>document.removeEventListener("keydown",handleEnter,true);
- },[reviewPrompt,finished,activity,checked,canCheck]);
+ },[reviewPrompt,finished,activity,checked,canCheck,showExitConfirm]);
  function listen(){const SpeechRecognition=(window as unknown as {SpeechRecognition?:new()=>any;webkitSpeechRecognition?:new()=>any}).SpeechRecognition||(window as unknown as {webkitSpeechRecognition?:new()=>any}).webkitSpeechRecognition;if(!SpeechRecognition){setError("Trình duyệt chưa hỗ trợ nhận diện giọng nói. Bạn có thể nhập câu vào ô bên dưới.");return;}try{const r=new SpeechRecognition();r.lang="en-US";r.interimResults=false;r.onresult=(e:{results:{[key:number]:{[key:number]:{transcript:string}}}})=>{setRecognized(e.results[0][0].transcript);setListening(false);};r.onerror=()=>{setListening(false);setError("Không nhận diện được giọng nói. Hãy thử lại hoặc nhập câu.");};r.onend=()=>setListening(false);setListening(true);r.start();}catch{setListening(false);setError("Không thể mở micro.");}}
 
  const scene=sceneInfo[activity?.type||"intro"];
  useEffect(()=>{if(activity?.type!=="match"||!matchComplete||!matchCorrect)return;playSuccessSound();setRight(n=>n+1);setChecked(true);},[activityIndex,activity?.type,matchComplete,matchCorrect]);
- return <section key={lesson.id+"-"+activityIndex+(reviewMode?"-review":"")} className={"adv-screen adv-scene-"+(activity?.type||"intro")+(checked?" adv-is-checked":"") }><div className="adv-top"><button onClick={onExit} className="adv-back"><ArrowLeft size={19}/> Bài học</button><div className="adv-progress"><div style={{width:(Math.min(step,activities.length)/Math.max(activities.length,1)*100)+"%"}}/></div><b>{Math.min(step+1,activities.length)} / {activities.length}</b></div>
+ return <section key={lesson.id+"-"+activityIndex+(reviewMode?"-review":"")} className={"adv-screen adv-scene-"+(activity?.type||"intro")+(checked?" adv-is-checked":"") }><div className="adv-top"><button type="button" onClick={()=>setShowExitConfirm(true)} className="adv-back" aria-label="Thoát bài học"><ArrowLeft size={19}/> Bài học</button><div className="adv-progress"><div style={{width:(Math.min(step,activities.length)/Math.max(activities.length,1)*100)+"%"}}/></div><b>{Math.min(step+1,activities.length)} / {activities.length}</b></div>
  {reviewPrompt?<div className="adv-main adv-done"><img src={wolf} alt="Aivanta"/><h1>📚 Ôn lại các câu chưa đúng</h1><p>Bạn đã hoàn thành phần học chính. Cùng Aivanta làm lại {reviewQueue.length} câu trả lời sai hoặc chưa thể luyện nói nhé!</p><button className="adv-primary" onClick={()=>{setReviewMode(true);setReviewIndex(0);resetAnswer();}}>Bắt đầu ôn tập <ArrowRight size={18}/></button></div>:finished?<div className="adv-main adv-done"><img src={wolf} alt="Aivanta"/><h1>🎉 Hoàn thành bài học!</h1><p>Aivanta: Bạn đã hoàn thành {activities.length} hoạt động. {reviewQueue.length?`Bạn đã ôn tập ${reviewQueue.length} câu cần cải thiện.`:"Bạn đã hoàn thành tất cả câu hỏi."} Hãy ôn lại những phần chưa chắc nhé!</p><button disabled={saving} className="adv-primary" onClick={async()=>{setSaving(true);try{await onFinish(right,activities.length);}catch{setError("Chưa lưu được tiến độ. Vui lòng thử lại.");}finally{setSaving(false);}}}>{saving?"Đang lưu...":"Lưu tiến độ và về danh sách"} <ArrowRight size={18}/></button>{error&&<p role="alert">{error}</p>}</div>:<div className="adv-layout"><main className="adv-main"><div className="adv-exercise"><div className="adv-heading"><div className="adv-mission-label"><span>{scene.icon} {scene.name}</span><span>⭐ NHIỆM VỤ {Math.min(step+1,activities.length)}/{activities.length}</span></div><span className="adv-lesson-title">📖 {lesson.title}</span><h1>{activity.question}</h1><p className="adv-mission-subtitle">{scene.mission}</p>{reviewMode&&<p className="adv-review-label">🔁 Ôn tập câu {reviewIndex+1}/{reviewQueue.length}</p>}<div className="adv-mini-progress">{activity.type==="chat"?"Hội thoại AI":activity.type==="intro"?"Học cùng Aivanta":"Thử thách tương tác"}</div></div>
  {activity.type==="intro"&&<div className="adv-word adv-picture-card"><div className="adv-picture-illustration" aria-hidden="true">{visualElement(activity.word?.word||"",activity.word?.meaning||"")||"📖"}</div><button onClick={()=>say(activity.word?.word||"")}><Volume2 size={26}/></button><h2>{activity.word?.word}</h2><strong>{activity.word?.meaning}</strong><small>Nhấn loa để nghe phát âm.</small></div>}
  {(activity.type==="choice"||activity.type==="picture"||activity.type==="listen"||activity.type==="read")&&<>{activity.type==="listen"&&<button className="adv-audio" onClick={()=>say(activity.answer)}><Volume2 size={27}/> Nghe phát âm</button>}{(activity.type==="choice"||activity.type==="picture")&&<div className="adv-character-prompt"><img src={wolf} alt="Aivanta"/><div className="adv-character-speech">{activity.word?.word}</div></div>}{activity.type==="read"&&<div className="adv-character-prompt"><img src={wolf} alt="Aivanta"/><div className="adv-character-speech">{activity.sentence}</div></div>}<div className={"adv-choices "+(activity.type==="read"?"adv-choices-dialogue ":"")+(activity.type==="listen"||activity.type==="picture"?"adv-choices-listen":"")}>{activity.options?.map((o,i)=><button disabled={checked} className={selected===o?"adv-selected":""} onClick={()=>setSelected(o)} key={i}><span>{activity.type==="listen"||activity.type==="picture"?visualElement(o,lesson.words.find(w=>w.word===o)?.meaning||""):String.fromCharCode(65+i)}</span>{o}</button>)}</div></>}
@@ -308,5 +316,25 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
   {activity.type!=="match"&&<button type="button" className="adv-feedback-replay" onClick={()=>say(feedbackWord?.word||activity.answer)}><Volume2 size={16}/> Nghe lại</button>}
  </div>}
  <div className="adv-actions"><button className="adv-primary" disabled={!checked&&!canCheck} onClick={next}>{activity.type==="chat"?"Hoàn thành hội thoại":activity.type==="intro"?"Tiếp theo":checked?"Tiếp tục":"Kiểm tra"} <ArrowRight size={19}/></button></div>
- </div></main><aside className="adv-companion"><div className={"adv-wolf "+(checked?(correct?"adv-wolf-happy":"adv-wolf-try"):hint?"adv-wolf-help":"")}><div className="adv-companion-tag">🐺 ĐỒNG ĐỘI AIVANTA</div><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div></aside></div>}</section>;
+ </div></main><aside className="adv-companion"><div className={"adv-wolf "+(checked?(correct?"adv-wolf-happy":"adv-wolf-try"):hint?"adv-wolf-help":"")}><div className="adv-companion-tag">🐺 ĐỒNG ĐỘI AIVANTA</div><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div></aside></div>}
+ <dialog ref={exitDialog} className="adv-exit-dialog" aria-labelledby="adv-exit-title" aria-describedby="adv-exit-description" onCancel={event=>{event.preventDefault();setShowExitConfirm(false);}} onClose={()=>setShowExitConfirm(false)}>
+  <h2 id="adv-exit-title">Bạn có chắc chắn muốn thoát bài học không?</h2>
+  <p id="adv-exit-description">Nếu thoát bây giờ, lần vào lại bạn sẽ bắt đầu bài học từ đầu.</p>
+  <div className="adv-exit-buttons">
+   <button type="button" autoFocus className="adv-exit-stay" onClick={()=>setShowExitConfirm(false)}>Tiếp tục học</button>
+   <button type="button" className="adv-exit-leave" onClick={()=>{setShowExitConfirm(false);onExit();}}>Thoát bài học</button>
+  </div>
+ </dialog>
+ <style>{`
+ .adv-exit-dialog{width:min(460px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto;border:1px solid #d7e5f7;border-radius:24px;padding:28px;background:#fff;color:#233f65;box-shadow:0 24px 80px #09245355}
+ .adv-exit-dialog::backdrop{background:#09245399;backdrop-filter:blur(4px)}
+ .adv-exit-dialog h2{font-size:23px;line-height:1.35;margin:0 0 12px}
+ .adv-exit-dialog p{font-size:16px;line-height:1.6;color:#617594;margin:0 0 24px}
+ .adv-exit-buttons{display:flex;gap:12px;flex-wrap:wrap}
+ .adv-exit-buttons button{flex:1;min-width:150px;min-height:48px;border-radius:12px;padding:12px 14px;font-size:16px;font-weight:800;cursor:pointer}
+ .adv-exit-stay{background:#2679e9;color:white;border:2px solid #2679e9}
+ .adv-exit-leave{background:white;color:#b42332;border:2px solid #eac5ca}
+ .adv-exit-buttons button:focus-visible{outline:3px solid #78b2ff;outline-offset:3px}
+ `}</style>
+ </section>;
 }
