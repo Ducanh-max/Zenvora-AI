@@ -13,22 +13,29 @@ Theo yêu cầu, Zenvora hiện kết nối tới project **AUNORA**. Các bản
 
 Không commit `.env.local`, mật khẩu hoặc secret key. Chỉ publishable key được phép dùng ở trình duyệt; không đưa secret/service-role key vào biến `NEXT_PUBLIC_*`.
 
-## Firebase Performance Monitoring (Spark)
+## Firebase services on the web
 
-Production browser performance is measured with the Firebase web app registered
-for `zenvora-ai-alpha.vercel.app` in project `aunora-81dcc`. The client initializes
-lazily through Next.js client instrumentation; monitoring failures are isolated
-from the learning app. Do Not Track and Global Privacy Control disable startup.
-Local and preview hostnames do not send performance telemetry.
+- **Analytics:** property `560698885`, stream `16198172601`, measurement ID
+  `G-C93HJX9EWQ`. The website asks for optional analytics consent before
+  initializing Analytics. Advertising consent stays denied. Browser Do Not Track
+  and Global Privacy Control opt out. The settings button allows later changes.
+  Only page views for public/learning routes are sent, with query strings and
+  referrers removed. Profile, payment and callback pages are excluded. Enhanced
+  measurement is disabled in the stream; keep it disabled to avoid automatic
+  URL/form collection outside this implementation.
+- **Remote Config:** `web_announcement` (string, default empty) and
+  `web_announcement_enabled` (boolean, default false) control the optional site
+  notice. Text is rendered as plain text, limited to 300 characters. No secrets
+  belong in Remote Config. The app uses cached defaults offline and a 12-hour
+  minimum fetch interval. New visitors get the latest published settings; an
+  existing browser can take up to 12 hours to fetch changes.
+- **Performance Monitoring:** production-only monitoring continues to run and
+  respects browser privacy opt-outs. This is operational performance telemetry,
+  separate from optional Analytics consent.
 
-This adds Performance Monitoring only. Authentication, learning progress and
-payments continue to use the existing Supabase integration. No billing plan
-change, Firebase Authentication, Firestore, Storage, AI or Analytics is enabled.
-Performance Monitoring is a no-cost Firebase product; its Web SDK is beta.
-See https://firebase.google.com/docs/perf-mon/get-started-web .
+All integrations target the existing Spark project `aunora-81dcc`. Billing is
+not enabled. Supabase and Vercel remain responsible for existing authentication,
+learning data and hosting. No extra database or authentication system is added.
+Firebase quotas still apply; the website retains its defaults if Remote Config
+cannot be fetched. Do not upgrade to Blaze just to use these integrations.
 
-After deployment, visit the production website and check Firebase Console →
-Performance for this web app. Initial reports can take time to appear. If the
-production domain changes, update the hostname allowlist in
-`lib/firebase-monitoring.ts`. To remove monitoring, remove
-`instrumentation-client.ts` and the Firebase dependency.
