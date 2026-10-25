@@ -9,7 +9,7 @@ export default function FunPage(){
  const vi=lang==="vi";
  const games=[
   {id:"chain",icon:Link2,tag:vi?"NỐI TỪ":"WORD CHAIN",title:vi?"Nối Từ":"Word Chain",description:vi?"Nối chữ cái cuối để tạo từ mới, thi đấu cùng Aivanta hoặc bạn bè.":"Chain words by their last letter, against Aivanta or friends.",href:"/learn/fun/word-chain",room:"/learn/fun/word-chain/rooms"},
-  {id:"chess",icon:Crown,tag:vi?"CỜ VUA":"CHESS",title:vi?"Cờ Vua":"Chess",description:vi?"Đấu trí trên bàn cờ với bạn bè, đầy đủ luật di chuyển và phong cấp.":"Play chess locally with full legal moves and promotions.",href:"/learn/fun/chess",room:""},
+  {id:"chess",icon:Crown,tag:vi?"CỜ VUA":"CHESS",title:vi?"Cờ Vua":"Chess",description:vi?"Đấu trí trên bàn cờ với bạn bè, đầy đủ luật di chuyển và phong cấp.":"Play chess locally with full legal moves and promotions.",href:"/learn/fun/chess",room:"/learn/fun/chess/rooms"},
   {id:"translate",icon:Languages,tag:vi?"DỊCH TỪ":"TRANSLATE",title:vi?"Dịch từ vựng":"Vocabulary Translation",description:vi?"Dịch từ Anh ↔ Việt để ôn tập, có chế độ Solo và tạo phòng.":"Practice English ↔ Vietnamese translation in solo or multiplayer.",href:"/learn/fun/translate",room:"/learn/fun/translate/rooms"}
  ];
  return <main className="fz-two">
