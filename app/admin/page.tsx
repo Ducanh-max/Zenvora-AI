@@ -1,3 +1,4 @@
+import LearningConsole from "./learning-console";
 import OnlineVisitors from "./online-visitors";
 import AdminMemberships from "./admin-memberships";
 import AdminScores from "./admin-scores";
@@ -8,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createCourse, createLesson, deleteCourse, deleteLesson, updateCourse, updateLesson } from "./actions";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 type Course = { id: string; slug: string; title: string; level: string; description: string; is_free: boolean; sort_order: number };
 type Lesson = { id: string; course_id: string; slug: string; title: string; summary: string; content: unknown; sort_order: number };
@@ -56,6 +58,7 @@ export default async function AdminPage() {
       <div className="admin-side-label">QUẢN TRỊ</div>
       <Link href="/learn" className="admin-side-link"><ArrowLeft size={17}/> Về trang học tập</Link>
       <a href="#overview" className="admin-side-link active"><Activity size={17}/> Tổng quan</a>
+      <a href="#learning-services" className="admin-side-link"><Activity size={17}/> Thống kê & vận hành</a>
       <a href="#users" className="admin-side-link"><Users size={17}/> Người dùng</a>
       <a href="#courses" className="admin-side-link"><BookOpen size={17}/> Khóa học</a>
       <a href="#lessons" className="admin-side-link"><GraduationCap size={17}/> Bài học</a>
@@ -76,6 +79,7 @@ export default async function AdminPage() {
       </section>
 
       <section className="admin-section"><OnlineVisitors/></section>
+      <section className="admin-section"><LearningConsole/></section>
       <section id="leaderboard-scores" className="admin-section"><AdminScores/></section>
 
       <section id="users" className="admin-section"><div className="admin-section-heading"><div><span className="admin-eyebrow">CỘNG ĐỒNG · GÓI HỌC</span><h2>Danh sách người dùng & tặng gói 🎁</h2><p>Tìm kiếm người dùng và cấp quyền sử dụng gói Explorer, Achiever hoặc Mastery.</p></div></div><AdminMemberships/></section>
@@ -87,7 +91,7 @@ export default async function AdminPage() {
             <label>Mã khóa học<input name="slug" required placeholder="daily-conversation"/></label><label>Tên khóa học<input name="title" required placeholder="Daily Conversation"/></label>
             <label>Trình độ<input name="level" defaultValue="Beginner"/></label><label>Thứ tự<input name="sort_order" type="number" defaultValue="1"/></label>
             <label className="admin-field-wide">Mô tả<input name="description" placeholder="Mô tả ngắn về khóa học"/></label>
-            <label className="admin-check"><input name="is_free" type="checkbox"/> Khóa học miễn phí</label>
+            <label className="admin-check"><input name="is_free" type="checkbox"/> Khóa học miễn phí</label><label className="admin-check"><input name="notify_learners" type="checkbox" defaultChecked/> Thông báo khóa học mới cho người theo dõi</label>
           </div><button className="admin-primary">Thêm khóa học</button>
         </form>
         <div className="admin-record-list">{courses.map(course => <details className="admin-record" key={course.id}><summary><span className="admin-record-letter">{course.title.slice(0,1)}</span><span className="admin-record-name"><b>{course.title}</b><small>/{course.slug} · {course.level}</small></span><span className={course.is_free ? "admin-pill free" : "admin-pill"}>{course.is_free ? "MIỄN PHÍ" : "TRẢ PHÍ"}</span><span className="admin-details-hint">Chỉnh sửa⌄</span></summary>
@@ -119,5 +123,7 @@ export default async function AdminPage() {
     </div>
   </main>;
 }
+
+
 
 

@@ -69,6 +69,12 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     return () => window.removeEventListener("storage", readLanguage);
   }, []);
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
+  useEffect(()=>{
+    if(!selected||!selectedCourseSlug)return;
+    const report=()=>{if(document.visibilityState==='visible')void fetch('/api/learning-activity',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug})}).catch(()=>{});};
+    report();const timer=setInterval(report,60000);document.addEventListener('visibilitychange',report);
+    return()=>{clearInterval(timer);document.removeEventListener('visibilitychange',report);};
+  },[selected?.slug,selectedCourseSlug]);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [enteringLesson, setEnteringLesson] = useState<LibraryLesson | null>(null);
   useEffect(()=>{try{const saved=sessionStorage.getItem("aunora_active_lesson")||localStorage.getItem("aunora_resume_lesson");if(!saved)return;const item=JSON.parse(saved) as {slug:string;course:string};const found=lessons.find(l=>l.slug===item.slug&&courses.some(c=>c.id===l.course_id&&c.slug===item.course));if(found){setSelectedCourseSlug(item.course);setSelectedSection(Math.floor(Math.max(0,lessons.filter(l=>l.course_id===found.course_id).sort((a,b)=>a.sort_order-b.sort_order).findIndex(l=>l.id===found.id))/10));setSelected(found);sessionStorage.removeItem("aunora_active_lesson");sessionStorage.removeItem("aunora_returning_to_lesson");localStorage.removeItem("aunora_resume_lesson");}}catch{}},[lessons,courses]);
@@ -321,3 +327,4 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     </article>;
   })}</section></>;
 }
+

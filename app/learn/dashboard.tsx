@@ -9,7 +9,7 @@ import { LayoutDashboard, BookOpen, Dumbbell, MessageCircle, Mic2, BookText, Log
 type Lang = "vi" | "en";
 const copy = {
  vi: {
-  overview:"Trang chủ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển", entertainment:"Giải trí", plans:"Gói đăng ký",
+  overview:"Trang chủ", progress:"Tiến độ", learning:"Khóa học", practice:"Luyện tập", tutor:"AI Tutor", speaking:"Luyện nói", dictionary:"Từ điển", entertainment:"Giải trí", plans:"Gói đăng ký",
   space:"KHÔNG GIAN HỌC TẬP", journey:"HÀNH TRÌNH CỦA BẠN", dashboard:"Bảng điều khiển",
   hello:"Chào mừng trở lại!", lead:"Cùng AUNORA và AI Tutor, chinh phục tiếng Anh mỗi ngày!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"Mình là Aivanta!", tutorText:"Gia sư AI đồng hành cùng bạn trên hành trình học tiếng Anh. Cùng bắt đầu nhé!",
@@ -24,7 +24,7 @@ const copy = {
   account:"Tài khoản", language:"Ngôn ngữ", menu:"Mở menu", courseDescriptions:["Nền tảng tiếng Anh cho người mới bắt đầu.","Giao tiếp tự nhiên trong các tình huống hằng ngày.","Tiếng Anh thực tế khi đi du lịch.","Nắm vững ngữ pháp qua ví dụ và bài tập.","Tự tin trò chuyện và bày tỏ ý kiến."]
  },
  en: {
-  overview:"Home", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary", entertainment:"Fun Zone", plans:"Membership plans",
+  overview:"Home", progress:"Progress", learning:"Courses", practice:"Practice", tutor:"AI Tutor", speaking:"Speaking", dictionary:"Dictionary", entertainment:"Fun Zone", plans:"Membership plans",
   space:"YOUR LEARNING SPACE", journey:"YOUR JOURNEY", dashboard:"Learning dashboard",
   hello:"Welcome back!", lead:"Learn English every day with AUNORA and your AI Tutor!",
   heroQuote:"Better English, Brighter Future", tutorTitle:"I'm Aivanta!", tutorText:"Your AI tutor and learning companion. Let's make your English journey brighter!",
@@ -45,6 +45,7 @@ const courseLevels=["A1","A1–A2","A2","A2–B1","B1"];
 const menuItems=[
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
  {key:"learning" as const,href:"/learn/library",icon:BookOpen},
+ {key:"progress" as const,href:"/learn/progress",icon:Trophy},
  {key:"practice" as const,href:"/learn/practice",icon:Dumbbell},
  {key:"dictionary" as const,href:"/learn/dictionary",icon:BookText},
  {key:"entertainment" as const,href:"/learn/fun",icon:Gamepad2},
@@ -94,3 +95,4 @@ export default function LearnPage(){
   {showLogoutConfirm&&<div className="logout-modal-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setShowLogoutConfirm(false);}}><section className="logout-modal" role="dialog" aria-modal="true" aria-labelledby="logout-title"><div className="logout-modal-icon"><LogOut size={22}/></div><h2 id="logout-title">{t.confirmTitle}</h2><p>{t.confirmBody}</p><div className="logout-modal-actions"><button type="button" className="logout-cancel" onClick={()=>setShowLogoutConfirm(false)}>{t.cancel}</button><button type="button" className="logout-confirm" onClick={logout}>{t.confirm}</button></div></section></div>}
  </main>;
 }
+

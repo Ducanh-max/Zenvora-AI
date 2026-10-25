@@ -1,3 +1,4 @@
+import {feature} from "@/lib/learner-services-server";
 import {NextResponse} from "next/server";
 import {createClient as adminClient} from "@supabase/supabase-js";
 import {createClient} from "@/lib/supabase/server";
@@ -12,6 +13,7 @@ export async function POST(request:Request){
  try{
  const db=await createClient(),{data:{user}}=await db.auth.getUser();
  if(!user)return NextResponse.json({error:"Vui lòng đăng nhập."},{status:401});
+ if(!await feature(db,"games_enabled"))return NextResponse.json({error:"Khu giải trí đang tạm ngưng."},{status:503});
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
  if(!url||!key)return NextResponse.json({error:"Chưa cấu hình Supabase service role trên máy chủ."},{status:503});
  const admin=adminClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
@@ -37,3 +39,4 @@ export async function POST(request:Request){
  return NextResponse.json({room:data});
  }catch{return NextResponse.json({error:"Không thể xử lý yêu cầu."},{status:500});}
 }
+

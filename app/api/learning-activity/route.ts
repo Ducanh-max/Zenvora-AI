@@ -1,0 +1,4 @@
+import {NextResponse} from "next/server";
+import {session,body,failure,check,ServiceError} from "@/lib/learner-services-server";
+import {validLessonId} from "@/lib/service-validation";
+export async function POST(request:Request){try{const {client,user}=await session();const b=await body(request);if(!validLessonId(b.lessonId)||!validLessonId(b.courseId))throw new ServiceError(400,"Bài học không hợp lệ.");const {data:lesson,error:lookup}=await client.from("zenvora_lessons").select("id").eq("slug",b.lessonId).eq("is_published",true).limit(1).maybeSingle();check(lookup);if(!lesson)throw new ServiceError(404,"Bài học chưa được xuất bản.");const {error}=await client.from("aunora_learning_activity").upsert({user_id:user.id,lesson_id:b.lessonId,course_id:b.courseId});check(error);return NextResponse.json({ok:true});}catch(e){return failure(e);}}
