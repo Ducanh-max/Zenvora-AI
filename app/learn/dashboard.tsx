@@ -46,7 +46,6 @@ const menuItems=[
  {key:"overview" as const,href:"/learn",icon:LayoutDashboard,active:true},
  {key:"learning" as const,href:"/learn/library",icon:BookOpen},
  {key:"practice" as const,href:"/learn/practice",icon:Dumbbell},
- {key:"tutor" as const,href:"/learn/tutor",icon:MessageCircle,ai:true},
  {key:"dictionary" as const,href:"/learn/dictionary",icon:BookText},
  {key:"entertainment" as const,href:"/learn/fun",icon:Gamepad2},
  {key:"plans" as const,href:"/learn/plans",icon:Star}
