@@ -19,9 +19,9 @@ export default function Loading() {
       `}</style>
       <section className="aunora-loading">
         <div className="aunora-loading-card" role="status">
-          <img className="aunora-loading-wolf" src="/brand/aivanta-mascot.webp.png" alt="" />
+          <img className="aunora-loading-wolf" src="/brand/wolf-face/aivanta-face.png" alt="" />
           <h1 className="aunora-loading-title">{returning?"Đang quay lại bài học...":"Đang vào khóa học..."}</h1>
-          <p className="aunora-loading-desc">{returning?"Aivanta đang đưa bạn trở lại bài học vừa học 🐺":"Đang tải danh sách khóa học của bạn 🐺"}</p>
+          <p className="aunora-loading-desc">{returning?"Aivanta đang đưa bạn trở lại bài học vừa học":"Đang tải danh sách khóa học của bạn"}</p>
           <div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar" /></div>
         </div>
       </section>
