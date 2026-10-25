@@ -12,7 +12,7 @@ export default function LessonTutor({lesson}:{lesson:LessonContext}){
  const [error,setError]=useState("");
  const bottom=useRef<HTMLDivElement>(null);
  useEffect(()=>{setMessages([{role:"assistant",content:opening}]);setInput("");setError("");},[lesson.id,opening]);
- useEffect(()=>{bottom.current?.scrollIntoView({behavior:"smooth",block:"nearest"});},[messages,busy]);
+ useEffect(()=>{const chat=bottom.current?.parentElement;if(chat)chat.scrollTo({top:chat.scrollHeight,behavior:"instant"});},[messages,busy]);
  async function send(e?:FormEvent,quick?:string){
   e?.preventDefault();
   const value=(quick??input).trim();if(!value||busy)return;
