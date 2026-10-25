@@ -15,6 +15,19 @@ const gameTicket=(match,actor=currentUser?.id||null)=>({version:1,id:crypto.rand
 let signed=tickets.signTicket(gameTicket(mate),'test-secret');assert.equal(tickets.readTicket(signed,'test-secret').match.result.winner,'w');assert.throws(()=>tickets.readTicket(signed+'x','test-secret'));
 function markup(stage,fixture){const hooks={useState(v){return[v==='menu'?stage:typeof v==='function'?fixture:v,()=>{}];},useRef(v){return{current:v};},useMemo(fn){return fn();},useEffect(){},useCallback(fn){return fn;}};const Page=load('app/learn/fun/chess/page.tsx',{react:hooks,'next/link':{default:({children,...p})=>React.createElement('a',p,children)}}).default;return renderToStaticMarkup(React.createElement(Page));}
 const playing=markup('play',game.newMatch());assert.equal((playing.match(/role="gridcell"/g)||[]).length,64);for(const label of ['Chọn cấp độ','Bắt đầu lại','Lịch sử','Âm thanh'])assert.ok(!playing.includes(label),label);assert.ok(markup('setup',game.newMatch()).includes('1500+'));assert.ok(markup('setup',game.newMatch()).includes('Bắt đầu chơi'));assert.ok(markup('setup',game.newMatch()).includes('20 phút'));assert.ok(markup('play',mate).includes('Trắng đã tung đòn chiếu hết'));assert.ok(markup('play',mate).includes('ch-check'));assert.ok(markup('play',rep).includes('Hòa cờ!'));
+const review=load('lib/chess-review.ts');
+assert.equal(review.explainResult(game.newMatch()),null);
+const won=review.explainResult(mate),lost=review.explainResult(loss);
+assert.match(won.summary,/Trắng thắng.*chiếu hết/);assert.ok(won.facts.some(x=>x.includes('Vua Đen ở e8')&&x.includes('Hậu Trắng tại f7')));assert.equal(won.lastMove,'Hậu Trắng: h5 → f7');
+assert.ok(lost.facts.some(x=>x.includes('Vua Trắng ở e1')&&x.includes('Hậu Đen tại h4')));assert.equal(lost.lastMove,'Hậu Đen: d8 → h4');
+assert.match(review.explainResult(m).summary,/Trắng thắng vì Đen hết thời gian/);
+assert.match(review.explainResult({...stale,result:game.adjudicate(stale)}).summary,/hết nước đi hợp lệ nhưng Vua không bị chiếu/);
+assert.ok(review.explainResult(rep).facts.some(x=>x.includes('3 lần')));
+const material={...stale,position:sparse([[0,'k'],[63,'K']]),result:{winner:null,reason:'material'}};assert.match(review.explainResult(material).summary,/không thể tạo ra thế chiếu hết/);
+assert.match(review.explainResult({...game.newMatch(),halfmove:100,result:{winner:null,reason:'fifty'}}).summary,/50 nước/);
+assert.match(review.explainResult({...material,result:{winner:null,reason:'timeout'}}).summary,/Ván hòa dù/);
+assert.ok(!playing.includes('ch-review-summary'));assert.ok(markup('play',mate).includes('Vì sao bạn thắng?'));assert.ok(markup('play',loss).includes('Vì sao bạn thua?'));assert.ok(markup('play',rep).includes('Vì sao hòa cờ?'));
+console.log('PASS: result explanations identify the actual king, attacker and last move; explain timeout and every draw reason; appear only after the game.');
 (async()=>{const api=load('app/api/chess/bot/route.ts');const post=body=>api.POST(new Request('http://localhost/api/chess/bot',{method:'POST',body:JSON.stringify(body)}));
  const start=await post({action:'start',difficulty:'expert'});assert.equal(start.status,200);assert.equal(start.data.match.clocks.w,1200000);assert.equal((await post({action:'move',ticket:start.data.ticket,from:0,to:63})).status,400);assert.equal((await post({action:'move',ticket:'tampered',from:52,to:36})).status,400);
  const reply=await post({action:'move',ticket:start.data.ticket,from:52,to:36});assert.equal(reply.status,200);assert.equal(reply.data.match.position.turn,'w');assert.equal(reply.data.match.position.history.length,2);
