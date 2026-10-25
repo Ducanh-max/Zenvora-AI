@@ -233,3 +233,34 @@
  .adv-screen .adv-match-col button{min-height:44px;padding:7px 10px;font-size:16px}
  .adv-screen .adv-match-status{margin-top:6px}
 }
+
+/* Compact sentence-building exercises keep the audio, answer and word bank together. */
+.adv-screen:is(.adv-scene-hearorder,.adv-scene-order,.adv-scene-fill) .adv-heading{margin-bottom:8px}
+.adv-screen:is(.adv-scene-hearorder,.adv-scene-order,.adv-scene-fill) .adv-heading h1{font-size:clamp(21px,2.2vw,29px);margin:6px 0}
+.adv-screen:is(.adv-scene-hearorder,.adv-scene-order,.adv-scene-fill) .adv-mission-subtitle{font-size:14px;margin:4px 0}
+.adv-screen .adv-dictation{padding:12px 16px;margin:10px 0;border-radius:16px;box-shadow:0 3px 0 #d6e4f3}
+.adv-screen .adv-dictation-top{font-size:16px;gap:8px}
+.adv-screen .adv-dictation-audio{padding:10px 0 6px;gap:14px}
+.adv-screen .adv-dictation-audio button{width:54px;height:54px;min-height:44px;border-radius:16px}
+.adv-screen .adv-dictation-audio button svg{width:26px;height:26px}
+.adv-screen .adv-dictation-audio button span{font-size:28px}
+.adv-screen .adv-workshop-title{margin:10px 0 4px;font-size:13px}
+.adv-screen .adv-order-answer{min-height:64px;padding:12px 14px;margin:12px 0;gap:8px;font-size:16px}
+.adv-screen .adv-order-pool{min-height:0;padding:8px 0 12px;margin:8px 0;gap:8px}
+.adv-screen .adv-order-answer button,.adv-screen .adv-order-pool button,
+.adv-screen .adv-dictation-answer button,.adv-screen .adv-dictation-pool button{min-height:44px;padding:8px 13px;font-size:17px;line-height:1.3;border-radius:10px}
+.adv-screen .adv-dictation-answer{min-height:64px;padding:10px 4px;gap:8px}
+.adv-screen .adv-dictation-pool{padding:14px 0 4px;gap:8px}
+.adv-screen .adv-dictation>input{padding:12px;font-size:18px}
+@media(max-width:650px){
+ .adv-screen .adv-dictation{padding:10px 12px}
+ .adv-screen .adv-dictation-top{font-size:15px}
+ .adv-screen .adv-dictation-modes button{padding:8px 10px}
+ .adv-screen .adv-order-answer button,.adv-screen .adv-order-pool button,
+ .adv-screen .adv-dictation-answer button,.adv-screen .adv-dictation-pool button{font-size:16px;padding:8px 11px}
+}
+@media(max-height:700px){
+ .adv-screen:is(.adv-scene-hearorder,.adv-scene-order,.adv-scene-fill) .adv-mission-label{margin-bottom:4px}
+ .adv-screen .adv-dictation-audio{padding:8px 0 4px}
+ .adv-screen .adv-order-answer{min-height:56px;margin:8px 0;padding:8px 12px}
+}
