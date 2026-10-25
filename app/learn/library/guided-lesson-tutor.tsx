@@ -62,16 +62,16 @@ export default function GuidedLessonTutor({onComplete,words=[],title="English"}:
  async function send(e:FormEvent){e.preventDefault();const value=input.trim();if(!value||busy||done||quotaLocked)return;
   const next:Message[]=[...messages,{role:"user",content:value}];setMessages(next);setInput("");setHelp(false);setHintText("");setBusy(true);setError("");
   try{
-   const response=await fetch("/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"lesson_conversation",lesson:{title,words:words.map(w=>w.word)},messages:next})});
+   const response=await fetch("/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"lesson_conversation",lesson:{title,words:words.map(w=>w.word)},relevantTurns:count,messages:next})});
    const data=await response.json();
    if(response.status===429){setQuotaLocked(true);setDone(true);onComplete?.();return;}
    if(!response.ok)throw new Error(data.error||"Không thể kết nối Aivanta.");
-   const n=count+1;
-   const reply=n>=5
-    ? "You did a great job today! I enjoyed talking with you. Goodbye, and see you next time! 👋"
-    : String(data.reply||"Let's keep talking!");
+   const onTopic=data.onTopic===true;
+   const n=Math.min(5,count+(onTopic?1:0));
+   const reply=String(data.reply||"Let's keep talking about our lesson!");
    setMessages([...next,{role:"assistant",content:reply}]);
-   setCount(n);if(n>=5){setDone(true);onComplete?.();}
+   setCount(n);
+   if(onTopic&&n>=5){setDone(true);onComplete?.();}
   }catch(err){setError(err instanceof Error?err.message:"Có lỗi xảy ra.");}
   finally{setBusy(false);}
  }
