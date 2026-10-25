@@ -111,11 +111,22 @@ function sentenceTranslation(sentence:string,dialogue?:Dialogue[]){const clean=s
  };
  if(introductions[clean])return introductions[clean];const name=clean.match(/^my name is (.+)$/);if(name)return "Tên tôi là "+sentence.trim().replace(/[.!?]+$/,"").slice(11)+".";return null;}
 function sourceSentenceTranslation(sentence:string,lesson:{dialogue?:Dialogue[];examples?:ExampleTranslation[]}){
- const normalized=(value:string)=>value.toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\\s+/g," ");
+ const normalized=(value:string)=>value.toLowerCase().trim().replace(/[.!?]+$/,"").replace(/\s+/g," ");
  const found=[...(lesson.examples||[]),...(lesson.dialogue||[])].find(item=>normalized(item.english)===normalized(sentence)&&item.vietnamese?.trim());
  return found?.vietnamese?.trim()||sentenceTranslation(sentence,lesson.dialogue);
 }
 function norm(t:string){return t.toLowerCase().replace(/[.,!?]/g,"").replace(/\s+/g," ").trim();}
+
+function listeningSentence(lesson:{dialogue?:Dialogue[];examples?:ExampleTranslation[]},words:Word[],activities:Activity[]){
+ const candidates=[...(lesson.dialogue||[]).map(item=>item.english),...(lesson.examples||[]).map(item=>item.english),...words.map(word=>word.example),...words.map(word=>word.word)]
+  .filter((sentence):sentence is string=>typeof sentence==="string")
+  .map(sentence=>sentence.trim().replace(/^[A-Z][a-z]*:\s*/,"").replace(/\s+/g," "))
+  .filter(sentence=>{const count=sentence.split(/\s+/).length;return count>=3&&count<=18&&!/\b(?:learning|reading|studying) the word\b/i.test(sentence);});
+ const unique=[...new Map(candidates.map(sentence=>[norm(sentence),sentence])).values()];
+ const used=new Set(activities.filter(activity=>activity.type==="order").map(activity=>norm(activity.answer)));
+ return unique.find(sentence=>!used.has(norm(sentence)))||unique[0];
+}
+
 export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];examples?:ExampleTranslation[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review||lesson.test?10:5);if(!words.length)return[];
@@ -134,11 +145,10 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
     practice.slice(0,questionCount).forEach(w=>a.push({type:"choice",word:w,question:"Chọn nghĩa đúng",answer:w.meaning,options:choicesFor(w,"meaning")}));
     practice.slice(questionCount,questionCount+3).forEach(w=>a.push({type:"listen",word:w,question:"Nghe và chọn từ đúng",answer:w.word,options:choicesFor(w,"word")}));
     a.push({type:"match",question:"Nối từ Anh – Việt của cả hai bài",answer:"",options:practice.slice(0,4).flatMap(w=>[w.word,w.meaning])});
-    const examples=[...new Map(practice.filter(w=>w.example?.trim().split(/\\s+/).length>=3).map(w=>[norm(w.example),w])).values()];
+    const examples=[...new Map(practice.filter(w=>w.example?.trim().split(/\s+/).length>=3).map(w=>[norm(w.example),w])).values()];
     examples.slice(0,lesson.test?3:2).forEach(w=>a.push({type:"order",word:w,question:"Sắp xếp từ thành câu tiếng Anh",answer:w.example.replace(/[.!?]+$/,"")}));
-    const heard=examples.find(w=>!a.some(item=>item.type==="order"&&norm(item.answer)===norm(w.example)));
-    const heardSentence=heard?.example?.trim()||("I am learning the word "+practice[0].word+".");
-    a.push({type:"hearorder",word:heard||practice[0],question:"Nghe Aivanta đọc rồi ghép lại câu",answer:heardSentence.replace(/[.!?]+$/,"")});
+    const heardSentence=listeningSentence(lesson,practice,a);
+    if(heardSentence)a.push({type:"hearorder",question:"Nghe Aivanta đọc rồi ghép lại câu",answer:heardSentence.replace(/[.!?]+$/,"")});
     practice.slice(6).forEach(w=>a.push({type:"choice",word:w,question:"Vận dụng từ vựng đã học",answer:w.meaning,options:choicesFor(w,"meaning")}));
     practice.slice(0,lesson.test?3:2).forEach(w=>a.push({type:"speak",word:w,question:"Phát âm từ đã học",answer:w.word}));
     return a;
@@ -147,11 +157,10 @@ export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:str
   if(!lesson.test)words.slice(0,3).forEach(w=>a.push({type:"intro",word:w,question:"Khám phá từ mới qua thẻ và âm thanh",answer:w.word}));
   words.slice(0,2).forEach((w,i)=>{const pictureOptions=choicesFor(w,"word");const pictureIcons=pictureOptions.map(option=>visualFor(option,words.find(item=>item.word===option)?.meaning||""));const validPicture=i===0&&pictureOptions.length>=3&&pictureIcons.every(icon=>icon!=="")&&new Set(pictureIcons).size===pictureIcons.length;a.push({type:validPicture?"picture":"choice",word:w,question:validPicture?"Chọn hình đúng với từ tiếng Anh":"Aivanta hỏi: Từ này có nghĩa là gì?",answer:validPicture?w.word:w.meaning,options:validPicture?pictureOptions:choicesFor(w,"meaning")});});
   words.slice(2,4).forEach(w=>a.push({type:"listen",word:w,question:"Nghe Aivanta đọc rồi chọn từ tương ứng",answer:w.word,options:choicesFor(w,"word")}));
-  const examples=[...new Map(words.filter(w=>w.example?.trim().split(/\\s+/).length>=3).map(w=>[norm(w.example),w])).values()];
+  const examples=[...new Map(words.filter(w=>w.example?.trim().split(/\s+/).length>=3).map(w=>[norm(w.example),w])).values()];
   examples.slice(0,1).forEach(w=>a.push({type:"order",word:w,question:"Ghép các mảnh từ thành câu tiếng Anh",answer:w.example.replace(/[.!?]+$/,"")}));
-  const heard=examples.find(w=>!a.some(item=>item.type==="order"&&norm(item.answer)===norm(w.example)));
-  const heardSentence=heard?.example?.trim()||("I am learning the word "+words[0].word+".");
-  a.push({type:"hearorder",word:heard||words[0],question:"Nghe Aivanta đọc rồi ghép lại câu",answer:heardSentence.replace(/[.!?]+$/,"")});
+  const heardSentence=listeningSentence(lesson,words,a);
+  if(heardSentence)a.push({type:"hearorder",question:"Nghe Aivanta đọc rồi ghép lại câu",answer:heardSentence.replace(/[.!?]+$/,"")});
   a.push({type:"match",question:"Nối các cặp từ Anh – Việt",answer:"",options:words.slice(0,4).flatMap(w=>[w.word,w.meaning])});
   words.slice(3,5).filter(w=>!a.some(item=>item.type==="order"&&norm(item.answer)===norm(w.example||""))).forEach(w=>{
     const example=w.example||"";
