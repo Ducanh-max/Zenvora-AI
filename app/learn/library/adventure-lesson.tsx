@@ -42,6 +42,15 @@ function visualFor(word:string,meaning:string){
  if(/^\\d+$/.test(key))return key;
  // Match the actual vocabulary word, never substrings of unrelated words or its translated description.
  const icons:Record<string,string>={
+ left:"⬅️",right:"➡️",straight:"⬆️",near:"📍",
+ cheap:"🏷️",expensive:"💎",price:"💲",shop:"🏪",
+ cent:"🪙",cost:"🧾",dollar:"💵",pay:"💳",
+ what:"❓",when:"⏰",where:"📍",who:"👤",
+ do:"🛠️",does:"⚙️",
+ this:"👇",that:"👉",these:"👇👥",those:"👉👥",
+ any:"🎲",many:"🔢",some:"🤏",there:"📍",
+ ability:"💪",can:"✅",cannot:"🚫",try:"🎯",
+ "can't":"🚫","can’t":"🚫",
  bed:"🛏️",blanket:"🛌",lamp:"💡",pillow:"💤",
  shirt:"👕",shoes:"👟",trousers:"👖",
  cloudy:"☁️",rainy:"🌧️",sunny:"☀️",windy:"🌬️",
@@ -251,4 +260,3 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
  {checked&&<div role="status" className={"adv-feedback "+(correct||easy?"adv-good":"adv-bad")}>{correct||easy?"🎉 Làm tốt lắm!":speechSkipped?"Bạn có thể luyện phát âm từ này vào cuối bài.":"❌ Chưa chính xác. Đáp án: "+(activity.type==="match"?"Có cặp nối sai (đường màu đỏ). Nhấn vào từ đã nối để gỡ và nối lại.":activity.answer)}</div>}
  <div className="adv-actions">{activity.type!=="match"&&<button className="adv-primary" disabled={!checked&&!canCheck} onClick={next}>{activity.type==="chat"?"Hoàn thành hội thoại":activity.type==="intro"?"Tiếp theo":checked?"Tiếp tục":"Kiểm tra"} <ArrowRight size={19}/></button>}</div></main><aside className="adv-companion"><div className={"adv-wolf "+(checked?(correct?"adv-wolf-happy":"adv-wolf-try"):hint?"adv-wolf-help":"")}><div className="adv-companion-tag">🐺 ĐỒNG ĐỘI AIVANTA</div><img src={wolf} alt="Sói Aivanta đồng hành"/><div className="adv-bubble">{checked?(correct||easy?"Giỏi quá! Tiếp tục nhé! 🐾":"Không sao! Mình cùng học lại nhé."):hint?"Mình ở đây để giúp bạn!":"Cùng học nào! Bạn làm được mà! 💙"}</div></div></aside></div>}</section>;
 }
-
