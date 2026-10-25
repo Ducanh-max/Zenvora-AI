@@ -28,6 +28,21 @@ assert.match(review.explainResult({...game.newMatch(),halfmove:100,result:{winne
 assert.match(review.explainResult({...material,result:{winner:null,reason:'timeout'}}).summary,/Ván hòa dù/);
 assert.ok(!playing.includes('ch-review-summary'));assert.ok(markup('play',mate).includes('Vì sao bạn thắng?'));assert.ok(markup('play',loss).includes('Vì sao bạn thua?'));assert.ok(markup('play',rep).includes('Vì sao hòa cờ?'));
 console.log('PASS: result explanations identify the actual king, attacker and last move; explain timeout and every draw reason; appear only after the game.');
+const replayed=review.replayPositions(mate.position.history);assert.equal(replayed.length,mate.position.history.length+1);assert.equal(replayed.at(-1).board.join(''),mate.position.board.join(''));assert.equal(replayed[0].board.join(''),engine.start().board.join(''));
+for(const line of [
+ [['e2','e4'],['e7','e5'],['g1','f3'],['b8','c6'],['f1','c4'],['g8','f6'],['e1','g1']],
+ [['e2','e4'],['a7','a6'],['e4','e5'],['d7','d5'],['e5','d6']],
+ [['a2','a4'],['h7','h5'],['a4','a5'],['h5','h4'],['a5','a6'],['h4','h3'],['a6','b7'],['h3','g2'],['b7','a8']]
+]){let sample=game.newMatch();for(const [a,b] of line)sample=move(sample,a,b);const rebuilt=review.replayPositions(sample.position.history);assert.equal(rebuilt.length,line.length+1);assert.equal(rebuilt.at(-1).board.join(''),sample.position.board.join(''));}
+assert.equal(review.replayPositions(['invalid']).length,1);
+{
+ let slots=[],cursor=0,tree;const hooks={useState(v){const i=cursor++;if(!(i in slots))slots[i]=v==='menu'?'play':typeof v==='function'?mate:v;return[slots[i],value=>{slots[i]=typeof value==='function'?value(slots[i]):value;}];},useRef(v){const i=cursor++;return slots[i]||={current:v};},useMemo(fn){cursor++;return fn();},useEffect(){cursor++;},useCallback(fn){cursor++;return fn;}};
+ const Page=load('app/learn/fun/chess/page.tsx',{react:hooks,'next/link':{default:({children,...p})=>React.createElement('a',p,children)}}).default;
+ const render=()=>{cursor=0;tree=Page();};const nodes=n=>Array.isArray(n)?n.flatMap(nodes):n&&typeof n==='object'&&n.props?[n,...nodes(n.props.children)]:[];const text=n=>Array.isArray(n)?n.map(text).join(''):n&&typeof n==='object'?text(n.props?.children):n==null||typeof n==='boolean'?'':String(n);
+ const clickButton=label=>{const button=nodes(tree).find(n=>n.type==='button'&&(n.props['aria-label']===label||text(n)===label));assert.ok(button,label);button.props.onClick();render();};const html=()=>renderToStaticMarkup(tree);
+ render();clickButton('Xem lại bàn cờ');assert.ok(!html().includes('id="result-title"'));assert.ok(html().includes('Thế cờ cuối ván'));assert.ok(html().includes('f7 Hậu Trắng'));clickButton('Nước trước');assert.ok(html().includes('h5 Hậu Trắng'));clickButton('Về đầu ván');assert.ok(html().includes('Thế cờ ban đầu'));assert.ok(html().includes('d1 Hậu Trắng'));const before=html();nodes(tree).find(n=>n.props.role==='gridcell').props.onClick();render();assert.equal(html(),before,'review board is read-only');clickButton('Về cuối ván');assert.ok(html().includes('f7 Hậu Trắng'));clickButton('Xem kết quả và giải thích');assert.ok(html().includes('Vì sao bạn thắng?'));
+}
+console.log('PASS: replay navigation, unchanged read-only final result, castling, en passant and promotion histories.');
 (async()=>{const api=load('app/api/chess/bot/route.ts');const post=body=>api.POST(new Request('http://localhost/api/chess/bot',{method:'POST',body:JSON.stringify(body)}));
  const start=await post({action:'start',difficulty:'expert'});assert.equal(start.status,200);assert.equal(start.data.match.clocks.w,1200000);assert.equal((await post({action:'move',ticket:start.data.ticket,from:0,to:63})).status,400);assert.equal((await post({action:'move',ticket:'tampered',from:52,to:36})).status,400);
  const reply=await post({action:'move',ticket:start.data.ticket,from:52,to:36});assert.equal(reply.status,200);assert.equal(reply.data.match.position.turn,'w');assert.equal(reply.data.match.position.history.length,2);

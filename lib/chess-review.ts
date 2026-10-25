@@ -1,4 +1,4 @@
-import {attacked,other,type Position,type Side} from "./chess-engine";
+import {attacked,other,start,legal,execute,type Position,type Side} from "./chess-engine";
 import {positionKey,type Match} from "./chess-match";
 const names:Record<string,string>={k:"Vua",q:"Hậu",r:"Xe",b:"Tượng",n:"Mã",p:"Tốt"};
 const sideName=(side:Side)=>side==="w"?"Trắng":"Đen";
@@ -61,4 +61,16 @@ export function explainResult(match:Match):ResultReview|null{
   tip="Bài học: cần tạo tiến triển thực sự, thay vì chỉ di chuyển quân qua lại mà không thay đổi thế cờ.";
  }
  return {summary,facts,lastMove,tip};
+}
+
+/** Rebuild legal board positions from the game's coordinate move history. */
+export function replayPositions(history:string[]):Position[]{
+ const positions:Position[]=[start()];
+ for(const notation of history){
+  const parsed=notation.match(/^([a-h][1-8])–([a-h][1-8])(?:=([QRBN]))?$/);if(!parsed)break;
+  const current=positions[positions.length-1];
+  const move=legal(current).find(m=>m.from===index(parsed[1])&&m.to===index(parsed[2])&&(m.promotion||"")===(parsed[3]?.toLowerCase()||""));
+  if(!move)break;positions.push(execute(current,move));
+ }
+ return positions;
 }
