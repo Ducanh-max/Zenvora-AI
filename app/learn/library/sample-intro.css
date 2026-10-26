@@ -30,3 +30,7 @@
 .si-answer button.si-dragging{opacity:.35;border-color:#5394e0}
 .si-answer button:focus-visible,.si-bank button:focus-visible{outline:3px solid #75a9ef;outline-offset:3px}
 .si-gloss>[role=button]{cursor:inherit}
+
+.si-gloss.is-known>[role=button]{color:inherit;font-weight:inherit;border-bottom:1px dotted #8ca4c4}
+.si-gloss.is-new>[role=button]{color:#d63d8f;font-weight:850;border-bottom:2px dotted #eb93c4}
+.si-screen>header>b{white-space:nowrap;font-size:14px}
