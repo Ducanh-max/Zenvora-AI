@@ -26,9 +26,21 @@ const conversationHelp:Record<string,{vi:string;answers:{en:string;vi:string}[]}
 };
 function PairBoard({task,newWords,onComplete}:{task:Task;newWords:string[];onComplete:()=>void}){
  const pairs=task.pairs||[];
- const [left,setLeft]=useState<number|null>(null),[solved,setSolved]=useState<number[]>([]),[message,setMessage]=useState("");
+ const [left,setLeft]=useState<number|null>(null),[solved,setSolved]=useState<number[]>([]),[message,setMessage]=useState(""),[wrong,setWrong]=useState<{left:number;right:number}|null>(null);
+ const wrongTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ useEffect(()=>()=>{if(wrongTimer.current)clearTimeout(wrongTimer.current);},[]);
  const right=useMemo(()=>shuffle(pairs.map((_,i)=>i)),[task.id]);
- return <div><p className="si-tip">{task.kind==="audioMatch"?"Mỗi ô loa đọc một từ. Nghe rồi chọn nghĩa ở cột phải.":"Chọn từ tiếng Anh rồi chọn nghĩa tiếng Việt."}</p><div className="si-pairs"><div><h3>{task.kind==="audioMatch"?"Âm thanh":"Tiếng Anh"}</h3>{pairs.map((p,i)=><button type="button" aria-label={task.kind==="audioMatch"?"Nghe ô "+(i+1):p.en} disabled={solved.includes(i)} className={(left===i?"selected ":"")+(solved.includes(i)?"solved":"")} key={p.en} onClick={()=>{setLeft(i);if(task.kind==="audioMatch")say(p.en);}}>{task.kind==="audioMatch"?"🔊 Ô "+(i+1):<Gloss text={p.en} words={newWords}/>}{solved.includes(i)?" ✓":""}</button>)}</div><div><h3>Nghĩa tiếng Việt</h3>{right.map(i=><button type="button" key={pairs[i].en} disabled={solved.includes(i)} className={solved.includes(i)?"solved":""} onClick={()=>{if(left===null){setMessage("Chọn ô bên trái trước nhé.");return;}if(left===i){const next=[...solved,i];setSolved(next);setLeft(null);setMessage("✓ "+pairs[i].en+" — "+pairs[i].vi);if(next.length===pairs.length)onComplete();}else setMessage("Chưa đúng. Nghe hoặc đọc lại ô đang chọn nhé.");}}>{pairs[i].vi}{solved.includes(i)?" ✓":""}</button>)}</div></div><p role="status">{message||"Đã nối "+solved.length+"/"+pairs.length+" cặp"}</p></div>;
+ const wrongStyle={background:"#ffe3e6",borderColor:"#ed5367",color:"#a82035",boxShadow:"0 0 0 2px #ed536722"};
+ function chooseRight(i:number){
+  if(wrong||solved.includes(i))return;
+  if(left===null){setMessage("Chọn ô bên trái trước nhé.");return;}
+  if(left===i){const next=[...solved,i];setSolved(next);setLeft(null);setMessage("✓ "+pairs[i].en+" — "+pairs[i].vi);if(next.length===pairs.length)onComplete();}
+  else{
+   setWrong({left,right:i});setMessage("Chưa đúng. Hãy thử lại nhé.");
+   wrongTimer.current=setTimeout(()=>{setWrong(null);setLeft(null);setMessage("Chọn lại ô tiếng Anh rồi chọn nghĩa phù hợp.");wrongTimer.current=null;},1000);
+  }
+ }
+ return <div><p className="si-tip">{task.kind==="audioMatch"?"Mỗi ô loa đọc một từ. Nghe rồi chọn nghĩa ở cột phải.":"Chọn từ tiếng Anh rồi chọn nghĩa tiếng Việt."}</p><div className="si-pairs"><div><h3>{task.kind==="audioMatch"?"Âm thanh":"Tiếng Anh"}</h3>{pairs.map((p,i)=><button type="button" aria-label={task.kind==="audioMatch"?"Nghe ô "+(i+1):p.en} disabled={solved.includes(i)||Boolean(wrong)} style={wrong?.left===i?wrongStyle:undefined} className={(!wrong&&left===i?"selected ":"")+(solved.includes(i)?"solved":"")} key={p.en} onClick={()=>{if(wrong)return;setLeft(i);if(task.kind==="audioMatch")say(p.en);}}>{task.kind==="audioMatch"?"🔊 Ô "+(i+1):<Gloss text={p.en} words={newWords}/>}{solved.includes(i)?" ✓":""}</button>)}</div><div><h3>Nghĩa tiếng Việt</h3>{right.map(i=><button type="button" key={pairs[i].en} disabled={solved.includes(i)||Boolean(wrong)} style={wrong?.right===i?wrongStyle:undefined} className={solved.includes(i)?"solved":""} onClick={()=>chooseRight(i)}>{pairs[i].vi}{solved.includes(i)?" ✓":""}</button>)}</div></div><p role="status">{message||"Đã nối "+solved.length+"/"+pairs.length+" cặp"}</p></div>;
 }
 function Exercise({task,newWords,onDone}:{task:Task;newWords:string[];onDone:(correct:boolean)=>void}){
  const [answer,setAnswer]=useState(""),[tiles,setTiles]=useState<number[]>([]),[checked,setChecked]=useState(false),[paired,setPaired]=useState(false),[listening,setListening]=useState(false),[error,setError]=useState("");
