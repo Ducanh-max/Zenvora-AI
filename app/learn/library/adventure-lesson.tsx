@@ -3,6 +3,8 @@ import {useEffect,useMemo,useRef,useState} from "react";
 import {ArrowLeft,ArrowRight,Lightbulb,Volume2,Mic,CheckCircle2,RotateCcw} from "lucide-react";
 import GuidedLessonTutor from "./guided-lesson-tutor";
 import MatchPairs from "./match-pairs";
+import SampleIntroLesson from "./sample-intro-lesson";
+import {SAMPLE_IDS} from "./sample-intro-content";
 type Word={word:string;meaning:string;example:string;pronunciation?:string};
 type ExampleTranslation={english:string;vietnamese:string};
 type Dialogue={speaker:string;english:string;vietnamese?:string};
@@ -169,7 +171,7 @@ function listeningSentence(lesson:{dialogue?:Dialogue[];examples?:ExampleTransla
  return unique.find(sentence=>!used.has(norm(sentence)))||unique[0];
 }
 
-export default function AdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];examples?:ExampleTranslation[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
+function LegacyAdventureLesson({lesson,onExit,onFinish}:{lesson:{id:string;title:string;words:Word[];dialogue?:Dialogue[];examples?:ExampleTranslation[];goal?:string;review?:boolean;test?:boolean};onExit:()=>void;onFinish:(correct:number,total:number)=>Promise<void>}){
  const activities=useMemo<Activity[]>(()=>{
   const words=lesson.words.filter(w=>w.word&&w.meaning).slice(0,lesson.review||lesson.test?10:5);if(!words.length)return[];
   const a:Activity[]=[];
@@ -366,4 +368,9 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
  .adv-exit-buttons button:focus-visible{outline:3px solid #78b2ff;outline-offset:3px}
  `}</style>
  </section>;
+}
+
+export default function AdventureLesson(props:Parameters<typeof LegacyAdventureLesson>[0]) {
+ const index=SAMPLE_IDS.indexOf(props.lesson.id);
+ return index>=0?<SampleIntroLesson lessonIndex={index} onExit={props.onExit} onFinish={props.onFinish}/>:<LegacyAdventureLesson {...props}/>;
 }

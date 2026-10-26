@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import LessonTutor from "./lesson-tutor";
 import LessonPractice from "./lesson-practice";
 import AdventureLesson from "./adventure-lesson";
+import {SAMPLE_IDS} from "./sample-intro-content";
 import "./course-design.css";
 import "./adventure-lesson.css";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -216,6 +217,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   // Four groups per section, each containing two source lessons, a review and a test.
   // The final group also incorporates the remaining source lessons.
   function makeSectionActivities(source: LibraryLesson[], sectionIndex: number): LibraryLesson[] {
+    if(source.length&&source.every(lesson=>SAMPLE_IDS.includes(lesson.id)))return source;
     const pairs = [[0,1],[2,3],[4,5],[6,7,8,9]];
     return pairs.flatMap((indices,groupIndex) => {
       const items=indices.map(i=>source[i]).filter((item):item is LibraryLesson=>Boolean(item));
@@ -246,7 +248,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     "grammar-in-action":["Nền tảng câu tiếng Anh","Thì và thời gian","Diễn đạt ý tưởng","Vận dụng ngữ pháp"],
     "confident-conversations":["Bắt đầu cuộc trò chuyện","Chia sẻ và hỏi đáp","Diễn đạt cảm xúc, ý kiến","Giao tiếp tự tin"]
   };
-  const sectionTitles = activeCourse ? sectionNames[activeCourse.slug] || [] : [];
+  const sampleCourse=courseLessons.some(lesson=>SAMPLE_IDS.includes(lesson.id));
+  const sectionTitles = sampleCourse?["Giới thiệu bản thân"]:activeCourse ? sectionNames[activeCourse.slug] || [] : [];
   if (activeCourse) {
     const totalWords=courseLessons.reduce((sum,lesson)=>sum+(lesson.content.vocabulary||[]).length,0);
     const courseImageFiles=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
@@ -258,7 +261,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const isLessonMap=activeCourse.is_free && selectedSection!==null;
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
-      {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ 4 phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
+      {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ {Math.ceil(courseLessons.length/10)} phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
       {sectionTransition!==null&&typeof document!=="undefined"&&createPortal(
         <div className="acd-section-transition" role="dialog" aria-modal="true" aria-label="Chúc mừng hoàn thành phần học" onClick={()=>setSectionTransition(null)} style={{position:"fixed",inset:0,zIndex:2147483647,display:"flex",alignItems:"center",justifyContent:"center",padding:16,boxSizing:"border-box",background:"rgba(9,30,75,.76)",overflowY:"auto"}}>
           <div className="acd-section-transition-card" onClick={event=>event.stopPropagation()} style={{boxSizing:"border-box",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,width:"min(420px, 100%)",maxWidth:420,maxHeight:"calc(100dvh - 32px)",overflowY:"auto",padding:"22px 20px",margin:"auto",borderRadius:24,background:"linear-gradient(145deg,#fff,#e7f5ff)",textAlign:"center",boxShadow:"0 20px 70px rgba(7,26,76,.35)"}}>
@@ -270,7 +273,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
           </div>
         </div>,document.body)}
 
-      {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH 16 BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
+      {isLessonMap && <div className="acd-lesson-map-heading"><span>✦ PHẦN {(selectedSection ?? 0)+1} · LỘ TRÌNH {sampleCourse?4:16} BÀI HỌC</span><h2>{sectionTitles[selectedSection ?? 0] || "Khám phá tiếng Anh"}</h2><p>Chọn một điểm trên bản đồ để bắt đầu hoặc ôn tập bài học.</p></div>}
       <div className={isMapView?"acd-world-map":isLessonMap?"acd-lesson-map-wrap":"acd-sections"}>{Array.from({length:Math.ceil(courseLessons.length/10)},(_,sectionIndex)=>{
         const sourceSectionLessons=courseLessons.slice(sectionIndex*10,sectionIndex*10+10);
         const sectionLessons=activeCourse.is_free?makeSectionActivities(sourceSectionLessons,sectionIndex):sourceSectionLessons;
@@ -281,7 +284,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
           
           <span className="acd-island-panel"><span className="acd-island-label">PHẦN {sectionIndex+1} · BÀI {sectionIndex*16+1}–{sectionIndex*16+sectionLessons.length}</span><strong>{sectionTitle}</strong><span className="acd-island-description">{sectionLessons[0]?.title} · {sectionLessons[sectionLessons.length-1]?.title}</span><span className="acd-island-progress"><span><i style={{width:(completed/sectionLessons.length*100)+"%"}}/></span><b>{completed}/{sectionLessons.length}</b></span><span className="acd-island-action">{completed===sectionLessons.length?"Ôn tập phần này":"Khám phá phần "+(sectionIndex+1)} →</span></span>
         </button>;
-        if(isLessonMap)return <section className="acd-lesson-map" key={sectionIndex} aria-label={"Bản đồ 16 bài học của phần "+(sectionIndex+1)}>
+        if(isLessonMap)return <section className="acd-lesson-map" key={sectionIndex} aria-label={"Bản đồ "+sectionLessons.length+" bài học của phần "+(sectionIndex+1)}>
           <svg className="acd-lesson-route" viewBox="0 0 1000 558" preserveAspectRatio="none" aria-hidden="true"><path className="acd-route-shadow" d="M130 178.56 L200 161.82 L270 156.24 L340 172.98 L680 189.72 L750 178.56 L820 189.72 L890 212.04 L830 362.7 L760 385.02 L690 407.34000000000003 L620 429.66 L380 412.92 L310 390.6 L240 368.28000000000003 L170 351.54"/><path className="acd-route-line" d="M130 178.56 L200 161.82 L270 156.24 L340 172.98 L680 189.72 L750 178.56 L820 189.72 L890 212.04 L830 362.7 L760 385.02 L690 407.34000000000003 L620 429.66 L380 412.92 L310 390.6 L240 368.28000000000003 L170 351.54"/></svg>
           <div className="acd-lesson-map-points">{sectionLessons.map((lesson,offset)=>{
             const finished=done.includes(lesson.slug);
