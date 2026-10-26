@@ -22,3 +22,11 @@
 .si-answer-hints>p{margin:0 0 10px;font-size:14px;color:#775727}
 .si-answer-hints>div{border-top:1px solid #eadfc9;padding:10px 0}
 .si-answer-hints p{font-size:14px;line-height:1.5;margin:5px 0}
+
+.si-answer button[draggable=true],.si-bank button[draggable=true]{cursor:grab;user-select:none}
+.si-answer button[draggable=true]:active,.si-bank button[draggable=true]:active{cursor:grabbing}
+.si-answer.si-drop-active{outline:2px dashed #8bace4;outline-offset:3px}
+.si-bank.si-drop-active{min-height:70px;border-radius:14px;outline:1px dashed #aac3e5;outline-offset:2px}
+.si-answer button.si-dragging{opacity:.35;border-color:#5394e0}
+.si-answer button:focus-visible,.si-bank button:focus-visible{outline:3px solid #75a9ef;outline-offset:3px}
+.si-gloss>[role=button]{cursor:inherit}

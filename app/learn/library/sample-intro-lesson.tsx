@@ -11,10 +11,10 @@ function Gloss({text,words}:{text:string;words:string[]}){
  const entries=vocabulary.filter(w=>words.includes(w.en)).sort((a,b)=>b.en.length-a.en.length);
  const [tip,setTip]=useState<{en:string;vi:string;left:number;top:number}|null>(null);
  const tooltipId=useId();
- useEffect(()=>{const close=()=>setTip(null);window.addEventListener("scroll",close,true);window.addEventListener("resize",close);return()=>{window.removeEventListener("scroll",close,true);window.removeEventListener("resize",close);};},[]);
+ useEffect(()=>{const close=()=>setTip(null);window.addEventListener("scroll",close,true);window.addEventListener("resize",close);window.addEventListener("dragstart",close,true);return()=>{window.removeEventListener("scroll",close,true);window.removeEventListener("resize",close);window.removeEventListener("dragstart",close,true);};},[]);
  function show(target:HTMLElement,en:string,vi:string){const rect=target.getBoundingClientRect();const width=Math.min(240,window.innerWidth-24);setTip({en,vi,left:Math.max(12,Math.min(rect.left,window.innerWidth-width-12)),top:Math.max(12,rect.bottom+90>window.innerHeight?rect.top-80:rect.bottom+8)});}
  if(!entries.length)return <>{text}</>;
- return <>{text.split(new RegExp("(\\b(?:"+entries.map(w=>w.en).join("|")+")\\b)","gi")).map((p,i)=>{const v=entries.find(w=>norm(w.en)===norm(p));return v?<span className="si-gloss" key={i}><span tabIndex={0} role="button" aria-label={p+" — "+v.vi} aria-describedby={tip?.en===p?tooltipId:undefined} onMouseEnter={event=>show(event.currentTarget,p,v.vi)} onMouseLeave={()=>setTip(null)} onFocus={event=>show(event.currentTarget,p,v.vi)} onClick={event=>{event.stopPropagation();show(event.currentTarget,p,v.vi);}} onKeyDown={event=>{if(event.key==="Escape"){setTip(null);return;}if(event.key==="Enter"||event.key===" "){event.preventDefault();event.stopPropagation();show(event.currentTarget,p,v.vi);}}} onBlur={()=>setTip(null)}>{p}</span></span>:<span key={i}>{p}</span>;})}{tip&&createPortal(<span id={tooltipId} role="tooltip" className="si-floating-meaning" style={{left:tip.left,top:tip.top}}><b>{tip.en}</b><span>{tip.vi}</span></span>,document.body)}</>;
+ return <>{text.split(new RegExp("(\\b(?:"+entries.map(w=>w.en).join("|")+")\\b)","gi")).map((p,i)=>{const v=entries.find(w=>norm(w.en)===norm(p));return v?<span className="si-gloss" key={i}><span tabIndex={0} role="button" aria-label={p+" — "+v.vi} aria-describedby={tip?.en===p?tooltipId:undefined} onMouseEnter={event=>show(event.currentTarget,p,v.vi)} onMouseLeave={()=>setTip(null)} onFocus={event=>show(event.currentTarget,p,v.vi)} onClick={event=>{show(event.currentTarget,p,v.vi);}} onKeyDown={event=>{if(event.key==="Escape"){setTip(null);return;}if(event.key==="Enter"||event.key===" "){event.preventDefault();show(event.currentTarget,p,v.vi);event.currentTarget.closest("button")?.click();}}} onBlur={()=>setTip(null)}>{p}</span></span>:<span key={i}>{p}</span>;})}{tip&&createPortal(<span id={tooltipId} role="tooltip" className="si-floating-meaning" style={{left:tip.left,top:tip.top}}><b>{tip.en}</b><span>{tip.vi}</span></span>,document.body)}</>;
 }
 const conversationHelp:Record<string,{vi:string;answers:{en:string;vi:string}[]}>={
  "Hello! What is your name?":{vi:"Xin chào! Bạn tên là gì?",answers:[{en:"Hello! My name is Linh.",vi:"Xin chào! Tên tôi là Linh."},{en:"Hi, I am Nam.",vi:"Chào bạn, tôi là Nam."}]},
@@ -32,6 +32,32 @@ function PairBoard({task,newWords,onComplete}:{task:Task;newWords:string[];onCom
 }
 function Exercise({task,newWords,onDone}:{task:Task;newWords:string[];onDone:(correct:boolean)=>void}){
  const [answer,setAnswer]=useState(""),[tiles,setTiles]=useState<number[]>([]),[checked,setChecked]=useState(false),[paired,setPaired]=useState(false),[listening,setListening]=useState(false),[error,setError]=useState("");
+ const draggedTile=useRef<number|null>(null),suppressClickUntil=useRef(0);
+ const [dragging,setDragging]=useState<number|null>(null);
+ function moveTile(id:number,targetId?:number,after=false){
+  if(checked)return;
+  setTiles(previous=>{
+   if(id===targetId)return previous;
+   const next=previous.filter(value=>value!==id);
+   const target=targetId===undefined?-1:next.indexOf(targetId);
+   next.splice(target<0?next.length:target+(after?1:0),0,id);
+   return next;
+  });
+ }
+ function startDrag(event:React.DragEvent<HTMLButtonElement>,id:number){
+  if(checked){event.preventDefault();return;}
+  draggedTile.current=id;setDragging(id);suppressClickUntil.current=Number.POSITIVE_INFINITY;
+  event.dataTransfer.effectAllowed="move";event.dataTransfer.setData("text/plain",String(id));
+ }
+ function endDrag(){draggedTile.current=null;setDragging(null);suppressClickUntil.current=Date.now()+250;}
+ function allowDrop(event:React.DragEvent<HTMLElement>){if(!checked&&draggedTile.current!==null){event.preventDefault();event.dataTransfer.dropEffect="move";}}
+ function dropTile(event:React.DragEvent<HTMLElement>,targetId?:number){
+  if(checked||draggedTile.current===null)return;
+  event.preventDefault();event.stopPropagation();
+  const rect=event.currentTarget.getBoundingClientRect();
+  moveTile(draggedTile.current,targetId,targetId!==undefined&&event.clientX>rect.left+rect.width/2);
+  endDrag();
+ }
  const recognition=useRef<{stop:()=>void}|null>(null);
  useEffect(()=>()=>{recognition.current?.stop();window.speechSynthesis?.cancel();},[]);
  const bank=useMemo(()=>{const a=shuffle(task.answer.split(/\s+/).map((word,id)=>({word,id})));if(a.length>1&&a.map(t=>t.word).join(" ")===task.answer)a.push(a.shift()!);return a;},[task.id]);
@@ -49,7 +75,7 @@ function Exercise({task,newWords,onDone}:{task:Task;newWords:string[];onDone:(co
  return <><div className="si-body"><h1><Gloss text={task.prompt} words={newWords}/></h1>{newWords.length>0&&<p className="si-tip">Từ màu hồng là từ mới · Rê chuột hoặc chạm để xem nghĩa</p>}
  {task.context&&<div className="si-context"><Gloss text={task.context} words={newWords}/></div>}
  {(task.kind==="listenOrder"||task.kind==="speak")&&<div className="si-audio">{task.kind==="speak"&&<p className="si-spoken"><Gloss text={task.answer} words={newWords}/></p>}<button type="button" onClick={()=>say(task.answer)}>🔊 {task.kind==="speak"?"Nghe mẫu":"Nghe câu"}</button><button type="button" onClick={()=>say(task.answer,true)}>🐢 Nghe chậm</button></div>}
- {isTiles&&<><div className="si-answer">{tiles.length?tiles.map(id=><button type="button" disabled={checked} key={id} onClick={()=>setTiles(a=>a.filter(v=>v!==id))}>{bank.find(t=>t.id===id)?.word}</button>):<span>Chọn các từ bên dưới để ghép câu</span>}</div><div className="si-bank">{bank.map(t=><div className="si-tile" key={t.id}><button type="button" disabled={checked||tiles.includes(t.id)} onClick={()=>setTiles(a=>[...a,t.id])}><Gloss text={t.word} words={newWords}/></button>{newWords.includes(t.word.toLowerCase())&&<span className="si-tile-meaning">{vocabulary.find(w=>w.en===t.word.toLowerCase())?.vi}</span>}</div>)}</div></>}
+ {isTiles&&<><p className="si-tip">Bấm bất kỳ chỗ nào trên thẻ hoặc kéo thả để ghép câu. Kéo các từ trong câu để đổi vị trí; kéo về khay để bỏ từ.</p><div className={"si-answer"+(dragging!==null?" si-drop-active":"")} aria-label="Câu trả lời, có thể kéo thả các từ" onDragOver={allowDrop} onDrop={event=>dropTile(event)}>{tiles.length?tiles.map((id,index)=><button type="button" draggable={!checked} disabled={checked} key={id} className={dragging===id?"si-dragging":""} onDragStart={event=>startDrag(event,id)} onDragEnd={endDrag} onDragOver={allowDrop} onDrop={event=>dropTile(event,id)} onKeyDown={event=>{if(!checked&&event.altKey&&(event.key==="ArrowLeft"||event.key==="ArrowRight")){event.preventDefault();const target=tiles[index+(event.key==="ArrowLeft"?-1:1)];if(target!==undefined)moveTile(id,target,event.key==="ArrowRight");}}} onClick={()=>{if(!checked&&Date.now()>suppressClickUntil.current)setTiles(a=>a.filter(v=>v!==id));}}><Gloss text={bank.find(t=>t.id===id)?.word||""} words={newWords}/></button>):<span>Chọn hoặc kéo các từ vào đây để ghép câu</span>}</div><div className={"si-bank"+(dragging!==null?" si-drop-active":"")} aria-label="Khay từ" onDragOver={allowDrop} onDrop={event=>{if(!checked&&draggedTile.current!==null){event.preventDefault();event.stopPropagation();const id=draggedTile.current;setTiles(previous=>previous.filter(value=>value!==id));endDrag();}}}>{bank.map(t=><div className="si-tile" key={t.id}><button type="button" draggable={!checked&&!tiles.includes(t.id)} disabled={checked||tiles.includes(t.id)} onDragStart={event=>startDrag(event,t.id)} onDragEnd={endDrag} onClick={()=>{if(!checked&&Date.now()>suppressClickUntil.current)moveTile(t.id);}}><Gloss text={t.word} words={newWords}/></button></div>)}</div></>}
  {options.length>0&&<div className="si-options">{options.map(o=><div className="si-option" key={o}><button type="button" disabled={checked} className={answer===o?"selected":""} onClick={()=>setAnswer(o)}><Gloss text={o} words={newWords}/></button>{newWords.includes(o.toLowerCase())&&<span className="si-tile-meaning">{vocabulary.find(w=>w.en===o.toLowerCase())?.vi}</span>}</div>)}</div>}
  {isPairs&&<PairBoard task={task} newWords={newWords} onComplete={()=>setPaired(true)}/>}
  {task.kind==="speak"&&<div className="si-record"><button type="button" disabled={checked||listening} onClick={record}>🎙️ {listening?"Đang nghe…":"Chạm để đọc lại"}</button><label>Đã nghe / nhập nếu không dùng được micro<input value={answer} disabled={checked} onChange={e=>setAnswer(e.target.value)} placeholder={task.answer.split(/\s+/).length>1?"Nhập cả câu tiếng Anh":"Nhập từ tiếng Anh"}/></label>{error&&<p role="alert">{error}</p>}</div>}
