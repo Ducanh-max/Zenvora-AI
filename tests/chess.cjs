@@ -126,3 +126,19 @@ const endedBack=backHarness(loss);endedBack.click('← Quay lại');assert.ok(en
 console.log('PASS: final move settles before king explosion/result cue, correct losing king both sides, draw without explosion, persistent final board, no result modal, and back after game.');
 
 assert.ok(!markup('play',loss,'idle').includes('Bạn thua!'),'never reveal defeat before the final move has landed');
+
+{
+ // Browser timer functions require their native receiver; injected test timers did not expose this.
+ let browserTasks=new Map(),nextBrowserTimer=0,phases=[],cues=[];
+ function browserSetTimeout(fn,ms){if(this&&typeof this.later==='function')throw TypeError('Illegal invocation');browserTasks.set(++nextBrowserTimer,{fn,ms});return nextBrowserTimer;}
+ function browserClearTimeout(id){if(this&&typeof this.cancel==='function')throw TypeError('Illegal invocation');browserTasks.delete(id);}
+ const browserEnding=load('lib/chess-ending.ts',{__globals:{setTimeout:browserSetTimeout,clearTimeout:browserClearTimeout}});
+ for(const result of [mate.result,loss.result,rep.result]){
+  phases=[];cues=[];const stop=browserEnding.scheduleChessEnding(result,'w',p=>phases.push(p),cue=>cues.push(cue));
+  assert.equal(browserTasks.size,2);for(const task of [...browserTasks.values()].sort((a,b)=>a.ms-b.ms))task.fn();
+  assert.equal(phases.join(','),'landing,burst,done');assert.equal(cues.length,1);stop();assert.equal(browserTasks.size,0);
+ }
+ const stopEarly=browserEnding.scheduleChessEnding(loss.result,'w',()=>{},()=>{throw Error('Cancelled ending played a cue');});stopEarly();assert.equal(browserTasks.size,0);
+ console.log('PASS: browser-native timer receiver, default scheduler path for win/loss/draw and early cleanup.');
+}
+

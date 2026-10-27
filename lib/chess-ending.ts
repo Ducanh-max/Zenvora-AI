@@ -5,7 +5,7 @@ export type EndingPhase="idle"|"landing"|"burst"|"done";
 export const FINAL_MOVE_SETTLE_MS=240;
 export const KING_BURST_MS=850;
 /** Finish the visible move before the king effect and result sound. */
-export function scheduleChessEnding(result:Result,player:Side|undefined,onPhase:(phase:EndingPhase)=>void,onCue:(cue:ChessCue)=>void,timers={later:setTimeout,cancel:clearTimeout}){
+export function scheduleChessEnding(result:Result,player:Side|undefined,onPhase:(phase:EndingPhase)=>void,onCue:(cue:ChessCue)=>void,timers={later:(fn:()=>void,ms:number)=>setTimeout(fn,ms),cancel:(id:ReturnType<typeof setTimeout>)=>clearTimeout(id)}){
  let active=true;
  onPhase("landing");
  const impact=timers.later(()=>{
