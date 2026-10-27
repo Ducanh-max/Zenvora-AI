@@ -34,3 +34,45 @@
 .si-gloss.is-known>[role=button]{color:inherit;font-weight:inherit;border-bottom:1px dotted #8ca4c4}
 .si-gloss.is-new>[role=button]{color:#d63d8f;font-weight:850;border-bottom:2px dotted #eb93c4}
 .si-screen>header>b{white-space:nowrap;font-size:14px}
+
+/* AUNORA field notes: an editorial experiment for lesson one only. */
+.an-experiment{background:#f4f2ec}
+.an-experiment .si-track{background:#e2dfd6}
+.an-experiment .si-track i{background:linear-gradient(90deg,#427f81,#95bcac)}
+.an-experiment .si-meta{color:#557678}
+.an-notebook{grid-row:3/-1;min-height:0;overflow:auto;padding:28px clamp(16px,4vw,48px) 38px;max-width:940px;width:100%;margin:0 auto;color:#254b4d;overscroll-behavior:contain;scrollbar-gutter:stable;background:#fffdf8;border:1px solid #dfded3;border-radius:4px 28px 4px 4px}
+.an-notebook h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(36px,4.7vw,58px);font-weight:500;letter-spacing:-.035em;line-height:1.06;margin:10px 0 18px}
+.an-notebook h2{font-size:18px;margin:0 0 12px;font-weight:750;letter-spacing:-.02em}
+.an-notebook p{line-height:1.6}
+.an-eyebrow{font-size:10px;letter-spacing:.18em;font-weight:800;color:#8d7465;margin-bottom:26px}
+.an-cover{position:relative;padding:4px 0 14px;border-bottom:1px solid #dfded3}
+.an-cover>p:first-of-type,.an-result-title p{font-size:11px;letter-spacing:.12em;font-weight:800;color:#8d7465}
+.an-orbit{float:right;width:90px;height:90px;border:1px solid #a9c5bb;border-radius:50%;display:grid;place-items:center;font-size:48px;color:#5c918b;background:#edf4ee;margin:8px}
+.an-lead{max-width:510px;font-size:18px;color:#57716b;margin-bottom:10px}
+.an-notebook section{margin-top:26px}
+.an-goals{display:flex;gap:8px;flex-wrap:wrap}
+.an-goals button{border:1px solid #cbd9d1;background:#fffdf8;color:#365f5a;padding:10px 14px;border-radius:9px;min-height:44px;font-size:14px}
+.an-goals button.is-chosen{background:#e4eee5;border-color:#5c8d7b;box-shadow:inset 0 0 0 1px #5c8d7b}
+.an-goals button:focus-visible,.an-action:focus-visible{outline:3px solid #79a5a0;outline-offset:3px}
+.an-plan{display:flex;gap:18px;flex-wrap:wrap;padding:18px 0;border-bottom:1px solid #dfded3;font-size:13px;color:#65756b}
+.an-plan b{font-size:19px;color:#345f5b;margin-right:4px}
+.an-caption{font-size:13px;color:#758176;line-height:1.6}
+.an-action{display:inline-block;background:#305c59;border:0;border-radius:10px;color:#fff;min-height:48px;padding:13px 20px;font-size:15px;font-weight:700;margin-top:10px;cursor:pointer}
+.an-action:disabled{opacity:.5}
+.an-result-title{display:flex;justify-content:space-between;gap:18px;align-items:center}
+.an-result-symbol{font-size:68px;color:#ba936a}
+.an-goal-note{font-size:14px;color:#6c7d71}
+.an-stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #dcded4;border-bottom:1px solid #dcded4;margin:22px 0}
+.an-stats>div{padding:18px 10px;border-right:1px solid #dcded4}.an-stats>div:last-child{border:0}
+.an-stats b{display:block;font:38px/1 Georgia,serif;color:#427e73;margin-bottom:8px}
+.an-stats span{font-size:12px;line-height:1.4;display:block;color:#768171}
+.an-capabilities{display:grid;gap:8px}.an-capabilities>div{display:flex;gap:13px;align-items:center}.an-capabilities span{font-size:11px;letter-spacing:.1em;color:#a3866b}.an-capabilities p{margin:2px 0;font-size:15px}
+.an-aivanta-note{display:flex;align-items:flex-start;gap:15px;background:#eaf0e5;border:1px solid #d7e3d0;border-radius:14px;padding:18px}
+.an-aivanta-note img{width:54px;height:60px;object-fit:contain;flex-shrink:0}
+.an-aivanta-note p{font-size:14px;margin:5px 0;color:#49684f}
+.an-aivanta-note .an-repair-note{font-size:13px;margin-top:10px}
+.an-sentences{display:grid;gap:0}.an-sentences>div{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid #e3e2d8}.an-sentences strong{font-size:17px}.an-sentences p{font-size:13px;margin:5px 0 0;color:#74806f}.an-sentences button{border:1px solid #d7ded0;background:transparent;border-radius:50%;width:44px;height:44px;flex-shrink:0}
+.an-next-step{padding:20px;background:#f4eee3;border-radius:13px}.an-next-step>p{font-size:14px;color:#857867;margin:0 0 14px}
+.an-save{padding-top:24px}.an-save>p{font-size:12px;color:#818879;margin:9px 0 0}
+@media(max-width:600px){.an-notebook{padding:22px 16px 30px;border-radius:4px 20px 4px 4px}.an-notebook h1{font-size:37px}.an-orbit{width:58px;height:58px;font-size:34px}.an-lead{font-size:16px}.an-stats>div{padding:14px 7px}.an-stats b{font-size:30px}.an-stats span{font-size:11px}.an-result-symbol{font-size:44px}.an-aivanta-note{padding:14px;gap:10px}.an-aivanta-note img{width:42px;height:48px}.an-action{width:100%;text-align:center}.an-goals button{font-size:13px}.an-plan{gap:12px}}
+@media(prefers-reduced-motion:reduce){.an-experiment .si-track i{transition:none}}
