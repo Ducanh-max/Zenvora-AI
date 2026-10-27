@@ -42,7 +42,7 @@ function LoginPageContent() {
       <form onSubmit={submit}><label htmlFor="login-email">Email</label><input id="login-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/><label htmlFor="login-password">Mật khẩu</label><input id="login-password" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Nhập mật khẩu"/>
         {error&&<div className="formerror" role="alert">{error}</div>}
         <button className="btn authsubmit" disabled={busy}>{busy?"Đang đăng nhập...":"Đăng nhập"}</button>
-      </form><div className="authswitch">Chưa có tài khoản? <Link href="/register">Đăng ký miễn phí</Link></div><p className="demo-note">Tài khoản được xác thực an toàn qua Supabase.</p>
+      </form><div className="authswitch"><Link href="/forgot-password">Quên mật khẩu?</Link></div><div className="authswitch">Chưa có tài khoản? <Link href="/register">Đăng ký miễn phí</Link></div><p className="demo-note">Tài khoản được xác thực an toàn qua Supabase.</p>
     </section><aside className="auth-mascot-panel"><div className="auth-mascot-glow"/><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta - gia sư AI của AUNORA"/><div className="auth-mascot-message"><span>✦ AUNORA AI TUTOR</span><strong>Xin chào, mình là Aivanta!</strong><p>Cùng học tiếng Anh mỗi ngày nhé! 💙</p></div></aside></div>
   </main>;
 }
@@ -55,3 +55,4 @@ export default function LoginPage() {
     </Suspense>
   );
 }
+
