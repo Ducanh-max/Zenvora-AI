@@ -91,3 +91,17 @@
  .si-body.si-checked .si-options{grid-template-columns:repeat(2,minmax(0,1fr))}
  .si-body.si-checked .si-context{font-size:18px;padding:10px 12px}
 }
+
+.si-previous-question{margin-left:12px;padding:7px 11px;border:1px solid #bacfe7;border-radius:9px;background:transparent;color:#315e8f;font-size:13px;min-height:36px}
+.si-question-history{width:min(820px,calc(100vw - 28px));max-height:calc(100dvh - 28px);overflow:auto;border:1px solid #d2e0ef;border-radius:20px;padding:22px;background:#f8fbff;color:#244574}
+.si-question-history::backdrop{background:#16375899;backdrop-filter:blur(3px)}
+.si-question-history header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.si-question-history h2{font-size:19px;margin:0}
+.si-question-history h3{font-size:23px;line-height:1.4}
+.si-question-history p{line-height:1.6}
+.si-question-history button{padding:9px 12px;min-height:40px;border:1px solid #b9cee8;border-radius:10px;color:#275a92;background:#fff;font:inherit;cursor:pointer}
+.si-question-history button:disabled{opacity:.4;cursor:default}
+.si-question-history nav{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.si-question-history .si-options span{padding:12px;border:1px solid #d1dff0;border-radius:12px;background:#fff}
+.si-question-history .si-options .si-history-selected{border-color:#3784d4;background:#e6f1ff}
+@media(max-width:600px){.si-previous-question{margin:8px 0 0}.si-question-history{padding:18px}.si-question-history .si-primary{width:100%}}

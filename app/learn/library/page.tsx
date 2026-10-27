@@ -51,7 +51,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <div className="library-summary"><b>{visibleCourses.length} khóa học · {visibleLessons.length} bài học</b><span>5 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
-      <LibraryClient courses={visibleCourses as import("./library-client").LibraryCourse[]} lessons={visibleLessons as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
+      <LibraryClient canReviewQuestions={user.app_metadata?.role==="admin"||user.app_metadata?.lesson_testing===true} courses={visibleCourses as import("./library-client").LibraryCourse[]} lessons={visibleLessons as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}
     <p className="library-footnote">Chọn khóa học phù hợp với mục tiêu của bạn và bắt đầu hành trình học tiếng Anh.</p>
   
 <style>{`

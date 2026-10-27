@@ -370,7 +370,7 @@ const finished=reviewMode?reviewIndex>=reviewQueue.length:step>=activities.lengt
  </section>;
 }
 
-export default function AdventureLesson(props:Parameters<typeof LegacyAdventureLesson>[0]) {
+export default function AdventureLesson(props:Parameters<typeof LegacyAdventureLesson>[0]&{canReviewQuestions?:boolean}) {
  const index=SAMPLE_IDS.indexOf(props.lesson.id);
- return index>=0?<SampleIntroLesson lessonIndex={index} onExit={props.onExit} onFinish={props.onFinish}/>:<LegacyAdventureLesson {...props}/>;
+ return index>=0?<SampleIntroLesson canReviewQuestions={props.canReviewQuestions} lessonIndex={index} onExit={props.onExit} onFinish={props.onFinish}/>:<LegacyAdventureLesson {...props}/>;
 }
