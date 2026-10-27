@@ -1,0 +1,57 @@
+.actions {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 20px;
+}
+.actions button {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid #435b7c;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  transition: background-color .15s, border-color .15s;
+}
+.resend {
+  flex: 1;
+  color: #dbe9ff;
+  background: #243952;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.resend:disabled {
+  color: #dbe9ff;
+  background: #243952;
+  border-color: #435b7c;
+  opacity: 1;
+  cursor: default;
+}
+.resend:not(:disabled):hover {
+  background: #304d70;
+  border-color: #9abaff;
+}
+.changeEmail {
+  color: #b9d5ff;
+  background: transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.changeEmail:not(:disabled):hover {
+  color: #edf4ff;
+  background: #243952;
+  border-color: #9abaff;
+}
+.changeEmail:disabled { opacity: .65; cursor: wait; }
+.actions button:focus-visible {
+  outline: 3px solid #a5c5ff;
+  outline-offset: 3px;
+}
+@media (max-width: 380px) {
+  .actions { flex-direction: column; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .actions button { transition: none; }
+}

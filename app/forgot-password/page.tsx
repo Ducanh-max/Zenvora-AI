@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import styles from "./recovery.module.css";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { RECOVERY_MESSAGE, recoveryError, verifyRecoveryCode } from "@/lib/password-recovery";
@@ -42,9 +43,10 @@ export default function ForgotPasswordPage() {
     {!sent ? <form onSubmit={send}><label htmlFor="recovery-email">Email đăng ký</label><input id="recovery-email" type="email" autoComplete="email" required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} disabled={busy}/><button className="btn authsubmit" disabled={busy || wait > 0}>{busy ? "Đang gửi…" : wait ? `Gửi lại sau ${wait} giây` : "Gửi email xác nhận"}</button></form> : <>
       <p>Kiểm tra hộp thư của <strong>{email}</strong>. Mở liên kết khôi phục trong email; nếu email có mã xác nhận, bạn cũng có thể nhập mã bên dưới.</p>
       <form onSubmit={verify}><label htmlFor="recovery-code">Mã xác nhận trong email</label><input id="recovery-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6,8}" minLength={6} maxLength={8} required value={code} onChange={event => setCode(event.target.value.replace(/\D/g, ""))} disabled={busy}/><button className="btn authsubmit" disabled={busy}>{busy ? "Đang xác nhận…" : "Xác nhận mã"}</button></form>
-      <div className="authswitch"><button type="button" disabled={busy || wait > 0} onClick={() => void send()}>{wait ? `Gửi lại sau ${wait} giây` : "Gửi lại email"}</button> <button type="button" disabled={busy} onClick={() => { setSent(false); setCode(""); setNotice(""); setError(""); }}>Đổi email</button></div>
+      <div className={styles.actions}><button className={styles.resend} type="button" disabled={busy || wait > 0} onClick={() => void send()}>{wait ? `Gửi lại sau ${wait} giây` : "Gửi lại email"}</button><button className={styles.changeEmail} type="button" disabled={busy} onClick={() => { setSent(false); setCode(""); setNotice(""); setError(""); }}>Đổi email</button></div>
     </>}
     {notice && <p role="status">{notice}</p>}{error && <p className="formerror" role="alert">{error}</p>}
   </section></main>;
 }
+
 
