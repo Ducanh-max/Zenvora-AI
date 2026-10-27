@@ -12,3 +12,33 @@
 /* Deepen piece shading while keeping ivory and black sides distinct. */
 .ch-piece-image,.ch-promotions img{--ch-piece-tone:brightness(.88) contrast(1.22) saturate(1.08)}
 .ch-promotions img{filter:var(--ch-piece-tone) drop-shadow(0 2px 2px #0008)}
+
+/* Keep the board large with match details alongside it. */
+.ch-game-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;align-items:start;gap:18px;width:min(100%,calc(100dvh + 220px));min-height:0;flex-shrink:0}
+.ch-game-layout .ch-arena,.ch-game-layout .cm-arena{width:100%;max-width:none;margin:0}
+.ch-game-info{color:#e7efff;background:#10243d;border:1px solid #314b6a;border-radius:14px;overflow:hidden;font-family:Arial,sans-serif;font-size:14px;min-width:0}
+.ch-game-info h2{font-size:14px;color:#bfd0e6;margin:0 0 8px}
+.ch-turn{margin:0;padding:17px 14px;background:#1b395b;font-weight:700;line-height:1.5;border-bottom:2px solid #e5c580}
+.ch-turn-b{border-bottom-color:#738ca9}
+.ch-captures{display:grid;gap:14px;padding:16px;border-bottom:1px solid #314b6a}
+.ch-captured-pieces{display:flex;align-items:center;flex-wrap:wrap;min-height:30px;gap:1px}
+.ch-captured-pieces img{width:27px;height:31px;object-fit:contain;filter:brightness(.88) contrast(1.22) drop-shadow(0 1px 1px #0009)}
+.ch-empty{font-size:13px;color:#aebfd3;margin:8px 0}
+.ch-move-history{padding:16px}
+.ch-move-scroll{max-height:max(100px,calc(100dvh - 440px));overflow:auto;overscroll-behavior:contain;scrollbar-color:#627d9e #10243d}
+.ch-move-scroll:focus-visible{outline:2px solid #d8b367;outline-offset:3px}
+.ch-move-history table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;text-align:left}
+.ch-move-history th,.ch-move-history td{padding:9px 8px;font-size:14px}
+.ch-move-history thead{color:#acc2dd}
+.ch-move-history tbody tr:nth-child(odd){background:#182f4a}
+.ch-move-history tbody th{color:#9eb4ce;font-weight:400}
+.ch-move-history .ch-latest-move{background:#405b74;color:#ffe2a0;font-weight:700}
+.ch-playing .ch-play-header,.cm-playing .cm-play-actions{width:min(100%,calc(100dvh + 220px));max-width:none}
+@media(max-width:900px){.ch-game-layout{grid-template-columns:minmax(0,1fr);width:min(100%,calc(100dvh - 88px));gap:12px}.ch-game-info{display:grid;grid-template-columns:1fr 1fr}.ch-turn{grid-column:1/-1}.ch-captures{border-bottom:0;border-right:1px solid #314b6a}.ch-move-scroll{max-height:180px}.ch-playing,.cm.cm-playing:has(.ch-game-layout){justify-content:flex-start;overflow-y:auto}.ch-game-layout .ch-arena,.ch-game-layout .cm-arena{width:100%}}
+@media(max-width:480px){.ch-game-info{grid-template-columns:1fr}.ch-captures{grid-template-columns:1fr 1fr;border-right:0;border-bottom:1px solid #314b6a}.ch-game-layout{width:100%}}
+
+.ch-game-layout:has(.ch-arena-review){width:min(100%,calc(100dvh + 130px))}
+@media(max-width:900px){.ch-game-layout:has(.ch-arena-review){width:min(100%,calc(100dvh - 175px))}}
+@media(max-width:480px){.ch-game-layout:has(.ch-arena-review){width:100%}}
+
+.ch-captured-pieces img{box-sizing:border-box;padding:2px;background:#bccbdf;border-radius:3px}
