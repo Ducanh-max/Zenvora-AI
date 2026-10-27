@@ -5,3 +5,7 @@ out
 !.env.example
 .vercel
 *.tsbuildinfo
+
+vendor/stockfish/stockfish-*.js
+vendor/stockfish/stockfish-*.wasm
+vendor/stockfish/*.tmp

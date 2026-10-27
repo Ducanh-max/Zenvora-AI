@@ -42,3 +42,13 @@
 @media(max-width:480px){.ch-game-layout:has(.ch-arena-review){width:100%}}
 
 .ch-captured-pieces img{box-sizing:border-box;padding:2px;background:#bccbdf;border-radius:3px}
+
+/* Move persistent piece layers rather than remounting images in grid cells. */
+.ch-board{position:relative}
+.ch-piece-layer{position:absolute;inset:0;pointer-events:none;z-index:1}
+.ch-moving-piece{position:absolute;top:0;left:0;width:12.5%;height:12.5%;pointer-events:none;transition:transform 160ms cubic-bezier(.2,.7,.2,1)}
+.ch-moving-piece .ch-piece-image{filter:var(--ch-piece-tone) drop-shadow(0 2px 2px #000b)}
+.ch-checked-piece .ch-piece-image{filter:var(--ch-piece-tone) drop-shadow(0 0 7px #ff1919) drop-shadow(0 2px 2px #0009)}
+.ch-piece-layer~.ch-rank,.ch-piece-layer~.ch-file{z-index:2}
+@media(prefers-reduced-motion:reduce){.ch-moving-piece{transition:none}}
+

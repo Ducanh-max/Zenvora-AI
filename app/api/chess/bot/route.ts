@@ -3,7 +3,7 @@ import {createClient as adminClient} from "@supabase/supabase-js";
 import {createClient} from "@/lib/supabase/server";
 import {legal} from "@/lib/chess-engine";
 import {newMatch,chargeClock,playMove,type Difficulty} from "@/lib/chess-match";
-import {chooseAi} from "@/lib/chess-ai";
+import {chooseStockfishMove} from "@/lib/chess-stockfish";
 import {signTicket,readTicket,type BotTicket} from "@/lib/chess-ticket";
 export const runtime="nodejs";
 export const maxDuration=30;
@@ -26,7 +26,7 @@ export async function POST(request:Request){
      if(game.match.position.turn!=="w")return NextResponse.json({error:"Chưa đến lượt bạn."},{status:400});
      const move=legal(game.match.position).find(m=>m.from===body.from&&m.to===body.to&&(m.promotion||"")===(body.promotion||""));if(!move)return NextResponse.json({error:"Nước đi không hợp lệ."},{status:400});
      game.match=playMove(game.match,move);
-     if(!game.match.result){const response=chooseAi(game.match.position,game.difficulty);if(response)game.match=playMove(game.match,response);}
+     if(!game.match.result){const response=await chooseStockfishMove(game.match.position,game.difficulty,request.signal);if(response)game.match=playMove(game.match,response);}
     }
    }
   }
