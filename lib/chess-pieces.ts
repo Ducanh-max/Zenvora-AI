@@ -15,5 +15,5 @@ export function locateChessPieces(position:Position):LocatedPiece[]{
   }
   board[to]=m[3]?(white?m[3]:m[3].toLowerCase()):piece;ids[to]=ids[from];board[from]=".";ids[from]=null;
  }
- return position.board.flatMap((piece,square)=>piece==="."?[]:[{piece,square,id:board[square]===piece&&ids[square]?ids[square]!:"snapshot-"+piece+"-"+square}]);
+ return position.board.flatMap((piece,square)=>piece==="."?[]:[{piece,square,id:board[square]===piece&&ids[square]?ids[square]!:"snapshot-"+piece+"-"+square}]).sort((a,b)=>a.id.localeCompare(b.id));
 }

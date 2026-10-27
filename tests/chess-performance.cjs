@@ -11,7 +11,7 @@ const idx=x=>(8-Number(x[1]))*8+"abcdefgh".indexOf(x[0]);
 function move(p,from,to,promotion){const m=e.legal(p).find(m=>m.from===idx(from)&&m.to===idx(to)&&m.promotion===promotion);assert.ok(m,from+to);return e.execute(p,m);}
 function pieceAt(p,square){return locateChessPieces(p).find(x=>x.square===idx(square));}
 (async()=>{
- let p=e.start(),pawn=pieceAt(p,"e2").id;p=move(p,"e2","e4");assert.equal(pieceAt(p,"e4").id,pawn,"local optimistic move keeps the same image identity");const snapshot=JSON.parse(JSON.stringify(p));assert.equal(pieceAt(snapshot,"e4").id,pawn,"server echo keeps identity without a snap");
+ let p=e.start(),pawn=pieceAt(p,"e2").id;p=move(p,"e2","e4");assert.equal(pieceAt(p,"e4").id,pawn,"local optimistic move keeps the same image identity");assert.equal(locateChessPieces(p).map(x=>x.id).join(),locateChessPieces(e.start()).map(x=>x.id).join(),"moving pieces keep DOM order as well as keys");const snapshot=JSON.parse(JSON.stringify(p));assert.equal(pieceAt(snapshot,"e4").id,pawn,"server echo keeps identity without a snap");
  p=move(p,"d7","d5");p=move(p,"e4","d5");assert.equal(pieceAt(p,"d5").id,pawn);assert.equal(locateChessPieces(p).length,31);
  let castle=e.start();for(const [a,b] of [["g1","f3"],["g8","f6"],["g2","g3"],["g7","g6"],["f1","g2"],["f8","g7"]])castle=move(castle,a,b);
  const king=pieceAt(castle,"e1").id,rook=pieceAt(castle,"h1").id;castle=move(castle,"e1","g1");assert.equal(pieceAt(castle,"g1").id,king);assert.equal(pieceAt(castle,"f1").id,rook);
