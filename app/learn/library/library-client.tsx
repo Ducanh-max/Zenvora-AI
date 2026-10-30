@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import LessonTutor from "./lesson-tutor";
 import LessonPractice from "./lesson-practice";
 import AdventureLesson from "./adventure-lesson";
+import ScheduledReview from "./scheduled-review";
 import {SAMPLE_IDS} from "./sample-intro-content";
 import "./course-design.css";
 import "./adventure-lesson.css";
@@ -260,7 +261,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const isMapView=activeCourse.is_free && selectedSection===null;
     const isLessonMap=activeCourse.is_free && selectedSection!==null;
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
-      <button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại 4 phần":"Tất cả khóa học"}</button>
+      <ScheduledReview refresh={done.length}/><button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại các chủ đề":"Tất cả khóa học"}</button>
       {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ {Math.ceil(courseLessons.length/10)} phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
       {sectionTransition!==null&&typeof document!=="undefined"&&createPortal(
         <div className="acd-section-transition" role="dialog" aria-modal="true" aria-label="Chúc mừng hoàn thành phần học" onClick={()=>setSectionTransition(null)} style={{position:"fixed",inset:0,zIndex:2147483647,display:"flex",alignItems:"center",justifyContent:"center",padding:16,boxSizing:"border-box",background:"rgba(9,30,75,.76)",overflowY:"auto"}}>
@@ -294,8 +295,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
           })}</div>
           <div className={"acd-car-marker"+(carArriving?" is-driving":"")+(carPhase==="entering"?" is-entering":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/images/aunora/learning-parts/vehicles/aivanta-car.png" alt="Aivanta lái xe"/></div>
           {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span><img src="/brand/wolf-face/aivanta-face.png" alt="" style={{width:27,height:27,objectFit:"contain",verticalAlign:"middle",marginRight:7}}/>{done.includes(arrivedLesson.slug)?"Ôn tập kiến thức đã học!":"Aivanta đã đến bài tiếp theo!"}</span><h3>{arrivedLesson.title}</h3><p>⭐ {done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP":"Hoàn thành bài học · +10 EXP"}</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>{done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP →":"Bắt đầu · +10 EXP →"}</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
-          <div className="acd-lesson-chests">{[0,1,2,3].map(group=>{const cleared=sectionLessons.slice(group*4,group*4+4).every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành 4 bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
-          <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · 4 rương phần thưởng</strong></div>
+          <div className="acd-lesson-chests">{Array.from({length:Math.ceil(sectionLessons.length/4)},(_,group)=>group).map(group=>{const groupLessons=sectionLessons.slice(group*4,group*4+4);const cleared=groupLessons.length>0&&groupLessons.every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành nhóm bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
+          <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · {Math.ceil(sectionLessons.length/4)} rương phần thưởng</strong></div>
         </section>;
         return <section className="acd-section" key={sectionIndex}>
           <header className="acd-section-heading"><div><span className="acd-section-kicker">✦ PHẦN {sectionIndex+1} · BÀI {sectionIndex*10+1}–{sectionIndex*10+sectionLessons.length}</span><h2>{sectionTitle}</h2><p>{sectionLessons[0]?.title}{sectionLessons.length>1?" · "+sectionLessons[sectionLessons.length-1].title:""}</p></div><strong>{completed}/{sectionLessons.length} bài · {Math.round(completed/sectionLessons.length*100)}%</strong></header>
@@ -311,7 +312,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const coursePictures = ["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
   const courseNames = ["English Starter","Everyday English","English for Travel","Grammar in Action","Confident Conversations"];
   const courseSummaries = ["Xây nền tảng từ vựng và câu giao tiếp hằng ngày.","Giao tiếp tự nhiên trong những tình huống quen thuộc hằng ngày.","Tự tin sử dụng tiếng Anh tại sân bay, khách sạn và khi khám phá địa điểm mới.","Hiểu và vận dụng ngữ pháp qua ví dụ, hội thoại và tình huống thực tế.","Diễn đạt ý kiến, cảm xúc và xử lý các cuộc trò chuyện dài hơn."];
-  return <><h2 className="library-courses-title">Tất cả khóa học</h2><section className="aunora-library-showcase">{courses.map((course,index) => {
+  return <><ScheduledReview refresh={done.length}/><h2 className="library-courses-title">Khóa học và nội dung sắp ra mắt</h2><section className="aunora-library-showcase">{courses.map((course,index) => {
     const courseLessonsForCard = lessons.filter(lesson => lesson.course_id === course.id);
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
     const feature = index < 3;
@@ -320,7 +321,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
       <div className="als-info"><div className="als-info-top"><h2>{courseNames[index]||course.title}</h2><span className="als-symbol">{["🌱","♧","✈","▤","☏"][index%5]}</span></div>
       <p>{courseSummaries[index]||course.description}</p>
       <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>
-      <button type="button" onClick={()=>{setSelectedSection(null);setSelectedCourseSlug(course.slug)}}>Khám phá khóa học <ArrowRight size={17}/></button></div>
+      <button type="button" disabled={!courseLessonsForCard.length} onClick={()=>{setSelectedSection(null);setSelectedCourseSlug(course.slug)}}>{courseLessonsForCard.length?"Vào học":"Đang xây dựng"} <ArrowRight size={17}/></button></div>
     </article>;
   })}</section></>;
 }

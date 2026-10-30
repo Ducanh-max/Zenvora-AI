@@ -105,3 +105,7 @@
 .si-question-history .si-options span{padding:12px;border:1px solid #d1dff0;border-radius:12px;background:#fff}
 .si-question-history .si-options .si-history-selected{border-color:#3784d4;background:#e6f1ff}
 @media(max-width:600px){.si-previous-question{margin:8px 0 0}.si-question-history{padding:18px}.si-question-history .si-primary{width:100%}}
+
+.si-review-card{max-width:1380px;margin:14px auto;padding:18px 22px;border:1px solid #83aaa3;border-radius:16px;background:#f2f5ed;color:#234b49}.si-review-card h2{margin:0 0 8px;font-size:21px;color:inherit}.si-review-card p{margin:8px 0}.si-review-card button{padding:10px 16px;border:0;border-radius:10px;background:#315b57;color:white;cursor:pointer}
+.si-record input{display:block;width:100%;box-sizing:border-box;padding:14px;margin-top:10px;border:1px solid #9bb6cc;border-radius:12px;font:inherit;color:#173c72;background:white}
+.als-info button:disabled{background:#798390;cursor:default;box-shadow:none}

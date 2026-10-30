@@ -47,8 +47,8 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
     <section className="library-heading">
       <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH CỦA BẠN</div><img className="library-aivanta" src="/brand/aivanta-mascot.webp.png" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
-      <p>Chọn một khóa học phù hợp với mục tiêu của bạn. Mỗi khóa học đều có bài học, luyện tập, bài kiểm tra và AI Tutor đồng hành cùng bạn.</p>
-      <div className="library-summary"><b>{visibleCourses.length} khóa học · {visibleLessons.length} bài học</b><span>5 khóa học miễn phí · Bắt đầu học ngay hôm nay</span><span>15 câu kiểm tra cho mỗi bài trong giai đoạn thử nghiệm.</span></div>
+      <p>Bản thử nghiệm hiện có chủ đề Giới thiệu bản thân gồm 4 bài. Các khóa khác đang được xây dựng.</p>
+      <div className="library-summary"><b>{visibleCourses.filter(course=>visibleLessons.some(lesson=>lesson.course_id===course.id)).length} khóa có nội dung · {visibleLessons.length} bài học</b><span>Chủ đề mẫu: Giới thiệu bản thân</span><span>Bài 1–3: 10 hoạt động + 2 câu Aivanta · Bài 4: 12 hoạt động ôn tập.</span></div>
     </section>
     {coursesError || lessonsError ? <div className="lesson-alert">Không thể tải danh sách khóa học. Hãy kiểm tra quyền đọc các bảng zenvora_courses và zenvora_lessons trong Supabase.</div> :
       <LibraryClient canReviewQuestions={user.app_metadata?.role==="admin"||user.app_metadata?.lesson_testing===true} courses={visibleCourses as import("./library-client").LibraryCourse[]} lessons={visibleLessons as LibraryLesson[]} progress={(progress || []) as {lesson_id:string;completed:boolean;score:number;total_questions:number}[]} quizSize={plan.quizSize} initialCourseSlug={params?.course} />}

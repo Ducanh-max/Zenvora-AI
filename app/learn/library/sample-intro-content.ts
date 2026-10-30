@@ -1,5 +1,5 @@
 export type Vocab={en:string;vi:string};
-export type Task={id:string;kind:"translate"|"dialogue"|"order"|"listenOrder"|"match"|"speak"|"audioMatch";prompt:string;answer:string;vi:string;options?:string[];context?:string;contextVi?:string;pairs?:Vocab[];note:string};
+export type Task={id:string;kind:"translate"|"dialogue"|"order"|"listenOrder"|"match"|"speak"|"audioMatch"|"write";prompt:string;answer:string;vi:string;options?:string[];context?:string;contextVi?:string;pairs?:Vocab[];note:string;accepted?:string[];stage?:number};
 export const SAMPLE_IDS=["70a11000-0000-4000-8000-000000000001","70a11000-0000-4000-8000-000000000002","70a11000-0000-4000-8000-000000000003","70a11000-0000-4000-8000-000000000004"];
 export const vocabulary:Vocab[]=[{en:"good morning",vi:"chào buổi sáng"},{en:"good evening",vi:"chào buổi tối"},{en:"welcome",vi:"chào mừng"},{en:"thank you",vi:"cảm ơn bạn"},{en:"hello",vi:"xin chào"},{en:"name",vi:"tên"},{en:"my",vi:"của tôi"},{en:"your",vi:"của bạn"},{en:"meet",vi:"gặp"},{en:"nice",vi:"vui; tốt đẹp"},{en:"years old",vi:"tuổi"},{en:"from",vi:"đến từ"},{en:"live",vi:"sống"},{en:"student",vi:"học sinh"},{en:"like",vi:"thích"},{en:"reading",vi:"đọc sách"},{en:"music",vi:"âm nhạc"},{en:"football",vi:"bóng đá"},{en:"friend",vi:"bạn"}];
 const task=(id:string,kind:Task["kind"],prompt:string,answer:string,vi:string,note:string,extra:Partial<Task>={}):Task=>({id,kind,prompt,answer,vi,note,...extra});
@@ -7,15 +7,15 @@ const greetings=[{en:"hello",vi:"xin chào"},{en:"name",vi:"tên"},{en:"friend",
 const personal=[{en:"student",vi:"học sinh"},{en:"from",vi:"đến từ"},{en:"live",vi:"sống"},{en:"years old",vi:"tuổi"}];
 const hobbies=[{en:"reading",vi:"đọc sách"},{en:"music",vi:"âm nhạc"},{en:"football",vi:"bóng đá"},{en:"like",vi:"thích"}];
 export const sampleLessons=[
- {title:"Lời chào và tên của bạn",newWords:["hello","name","my","your","meet","nice","friend","good morning","good evening","welcome","thank you"],questions:["Hello! What is your name?","Nice to meet you! How do you greet a new friend?"],tasks:[
+ {title:"Lời chào và tên của bạn",newWords:["hello","name","my","your","meet","nice","friend","good morning","good evening","welcome","thank you"],questions:["Hello! What is your name?","You meet a new friend. Greet them, introduce yourself, and ask their name."],tasks:[
  task("1a","translate","“Hello” có nghĩa là gì?","Xin chào","Xin chào","Dùng Hello để chào người khác.",{options:["Xin chào","Tạm biệt","Cảm ơn"]}),
  task("1b","order","Ghép câu: Tên tôi là Linh.","My name is Linh","Tên tôi là Linh.","My name is + tên là cách giới thiệu tên."),
  task("1c","dialogue","Điền từ còn thiếu trong lời giới thiệu.","name","tên","My name is… nghĩa là Tên tôi là…",{context:"A: What is your name?\nB: My ___ is Linh.",contextVi:"A: Bạn tên là gì?\nB: Tên tôi là Linh.",options:["name","meet","hello"]}),
  task("1d","listenOrder","Nghe rồi ghép lại lời chào đón.","Good morning and welcome","Chào buổi sáng và chào mừng bạn.","Good morning dùng để chào buổi sáng; welcome là lời chào đón."),
  task("1e","match","Nối từ với nghĩa tiếng Việt.","","","Ghép đúng từng từ và nghĩa.",{pairs:greetings}),
  task("1f","translate","Chọn cách nói “cảm ơn bạn”.","thank you","cảm ơn bạn","Thank you là cách nói cảm ơn lịch sự.",{options:["thank you","goodbye","hello"]}),
- task("1g","dialogue","Hoàn thành lời chào khi gặp bạn mới.","meet","gặp","Nice to meet you là cách chào khi mới gặp.",{context:"A: Hello, I am Mai.\nB: Nice to ___ you.",contextVi:"A: Xin chào, tôi là Mai.\nB: Rất vui được gặp bạn.",options:["meet","name","my"]}),
- task("1h","order","Ghép câu: Rất vui được gặp bạn.","Nice to meet you","Rất vui được gặp bạn.","Nice to meet you được dùng trong lần gặp đầu."),
+ task("1g","dialogue","Hoàn thành lời chào khi gặp bạn mới.","meet","gặp","Nice to meet you là cách chào khi mới gặp.",{context:"A: Hello, I am Mai.\nB: Nice to ___ you.",contextVi:"A: Xin chào, tôi là Mai.\nB: Rất vui được gặp bạn.",stage:2}),
+ task("1h","write","Tự viết: Rất vui được gặp bạn.","Nice to meet you","Rất vui được gặp bạn.","Nice to meet you được dùng trong lần gặp đầu.",{stage:3,accepted:["It is nice to meet you","It’s nice to meet you"]}),
  task("1i","listenOrder","Nghe và xếp lại lời chào buổi tối.","Good evening my friend","Chào buổi tối, bạn của tôi.","Good evening dùng khi chào ai đó vào buổi tối."),
  task("1j","translate","“This is my friend Mai” có nghĩa là gì?","Đây là bạn Mai của tôi","Đây là bạn Mai của tôi","This is… dùng để giới thiệu một người khác.",{options:["Đây là bạn Mai của tôi","Tên tôi là Mai","Tôi gặp Mai"]})
  ]},
@@ -27,8 +27,8 @@ export const sampleLessons=[
  task("2e","listenOrder","Nghe rồi ghép lại câu.","I am a student","Tôi là học sinh.","Dùng a trước danh từ số ít student."),
  task("2f","speak","Nghe và đọc lại cả câu.","I am from Vietnam","Tôi đến từ Việt Nam.","From diễn tả nơi xuất thân."),
  task("2g","match","Nối các từ về bản thân.","","","Mỗi cụm từ có một nghĩa tương ứng.",{pairs:personal}),
- task("2h","dialogue","Hoàn thành câu nói về tuổi.","old","tuổi","Years old đi sau số tuổi.",{context:"A: How old are you?\nB: I am twelve years ___.",contextVi:"A: Bạn bao nhiêu tuổi?\nB: Tôi mười hai tuổi.",options:["old","from","live"]}),
- task("2i","order","Ghép câu: Tôi sống ở Hà Nội và tôi là học sinh.","I live in Hanoi and I am a student","Tôi sống ở Hà Nội và tôi là học sinh.","And nối thông tin về nơi sống và việc học."),
+ task("2h","dialogue","Hoàn thành câu nói về tuổi.","old","tuổi","Years old đi sau số tuổi.",{context:"A: How old are you?\nB: I am twelve years ___.",contextVi:"A: Bạn bao nhiêu tuổi?\nB: Tôi mười hai tuổi.",stage:2}),
+ task("2i","write","Tự viết: Tôi sống ở Hà Nội và tôi là học sinh.","I live in Hanoi and I am a student","Tôi sống ở Hà Nội và tôi là học sinh.","And nối thông tin về nơi sống và việc học.",{stage:3,accepted:["I am a student and I live in Hanoi","I live in Hanoi and I’m a student"]}),
  task("2j","translate","“Where are you from?” có nghĩa là gì?","Bạn đến từ đâu?","Bạn đến từ đâu?","Where hỏi về nơi chốn.",{options:["Bạn đến từ đâu?","Bạn thích gì?","Bạn tên là gì?"]})
  ]},
  {title:"Sở thích và kết bạn",newWords:["like","reading","music","football"],questions:["What do you like doing in your free time?","Tell your new friend one thing about yourself."],tasks:[
@@ -39,9 +39,9 @@ export const sampleLessons=[
  task("3e","translate","“reading” có nghĩa là gì?","đọc sách","đọc sách","Reading diễn tả hoạt động đọc.",{options:["đọc sách","hát","chạy"]}),
  task("3f","listenOrder","Nghe rồi xếp lại câu về sở thích.","I like music and reading","Tôi thích âm nhạc và đọc sách.","And nối hai sở thích trong cùng câu."),
  task("3g","audioMatch","Nghe và tìm nghĩa đúng của mỗi ô.","","","Nghe kỹ từng từ rồi chọn nghĩa tương ứng.",{pairs:[{en:"name",vi:"tên"},{en:"student",vi:"học sinh"},{en:"friend",vi:"bạn"},{en:"hello",vi:"xin chào"}]}),
- task("3h","dialogue","Điền hoạt động phù hợp.","reading","đọc sách","Like reading nghĩa là thích đọc sách.",{context:"A: Do you like books?\nB: Yes, I like ___.",contextVi:"A: Bạn có thích sách không?\nB: Có, tôi thích đọc sách.",options:["reading","from","old"]}),
+ task("3h","dialogue","Điền hoạt động phù hợp.","reading","đọc sách","Like reading nghĩa là thích đọc sách.",{context:"A: Do you like books?\nB: Yes, I like ___.",contextVi:"A: Bạn có thích sách không?\nB: Có, tôi thích đọc sách.",stage:2}),
  task("3i","speak","Nghe và đọc lại từ.","music","âm nhạc","Music là âm nhạc."),
- task("3j","translate","Chọn câu nói “Tôi thích chơi bóng đá”.","I like playing football","Tôi thích chơi bóng đá.","Like playing football là thích chơi bóng đá.",{options:["I like playing football","I am from Vietnam","My name is Nam"]})
+ task("3j","write","Tự viết: Tôi thích chơi bóng đá.","I like playing football","Tôi thích chơi bóng đá.","Like playing football là thích chơi bóng đá.",{stage:3,accepted:["I like football","I enjoy playing football"]})
  ]},
  {title:"Ôn tập: Tự tin giới thiệu bản thân",newWords:[],questions:[],tasks:[
  task("4a","translate","“My name is Linh” có nghĩa là gì?","Tên tôi là Linh","Tên tôi là Linh","My name is… dùng để giới thiệu tên.",{options:["Tên tôi là Linh","Tôi đến từ Linh","Bạn tên là Linh"]}),
