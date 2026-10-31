@@ -1,5 +1,5 @@
 export type Vocab={en:string;vi:string};
-export type Task={id:string;kind:"translate"|"dialogue"|"order"|"listenOrder"|"match"|"speak"|"audioMatch"|"write";prompt:string;answer:string;vi:string;options?:string[];context?:string;contextVi?:string;pairs?:Vocab[];note:string;accepted?:string[];stage?:number};
+export type Task={id:string;kind:"translate"|"dialogue"|"order"|"listenOrder"|"match"|"speak"|"audioMatch"|"write"|"introWrite";prompt:string;answer:string;vi:string;options?:string[];context?:string;contextVi?:string;pairs?:Vocab[];note:string;accepted?:string[];stage?:number};
 export const SAMPLE_IDS=["70a11000-0000-4000-8000-000000000001","70a11000-0000-4000-8000-000000000002","70a11000-0000-4000-8000-000000000003","70a11000-0000-4000-8000-000000000004"];
 export const vocabulary:Vocab[]=[{en:"good morning",vi:"chào buổi sáng"},{en:"good evening",vi:"chào buổi tối"},{en:"welcome",vi:"chào mừng"},{en:"thank you",vi:"cảm ơn bạn"},{en:"hello",vi:"xin chào"},{en:"name",vi:"tên"},{en:"my",vi:"của tôi"},{en:"your",vi:"của bạn"},{en:"meet",vi:"gặp"},{en:"nice",vi:"vui; tốt đẹp"},{en:"years old",vi:"tuổi"},{en:"from",vi:"đến từ"},{en:"live",vi:"sống"},{en:"student",vi:"học sinh"},{en:"like",vi:"thích"},{en:"reading",vi:"đọc sách"},{en:"music",vi:"âm nhạc"},{en:"football",vi:"bóng đá"},{en:"friend",vi:"bạn"}];
 const task=(id:string,kind:Task["kind"],prompt:string,answer:string,vi:string,note:string,extra:Partial<Task>={}):Task=>({id,kind,prompt,answer,vi,note,...extra});
@@ -41,7 +41,7 @@ export const sampleLessons=[
  task("3g","audioMatch","Nghe và tìm nghĩa đúng của mỗi ô.","","","Nghe kỹ từng từ rồi chọn nghĩa tương ứng.",{pairs:[{en:"name",vi:"tên"},{en:"student",vi:"học sinh"},{en:"friend",vi:"bạn"},{en:"hello",vi:"xin chào"}]}),
  task("3h","dialogue","Điền hoạt động phù hợp.","reading","đọc sách","Like reading nghĩa là thích đọc sách.",{context:"A: Do you like books?\nB: Yes, I like ___.",contextVi:"A: Bạn có thích sách không?\nB: Có, tôi thích đọc sách.",stage:2}),
  task("3i","speak","Nghe và đọc lại từ.","music","âm nhạc","Music là âm nhạc."),
- task("3j","write","Tự viết: Tôi thích chơi bóng đá.","I like playing football","Tôi thích chơi bóng đá.","Like playing football là thích chơi bóng đá.",{stage:3,accepted:["I like football","I enjoy playing football"]})
+ task("3j","write","Tự viết: Tôi thích chơi bóng đá.","I like playing football","Tôi thích chơi bóng đá.","Like playing football là thích chơi bóng đá.",{stage:3,accepted:["I like football","I enjoy playing football","I like to play football","I like to play soccer","I enjoy soccer"]})
  ]},
  {title:"Ôn tập: Tự tin giới thiệu bản thân",newWords:[],questions:[],tasks:[
  task("4a","translate","“My name is Linh” có nghĩa là gì?","Tên tôi là Linh","Tên tôi là Linh","My name is… dùng để giới thiệu tên.",{options:["Tên tôi là Linh","Tôi đến từ Linh","Bạn tên là Linh"]}),
@@ -55,6 +55,6 @@ export const sampleLessons=[
  task("4i","translate","Chọn câu nói “Tôi là học sinh”.","I am a student","Tôi là học sinh.","Dùng a trước student.",{options:["I am a student","I am from student","I like my name"]}),
  task("4j","dialogue","Hoàn thành câu hỏi về quê quán.","from","đến từ","Where are you from? hỏi quê quán.",{context:"A: Where are you ___?\nB: I am from Vietnam.",contextVi:"A: Bạn đến từ đâu?\nB: Tôi đến từ Việt Nam.",options:["from","old","like"]}),
  task("4k","order","Ghép câu: Tôi sống ở Hà Nội và tôi thích âm nhạc.","I live in Hanoi and I like music","Tôi sống ở Hà Nội và tôi thích âm nhạc.","Giới thiệu nơi sống và sở thích trong cùng câu."),
- task("4l","listenOrder","Nghe rồi ghép câu kết thúc phần giới thiệu.","Nice to meet you my new friend","Rất vui được gặp bạn, người bạn mới của tôi.","Nice to meet you thể hiện sự thân thiện.")
+ task("4l","introWrite","Tự giới thiệu trong 3–5 câu.","","","Viết tên và ít nhất 2 thông tin khác về tuổi, quê quán, nơi sống, việc học hoặc sở thích. Có thể dùng thông tin tưởng tượng.",{stage:4})
  ]}
 ];
