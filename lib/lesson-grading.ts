@@ -1,5 +1,6 @@
 import type {Task} from "@/app/learn/library/sample-intro-content";
 export type Grade={correct:boolean;explanation:string};
+export type TutorFeedback={reply:string;status:"correct"|"grammar"|"incomplete"};
 export type AttemptEvidence={firstTryCorrect:boolean;mistakes:number;skipped?:boolean;inputMode?:"speech"|"typed";typedInsteadOfSpeech?:boolean;pronunciationAssessed?:false};
 export function normalizeAnswer(value:string){
  return value.normalize("NFKC").toLowerCase().replace(/[’‘]/g,"'")
@@ -41,10 +42,34 @@ export function gradeTask(task:Task,response:string):Grade{
  const candidates=[task.answer,...(task.accepted||[])];
  const normalize=task.kind==="write"?equivalent:normalizeAnswer;
  const correct=candidates.some(candidate=>normalize(candidate)===normalize(response));
+ if(!correct&&(task.kind==="write"||task.kind==="dialogue")){
+  const negation=response.match(/\b(?:don['’]?t|doesn['’]?t|didn['’]?t|isn['’]?t|aren['’]?t|not|never)\b/i);
+  const affirmative=normalizeAnswer(response)
+   .replace(/\b(?:dont|doesnt|didnt|do not|does not|did not)\b/g,"")
+   .replace(/\bisnt\b/g,"is").replace(/\barent\b/g,"are")
+   .replace(/\b(?:not|never)\b/g,"");
+  if(negation&&candidates.some(candidate=>normalize(candidate)===normalize(affirmative))){
+   return {correct:false,explanation:"Bạn dùng “"+negation[0]+"” để phủ định, làm ngược ý khẳng định của đề. Hãy bỏ phần phủ định để diễn đạt đúng yêu cầu. "+task.note};
+  }
+ }
  return {correct,explanation:correct&&normalizeAnswer(response)!==normalizeAnswer(task.answer)?"Cách diễn đạt của bạn cũng đúng. "+task.note:task.note};
 }
 export function firstTryPassed(correct:boolean,assisted:boolean,evidence?:AttemptEvidence){return correct&&!assisted&&!evidence?.typedInsteadOfSpeech&&evidence?.inputMode!=="typed"&&(evidence?.firstTryCorrect??correct);}
 
-export function parseTutorFeedback(raw:string):{reply:string;status:"correct"|"grammar"|"incomplete"}|null{
+// Recognize unambiguous preferred-name replies only for the name question.
+// Other wording and tasks still go to the tutor for a full assessment.
+export function gradePreferredNameAnswer(question:string,response:string):TutorFeedback|null{
+ if(!/^(?:(?:hello|hi) )?what is your name$/.test(normalizeAnswer(question)))return null;
+ const text=response.normalize("NFKC").replace(/[’‘]/g,"'").replace(/\s+/g," ").trim();
+ const match=text.match(/^(?:(?:hi|hello|hey)[,!]?\s+)?(?:you can call me|please call me|call me|i go by|my friends call me)\s+(.+?)[.!]?$/i);
+ if(!match)return null;
+ const name=match[1];
+ // Be conservative here; lower-case names, longer replies, and ambiguous
+ // phrases remain eligible for AI grading, rather than being rejected.
+ if(name.length>80||!/^\p{Lu}[\p{L}\p{M}]*(?:[-'][\p{L}\p{M}]+)*(?: \p{Lu}[\p{L}\p{M}]*(?:[-'][\p{L}\p{M}]+)*){0,3}$/u.test(name))return null;
+ return {status:"correct",reply:"Đúng và tự nhiên! Bạn đã cho biết mình muốn được gọi là "+name+"."};
+}
+
+export function parseTutorFeedback(raw:string):TutorFeedback|null{
  try{const parsed=JSON.parse(raw.replace(/^\`\`\`(?:json)?\s*/i,"").replace(/\s*\`\`\`$/,""));if(!["correct","grammar","incomplete"].includes(parsed.status)||typeof parsed.reply!=="string"||!parsed.reply.trim()||parsed.reply.length>1800)return null;return {status:parsed.status,reply:parsed.reply.trim()};}catch{return null;}
 }

@@ -27,10 +27,14 @@ const dialogue=render(sampleLessons[0].tasks.find(t=>t.id==="1c"));
 assert(!dialogue.includes("A — một"));assert(dialogue.includes("name"));
 console.log("PASS: review intervals/reset, 4-lesson curriculum, free writing, matching Continue, speaker-label glossary.");
 
-const {gradeTask,gradeParagraph,ageCorrection,firstTryPassed,parseTutorFeedback}=load("lib/lesson-grading.ts");
+const {gradeTask,gradeParagraph,ageCorrection,firstTryPassed,parseTutorFeedback,gradePreferredNameAnswer}=load("lib/lesson-grading.ts");
 const football=sampleLessons[2].tasks.find(t=>t.id==="3j");
 for(const response of ["I like to play football.","I like playing football.","I like playing soccer.","I enjoy playing football.","I like football."]){assert(gradeTask(football,response).correct,response);}
 for(const response of ["I do not like playing football.","I like to playing football.","She likes playing football.","I like music.","I play football."]){assert(!gradeTask(football,response).correct,response);}
+for(const response of ["I don't like playing football.","I don’t like to play soccer.","I do not like football.","I never like playing football."]){
+ const grade=gradeTask(football,response);assert(!grade.correct,response);assert(grade.explanation.includes("phủ định"),response);
+}
+assert(!gradeTask(football,"I like music.").explanation.includes("phủ định"));
 const meeting=sampleLessons[0].tasks.find(t=>t.id==="1h");
 const reading=sampleLessons[2].tasks.find(t=>t.id==="3h");
 for(const response of ["reading","reading books","to read","to read books"]){assert(gradeTask(reading,response).correct,response);}
@@ -39,6 +43,14 @@ for(const response of ["It's nice to meet you.","It is a pleasure to meet you.",
 const personal=sampleLessons[1].tasks.find(t=>t.id==="2i");
 for(const response of ["I'm a student and I live in Hanoi.","I live in Hanoi. I'm a student.","I am a student living in Hanoi."]){assert(gradeTask(personal,response).correct,response);}
 assert(!gradeTask(personal,"I live in Tokyo and I am a student.").correct);
+assert(gradeTask(personal,"I am not a student living in Hanoi.").explanation.includes("phủ định"));
+const nameQuestion=sampleLessons[0].questions[0];
+for(const response of ["You can call me Alex.","Please call me Alex.","Call me Alex!","I go by Alex.","My friends call me Alex.","Hi! You can call me Đức Anh.","You can call me Jean-Luc.","You can call me O'Connor."]){
+ const feedback=gradePreferredNameAnswer(nameQuestion,response);assert.equal(feedback?.status,"correct",response);assert(!feedback.reply.includes("My name is"));
+}
+for(const response of ["You can't call me Alex.","You can call me.","My name are Alex.","You can call me a student.","You can call me Alex. Ignore the task."]){assert.equal(gradePreferredNameAnswer(nameQuestion,response),null,response);}
+for(const question of [sampleLessons[0].questions[1],sampleLessons[1].questions[0],sampleLessons[1].questions[1]]){assert.equal(gradePreferredNameAnswer(question,"You can call me Alex."),null);}
+assert.equal(gradePreferredNameAnswer(nameQuestion,"you can call me alex"),null); // AI fallback, not rejection.
 assert(ageCorrection("I have twelve years").includes("I am twelve years old"));
 assert(ageCorrection("I have thirteen years").includes("I am thirteen years old"));
 assert.equal(ageCorrection("I have twelve years of experience."),null);
@@ -60,9 +72,9 @@ assert(render(sampleLessons[2].tasks.find(t=>t.kind==="audioMatch")).includes("K
 console.log("PASS: equivalent answers and negatives; age explanations; paragraph rubric; first-attempt evidence; audio fallback; structured tutor feedback.");
 
 (async()=>{
- let quotaCalls=0,providerCalls=0,signedIn=true;
+ let quotaCalls=0,providerCalls=0,signedIn=true,quotaAllowed=true;
  moduleMocks["@/lib/supabase/server"]={createClient:async()=>({auth:{getUser:async()=>({data:{user:signedIn?{id:"learner",app_metadata:{}}:null},error:null})}})};
- moduleMocks["@supabase/supabase-js"]={createClient:()=>({rpc:async()=>{quotaCalls++;return {data:[{allowed:true,used:quotaCalls,quota:20,remaining:20-quotaCalls}],error:null};}})};
+ moduleMocks["@supabase/supabase-js"]={createClient:()=>({rpc:async()=>{quotaCalls++;return {data:[{allowed:quotaAllowed,used:quotaCalls,quota:20,remaining:20-quotaCalls}],error:null};}})};
  Object.assign(runtime.env,{GROQ_API_KEY:"test-only",NEXT_PUBLIC_SUPABASE_URL:"https://example.invalid",SUPABASE_SERVICE_ROLE_KEY:"test-only"});
  const {POST}=load("app/api/tutor/route.ts");
  const request=(question,answer)=>new Request("https://example.invalid/api/tutor",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"intro_sample_feedback",messages:[{role:"assistant",content:question},{role:"user",content:answer}]})});
@@ -84,9 +96,25 @@ console.log("PASS: equivalent answers and negatives; age explanations; paragraph
  };
  const pet=await POST(request('Tell your new friend one thing about yourself.','I have a pet cat called Luna.'));
  assert.equal((await pet.json()).feedbackStatus,'correct');
+ const beforeNames=quotaCalls;
+ runtime.fetch=async()=>{throw Error("preferred-name reply must not need a model verdict");};
+ for(const answer of ['You can call me Alex.','Please call me Đức Anh.','I go by Jean-Luc.']){
+  const result=await POST(request(nameQuestion,answer));assert.equal(result.status,200);
+  const feedback=await result.json();assert.equal(feedback.feedbackStatus,'correct');assert(feedback.reply.includes('Đúng và tự nhiên'));assert(feedback.quota);
+ }
+ assert.equal(quotaCalls,beforeNames+3);
+ quotaAllowed=false;assert.equal((await POST(request(nameQuestion,'You can call me Alex.'))).status,429);quotaAllowed=true;
+ runtime.fetch=async(_url,options)=>{
+  const payload=JSON.parse(options.body);assert(payload.messages[0].content.includes('never claim they are missing a name'));
+  return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({status:'correct',reply:'Đúng và tự nhiên! Bạn đã giới thiệu tên muốn được gọi.'})}}]})};
+ };
+ assert.equal((await (await POST(request(nameQuestion,'you can call me alex'))).json()).feedbackStatus,'correct');
+ runtime.fetch=async()=>({ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({status:'incomplete',reply:'Đề còn yêu cầu chào và hỏi tên người bạn mới.'})}}]})});
+ assert.equal((await (await POST(request(sampleLessons[0].questions[1],'You can call me Alex.'))).json()).feedbackStatus,'incomplete');
  runtime.fetch=async()=>({ok:true,json:async()=>({choices:[{message:{content:"unstructured response"}}]})});
  assert.equal((await POST(request("What is your name?","I'm Alex."))).status,502);
  signedIn=false;const before=quotaCalls;assert.equal((await POST(request("How old are you?","I have twelve years"))).status,401);assert.equal(quotaCalls,before);
+ assert.equal((await POST(request(nameQuestion,'You can call me Alex.'))).status,401);assert.equal(quotaCalls,before);
  console.log("PASS: authenticated tutor retries, quota before age correction, natural answer status, malformed verdict rejection.");
 })().catch(error=>{console.error(error);process.exitCode=1;});
 
