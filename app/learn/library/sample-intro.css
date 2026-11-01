@@ -118,3 +118,9 @@
 .si-screen textarea{min-height:130px}
 
 .si-screen:not(.an-experiment){background:linear-gradient(120deg,#edf7ff,#f8f4ff)}
+
+.si-review-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:16px 0}.si-review-stats p{margin:0;padding:16px;border:1px solid #adc8bd;border-radius:14px;background:#f3faf6;display:grid;gap:6px}.si-review-stats strong{font-size:30px}.si-review-stats span{font-size:15px}
+.si-review-table-wrap{overflow-x:auto}.si-review-table{width:100%;border-collapse:collapse;background:#fff;color:#244574;font-size:15px}.si-review-table caption{text-align:left;font-weight:800;margin:12px 0}.si-review-table th,.si-review-table td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid #d5e3ec}.si-review-table th[scope=row]{min-width:180px}.si-review-table small{display:block;font-size:13px;font-weight:400;margin-top:5px;line-height:1.5}.si-review-table time{display:block;min-width:110px}
+.si-schedule-list{margin-top:16px}.si-schedule-list summary{cursor:pointer;font-weight:700}.si-schedule-list li{padding:10px 0;border-bottom:1px solid #b4cbc1}.si-schedule-list time{display:block;margin-top:4px;font-weight:700}
+.si-input-modes{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:12px}.si-input-modes button{padding:10px;border:1px solid #a8c8e0;border-radius:10px;background:#edf4fa;color:#244574}.si-input-modes button[aria-pressed=true]{background:#d8eafa;border-color:#347abb;font-weight:800}.si-recognized{display:block;padding:12px;border-radius:10px;border:1px solid #afc9de;background:#fff;text-align:left;min-height:48px}
+@media(max-width:600px){.si-review-stats{gap:6px}.si-review-stats p{padding:10px}.si-review-stats span{font-size:12px}.si-review-stats strong{font-size:24px}.si-review-table th,.si-review-table td{padding:9px}}

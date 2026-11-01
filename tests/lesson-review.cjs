@@ -73,3 +73,22 @@ console.log("PASS: equivalent answers and negatives; age explanations; paragraph
  signedIn=false;const before=quotaCalls;assert.equal((await POST(request("How old are you?","I have twelve years"))).status,401);assert.equal(quotaCalls,before);
  console.log("PASS: authenticated tutor retries, quota before age correction, natural answer status, malformed verdict rejection.");
 })().catch(error=>{console.error(error);process.exitCode=1;});
+
+const {summarizeReview,formatReviewDate}=load("lib/review-results.ts");
+const reviewResults=Array.from({length:12},(_,i)=>({taskId:"test-"+i,correct:true,assisted:false,mistakes:0,previousDueAt:"2026-11-01T00:00:00.000Z",dueAt:"2026-11-04T00:00:00.000Z",streak:2}));
+Object.assign(reviewResults[8],{correct:false,mistakes:3});
+Object.assign(reviewResults[9],{correct:false,mistakes:1,assisted:true});
+reviewResults[10].assisted=true;
+Object.assign(reviewResults[11],{assisted:true,inputMode:"typed",typedInsteadOfSpeech:true});
+const summary=summarizeReview(reviewResults);
+assert.equal(summary.total,12);assert.equal(summary.selfCorrect,8);assert.equal(summary.hadErrors,2);assert.equal(summary.assisted,3);assert.equal(summary.typed,1);assert.equal(summary.wrongAttempts,4);
+assert(!firstTryPassed(true,false,{firstTryCorrect:true,mistakes:0,inputMode:"typed",typedInsteadOfSpeech:true}));
+assert(formatReviewDate("2026-11-01T18:00:00.000Z").includes("02/11/2026"));
+const Summary=load("app/learn/library/review-summary.tsx").default;
+const summaryHtml=renderToStaticMarkup(React.createElement(Summary,{results:reviewResults,onClose:()=>{}}));
+assert(summaryHtml.includes("Tổng kết lượt ôn"));assert(summaryHtml.includes("03")||summaryHtml.includes("04/11/2026"));
+assert(summaryHtml.includes("Lịch trước"));assert(summaryHtml.includes("Ôn tiếp theo"));assert(summaryHtml.includes("cả hai nhóm"));
+const speakingHtml=render(sampleLessons[1].tasks.find(t=>t.kind==="speak"),true);
+assert(speakingHtml.includes("<output"));assert(!speakingHtml.includes("<input"));
+assert(speakingHtml.includes("Chuyển sang luyện viết"));assert(speakingHtml.includes("chưa chấm độ chuẩn phát âm"));
+console.log("PASS: 12-question review totals, overlapping error/help counts, saved per-question dates, UTC+7 and read-only speech transcript.");

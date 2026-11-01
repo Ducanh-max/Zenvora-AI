@@ -1,6 +1,6 @@
 import type {Task} from "@/app/learn/library/sample-intro-content";
 export type Grade={correct:boolean;explanation:string};
-export type AttemptEvidence={firstTryCorrect:boolean;mistakes:number;skipped?:boolean};
+export type AttemptEvidence={firstTryCorrect:boolean;mistakes:number;skipped?:boolean;inputMode?:"speech"|"typed";typedInsteadOfSpeech?:boolean;pronunciationAssessed?:false};
 export function normalizeAnswer(value:string){
  return value.normalize("NFKC").toLowerCase().replace(/[’‘]/g,"'")
  .replace(/\bi'm\b/g,"i am").replace(/\bit's\b/g,"it is").replace(/\bwhat's\b/g,"what is").replace(/\bname's\b/g,"name is")
@@ -43,7 +43,7 @@ export function gradeTask(task:Task,response:string):Grade{
  const correct=candidates.some(candidate=>normalize(candidate)===normalize(response));
  return {correct,explanation:correct&&normalizeAnswer(response)!==normalizeAnswer(task.answer)?"Cách diễn đạt của bạn cũng đúng. "+task.note:task.note};
 }
-export function firstTryPassed(correct:boolean,assisted:boolean,evidence?:AttemptEvidence){return correct&&!assisted&&(evidence?.firstTryCorrect??correct);}
+export function firstTryPassed(correct:boolean,assisted:boolean,evidence?:AttemptEvidence){return correct&&!assisted&&!evidence?.typedInsteadOfSpeech&&evidence?.inputMode!=="typed"&&(evidence?.firstTryCorrect??correct);}
 
 export function parseTutorFeedback(raw:string):{reply:string;status:"correct"|"grammar"|"incomplete"}|null{
  try{const parsed=JSON.parse(raw.replace(/^\`\`\`(?:json)?\s*/i,"").replace(/\s*\`\`\`$/,""));if(!["correct","grammar","incomplete"].includes(parsed.status)||typeof parsed.reply!=="string"||!parsed.reply.trim()||parsed.reply.length>1800)return null;return {status:parsed.status,reply:parsed.reply.trim()};}catch{return null;}

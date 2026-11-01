@@ -35,8 +35,8 @@ export async function POST(request:Request){
  }
  return {user_id:user.id,task_id:a.taskId,...next,last_correct:a.correct,last_assisted:a.assisted,updated_at:new Date(now).toISOString()};
  });
- const {error}=await db.from("aunora_review_items").upsert(rows,{onConflict:"user_id,task_id"});
+ const {data:savedItems,error}=await db.from("aunora_review_items").upsert(rows,{onConflict:"user_id,task_id"}).select("task_id,due_at,streak");
  if(error)throw error;
- return NextResponse.json({saved:rows.length});
+ return NextResponse.json({saved:rows.length,items:savedItems||[]},{headers:{"Cache-Control":"no-store"}});
  }catch{return NextResponse.json({error:"Chưa lưu được lịch ôn. Hãy thử lại."},{status:500});}
 }
