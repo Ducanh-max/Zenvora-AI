@@ -62,3 +62,16 @@ tree=lessonRender();nodes(tree).find(n=>n.type===Exercise).props.onDone(true,"re
 tree=lessonRender();const notes=nodes(tree).find(n=>n.type===IntroFieldNotes);
 assert(notes);assert.equal(notes.props.mastered,2);assert.equal(notes.props.score,1);
 console.log("PASS: summary counts in-place repairs and review repairs without counting first-try successes.");
+
+function visibleText(node){if(typeof node==="string")return node;if(Array.isArray(node))return node.map(visibleText).join(" ");return node&&typeof node==="object"?visibleText(node.props?.children):"";}
+for(const [response,expected] of [["reading books",true],["to read books",true],["not reading books",false]]){
+ slots=[];cursor=0;result=null;
+ const props={task:sampleLessons[2].tasks.find(task=>task.id==="3h"),newWords:[],assessment:true,onDone:(...args)=>{result=args;}};
+ function exercise(){cursor=0;return Exercise(props);}
+ tree=exercise();nodes(tree).find(n=>n.type==="input").props.onChange({target:{value:response}});
+ tree=exercise();nodes(tree).find(n=>n.type==="button"&&n.props.className==="si-primary").props.onClick();
+ tree=exercise();assert(visibleText(tree).includes(expected?"✓ Chính xác!":"phủ định"),response);
+ nodes(tree).find(n=>n.type==="button"&&n.props.className==="si-primary").props.onClick();
+ assert.equal(result[0],expected);assert.equal(result[3].firstTryCorrect,expected);
+}
+console.log("PASS: reading phrases pass in the rendered exercise; negation gives a specific visible explanation.");
