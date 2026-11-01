@@ -32,6 +32,9 @@ const football=sampleLessons[2].tasks.find(t=>t.id==="3j");
 for(const response of ["I like to play football.","I like playing football.","I like playing soccer.","I enjoy playing football.","I like football."]){assert(gradeTask(football,response).correct,response);}
 for(const response of ["I do not like playing football.","I like to playing football.","She likes playing football.","I like music.","I play football."]){assert(!gradeTask(football,response).correct,response);}
 const meeting=sampleLessons[0].tasks.find(t=>t.id==="1h");
+const reading=sampleLessons[2].tasks.find(t=>t.id==="3h");
+for(const response of ["reading","reading books","to read","to read books"]){assert(gradeTask(reading,response).correct,response);}
+for(const response of ["read books","reading book","not reading books","playing football"]){assert(!gradeTask(reading,response).correct,response);}
 for(const response of ["It's nice to meet you.","It is a pleasure to meet you.","I am pleased to meet you."]){assert(gradeTask(meeting,response).correct,response);}
 const personal=sampleLessons[1].tasks.find(t=>t.id==="2i");
 for(const response of ["I'm a student and I live in Hanoi.","I live in Hanoi. I'm a student.","I am a student living in Hanoi."]){assert(gradeTask(personal,response).correct,response);}
@@ -68,6 +71,19 @@ console.log("PASS: equivalent answers and negatives; age explanations; paragraph
  runtime.fetch=async()=>{providerCalls++;return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({status:"correct",reply:"Đúng và tự nhiên!"})}}]})};};
  const natural=await POST(request("What do you like?","I like to play football."));
  assert.equal((await natural.json()).feedbackStatus,"correct");assert.equal(quotaCalls,2);assert.equal(providerCalls,1);
+ runtime.fetch=async(url,options)=>{
+  const payload=JSON.parse(options.body),instructions=payload.messages[0].content;
+  assert(instructions.includes('ONE personal fact is enough'));
+  assert(instructions.includes('I have a pet cat called Luna.'));
+  assert(instructions.includes('require all three actions'));
+  assert(instructions.includes('My name are Alex'));
+  assert.equal(payload.temperature,0);
+  assert.equal(payload.messages.at(-2).content,'Tell your new friend one thing about yourself.');
+  assert.equal(payload.messages.at(-1).content,'I have a pet cat called Luna.');
+  return {ok:true,json:async()=>({choices:[{message:{content:JSON.stringify({status:"correct",reply:"Đúng và tự nhiên! Bạn đã kể về thú cưng của mình."})}}]})};
+ };
+ const pet=await POST(request('Tell your new friend one thing about yourself.','I have a pet cat called Luna.'));
+ assert.equal((await pet.json()).feedbackStatus,'correct');
  runtime.fetch=async()=>({ok:true,json:async()=>({choices:[{message:{content:"unstructured response"}}]})});
  assert.equal((await POST(request("What is your name?","I'm Alex."))).status,502);
  signedIn=false;const before=quotaCalls;assert.equal((await POST(request("How old are you?","I have twelve years"))).status,401);assert.equal(quotaCalls,before);

@@ -39,7 +39,7 @@ export const sampleLessons=[
  task("3e","translate","“reading” có nghĩa là gì?","đọc sách","đọc sách","Reading diễn tả hoạt động đọc.",{options:["đọc sách","hát","chạy"]}),
  task("3f","listenOrder","Nghe rồi xếp lại câu về sở thích.","I like music and reading","Tôi thích âm nhạc và đọc sách.","And nối hai sở thích trong cùng câu."),
  task("3g","audioMatch","Nghe và tìm nghĩa đúng của mỗi ô.","","","Nghe kỹ từng từ rồi chọn nghĩa tương ứng.",{pairs:[{en:"name",vi:"tên"},{en:"student",vi:"học sinh"},{en:"friend",vi:"bạn"},{en:"hello",vi:"xin chào"}]}),
- task("3h","dialogue","Điền hoạt động phù hợp.","reading","đọc sách","Like reading nghĩa là thích đọc sách.",{context:"A: Do you like books?\nB: Yes, I like ___.",contextVi:"A: Bạn có thích sách không?\nB: Có, tôi thích đọc sách.",stage:2}),
+ task("3h","dialogue","Điền hoạt động phù hợp.","reading","đọc sách","Like reading nghĩa là thích đọc sách.",{accepted:["reading books","to read","to read books"],context:"A: Do you like books?\nB: Yes, I like ___.",contextVi:"A: Bạn có thích sách không?\nB: Có, tôi thích đọc sách.",stage:2}),
  task("3i","speak","Nghe và đọc lại từ.","music","âm nhạc","Music là âm nhạc."),
  task("3j","write","Tự viết: Tôi thích chơi bóng đá.","I like playing football","Tôi thích chơi bóng đá.","Like playing football là thích chơi bóng đá.",{stage:3,accepted:["I like football","I enjoy playing football","I like to play football","I like to play soccer","I enjoy soccer"]})
  ]},

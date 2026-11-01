@@ -40,3 +40,25 @@ assert(board);board.props.onMistake();board.props.onMistake();board.props.onMist
 cursor=0;tree=Exercise(matchingProps);nodes(tree).find(n=>n.type==="button"&&n.props.className==="si-primary").props.onClick();
 assert(result);assert.equal(result[0],true);assert.equal(result[3].firstTryCorrect,false);assert.equal(result[3].mistakes,3);
 console.log("PASS: three audio-matching errors remain in completed-attempt evidence.");
+
+// Exercise the parent completion handlers: an in-place repair and a review repair
+// count once each, while a first-try success does not count as a repair.
+const Lesson=load("app/learn/library/sample-intro-lesson.tsx").default;
+const {IntroFieldNotes}=load("app/learn/library/intro-field-notes.tsx");
+slots=[];cursor=0;
+const lessonProps={lessonIndex:0,onExit:()=>{},onFinish:async()=>{}};
+function lessonRender(){cursor=0;return Lesson(lessonProps);}
+lessonRender();slots[0]=true;slots[2]=sampleLessons[0].tasks;
+tree=lessonRender();
+nodes(tree).find(n=>n.type===Exercise).props.onDone(true,"repaired",false,{firstTryCorrect:false,mistakes:2});
+tree=lessonRender();
+nodes(tree).find(n=>n.type===Exercise).props.onDone(true,"first try",false,{firstTryCorrect:true,mistakes:0});
+tree=lessonRender();
+nodes(tree).find(n=>n.type===Exercise).props.onDone(false,"wrong",false,{firstTryCorrect:false,mistakes:1});
+slots[3]=slots[2].length;slots[5]=true;
+tree=lessonRender();
+nodes(tree).find(n=>n.type==="button"&&n.props.children==="Bắt đầu ôn tập →").props.onClick();
+tree=lessonRender();nodes(tree).find(n=>n.type===Exercise).props.onDone(true,"reviewed");
+tree=lessonRender();const notes=nodes(tree).find(n=>n.type===IntroFieldNotes);
+assert(notes);assert.equal(notes.props.mastered,2);assert.equal(notes.props.score,1);
+console.log("PASS: summary counts in-place repairs and review repairs without counting first-try successes.");
