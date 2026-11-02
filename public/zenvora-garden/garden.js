@@ -6,6 +6,8 @@ const canvas=document.querySelector('#nightGarden');
 const ctx=canvas.getContext('2d',{alpha:false});
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const duration=15;
+let language='vi';try{if(localStorage.getItem('aunora_language')==='en')language='en'}catch{}
+const sceneCopy={vi:{career:'HỌC TỪ GỐC RỄ',degree:'BẰNG CẤP',skills:'KỸ NĂNG',first:'Danh xưng phai mờ.',second:'Kỹ năng tích lũy.',depth:'GỐC RỄ VỮNG, VƯƠN XA HƠN',words:['NGHE','NÓI','TỪ VỰNG','TỰ TIN']},en:{career:'IT CAREERS',degree:'A DEGREE',skills:'SKILLS',first:'Titles fade.',second:'Skills compound.',depth:'DEPTH OUTLASTS HEIGHT',words:['LISTENING','SPEAKING','VOCABULARY','CONFIDENCE']}};
 const introOnce=new URLSearchParams(window.location.search).get('intro')==='once' && window.parent!==window;
 const completionTime=13.8;
 let completed=false,waitingForStart=introOnce;
@@ -124,7 +126,7 @@ function pose(x,y,size,t,graduate,can){
  ctx.restore();
 }
 function drawText(s,x,y,size,color,alpha=1,italic=false,tracking=0){
- if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;ctx.font=`${italic?'italic ':''}${size}px Georgia, serif`;ctx.fillStyle=color;ctx.textBaseline='middle';
+ if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;ctx.font=language==='vi'?`${size}px Arial, sans-serif`:`${italic?'italic ':''}${size}px Georgia, serif`;ctx.fillStyle=color;ctx.textBaseline='middle';
  if(!tracking){ctx.textAlign='center';ctx.fillText(s,x,y)}else{const letters=[...s],tw=letters.reduce((v,c)=>v+ctx.measureText(c).width,0)+tracking*(letters.length-1);let xx=x-tw/2;for(const c of letters){ctx.fillText(c,xx,y);xx+=ctx.measureText(c).width+tracking}}ctx.restore()
 }
 function draw(t){
@@ -174,17 +176,17 @@ function draw(t){
  if(storm>.01){ctx.save();ctx.beginPath();ctx.rect(0,0,W,ground);ctx.clip();for(const r of rain){const x=((r.x*W-t*90*r.speed)%W+W)%W,y=((r.y*ground+t*420*r.speed)%ground+ground)%ground;path([pt(x,y),pt(x-8*storm,y+r.length)],'#9caeb8',.85,storm*r.alpha)}ctx.restore();
   for(let i=0;i<18;i++){const phase=(t*2.6+i*.17)%1;if(phase>.45)continue;const x=(i*179+43)%W;path([pt(x-5*phase,ground-3*phase),pt(x,ground-6*phase),pt(x+5*phase,ground)],'#a1a3a0',.7,storm*(.45-phase)*.3)}
  }
- const labelSize=portrait?28:26;
- drawText('IT CAREERS',W*.5,H*.105,portrait?19:16,'#a59b73',.85,false,portrait?6:5);
- drawText('A DEGREE',portrait?235:445,H*.153,labelSize,'#e5e2cf',.95,false,5);
- drawText('SKILLS',portrait?685:1180,H*.153,labelSize,'#e5e2cf',.95,false,5);
+ const labelSize=portrait?28:26,wordsCopy=sceneCopy[language];
+ drawText(wordsCopy.career,W*.5,H*.105,portrait?19:16,'#a59b73',.85,false,portrait?6:5);
+ drawText(wordsCopy.degree,portrait?235:445,H*.153,labelSize,'#e5e2cf',.95,false,5);
+ drawText(wordsCopy.skills,portrait?685:1180,H*.153,labelSize,'#e5e2cf',.95,false,5);
  path([pt((portrait?235:445)-27,H*.173),pt((portrait?235:445)+27,H*.173)],'#a99458',1.5,.7);path([pt((portrait?685:1180)-27,H*.173),pt((portrait?685:1180)+27,H*.173)],'#a99458',1.5,.7);
  const center=portrait?W*.5:W*.51;
- drawText('Titles fade.',center,H*(portrait?.255:.277),portrait?49:43,'#e4dfc7',final,true);
- drawText('Skills compound.',center,H*(portrait?.303:.341),portrait?49:43,'#d5c183',final,true);
- drawText('DEPTH OUTLASTS HEIGHT',center,H*(portrait?.36:.415),portrait?16:14,'#aaa78f',final,false,4.8);
+ drawText(wordsCopy.first,center,H*(portrait?.255:.277),portrait?49:43,'#e4dfc7',final,true);
+ drawText(wordsCopy.second,center,H*(portrait?.303:.341),portrait?49:43,'#d5c183',final,true);
+ drawText(wordsCopy.depth,center,H*(portrait?.36:.415),portrait?16:14,'#aaa78f',final,false,4.8);
  // Subtle annotations sit beside, rather than over, the brightest roots.
- if(final>.01){const words=['LISTENING','SPEAKING','VOCABULARY','CONFIDENCE'];for(let i=0;i<4;i++){const y=ground+(portrait?160:62)+i*(portrait?66:43),x=portrait?350:750;drawText(words[i],x,y,portrait?15:13,'#b8a471',final*.8,false,1.8);path([pt(x+(portrait?76:67),y),pt(right-(portrait?64:90)+i*9,y-9)],'#ad9553',.8,final*.45)}}
+ if(final>.01){const words=wordsCopy.words;for(let i=0;i<4;i++){const y=ground+(portrait?160:62)+i*(portrait?66:43),x=portrait?350:750;drawText(words[i],x,y,portrait?15:13,'#b8a471',final*.8,false,1.8);path([pt(x+(portrait?76:67),y),pt(right-(portrait?64:90)+i*9,y-9)],'#ad9553',.8,final*.45)}}
  ctx.restore();
  if(fade<1){ctx.fillStyle=`rgba(4,6,7,${1-fade})`;ctx.fillRect(0,0,W,H)}
 }
@@ -206,6 +208,7 @@ function tick(now){
 requestAnimationFrame(tick);
 window.addEventListener('message',event=>{
  if(!introOnce||event.source!==window.parent||event.origin!==window.location.origin)return;
+ if(event.data?.type==='aunora:language'&&(event.data.language==='vi'||event.data.language==='en')){language=event.data.language;draw(time)}
  if(event.data?.type==='zenvora:garden-start'&&waitingForStart){
   waitingForStart=false;last=null;
   if(reduced)completeIntro();

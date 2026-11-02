@@ -2,3 +2,34 @@
 
 .keyboard{grid-template-rows:0 minmax(0,1fr)}.keyboard .header,.keyboard .art,.keyboard .heading{display:none}.keyboard .shell{display:flex;align-items:center;justify-content:center;padding:4px 0;width:min(390px,calc(100% - 28px))}.keyboard .card{width:100%;margin:auto}.keyboard .tabs{margin-bottom:8px;padding:3px}.keyboard .tabs button{min-height:26px;font-size:10px}.keyboard .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.keyboard .registerFields .passwordField{grid-column:1/-1}.keyboard .field{gap:3px}.keyboard .field label{font-size:9px}.keyboard .field input{height:32px;font-size:16px;padding:0 8px}.keyboard .password input{padding-right:31px}.keyboard .password button{height:26px;width:27px}.keyboard .labelRow{gap:4px}.keyboard .labelRow a{font-size:8px}.keyboard .feedback{min-height:26px;max-height:38px;font-size:9px;line-height:1.3;margin:3px 0}.keyboard .submit{min-height:32px;padding:7px 10px;font-size:10px}.keyboard .confirmation{min-height:160px;gap:12px}
 .panel{min-width:0}
+
+/* Shared preference controls sit beside the existing account navigation. */
+.headerActions{display:flex;align-items:center;justify-content:flex-end;gap:18px;min-width:0;flex-shrink:0}
+:global(html[data-theme="light"]) .page{color-scheme:light;background:radial-gradient(ellipse at 73% 45%,#c8dfd272,transparent 62%),#f6f7ef;color:#233b31}
+:global(html[data-theme="light"]) .header{border-bottom-color:#496b4e27}
+:global(html[data-theme="light"]) .brand{color:#294f3d}
+:global(html[data-theme="light"]) .mark{border-color:#8a9e686b;color:#617842;background:#dfe8ce66}
+:global(html[data-theme="light"]) .back{color:#526c56}
+:global(html[data-theme="light"]) .back:hover{color:#254c36}
+:global(html[data-theme="light"]) .eyebrow{color:#697c4c}
+:global(html[data-theme="light"]) .heading h1{color:#243d30}
+:global(html[data-theme="light"]) .intro{color:#5e7462}
+:global(html[data-theme="light"]) .tabs{background:#e9eee0;border-color:#8b9b743b}
+:global(html[data-theme="light"]) .tabs button{color:#5a6e4e}
+:global(html[data-theme="light"]) .tabs button[aria-selected=true]{background:#355d45;color:#fffbe9;box-shadow:0 2px 9px #28413017}
+:global(html[data-theme="light"]) .field label{color:#34533c}
+:global(html[data-theme="light"]) .field input{background:#fffef8;color:#213a2c;border-color:#adbea166}
+:global(html[data-theme="light"]) .field input::placeholder{color:#71816c}
+:global(html[data-theme="light"]) .field input:focus{border-color:#6d8559;box-shadow:0 0 0 3px #8caa6a1c}
+:global(html[data-theme="light"]) .labelRow a{color:#70622e}
+:global(html[data-theme="light"]) .password button{color:#667b56}
+:global(html[data-theme="light"]) .password button:hover{background:#6d8e5010}
+:global(html[data-theme="light"]) .feedback{color:#a23e32}
+:global(html[data-theme="light"]) .submit{background:linear-gradient(105deg,#dec682,#ecdfa9 65%,#bed9b5);border-color:#b7a56b99;color:#23371f;box-shadow:0 6px 20px #5b704317}
+:global(html[data-theme="light"]) .confirmation p{color:#526e55}
+:global(html[data-theme="light"]) .check{background:#dce9d7;border-color:#91b48288;color:#3e6840}
+:global(html[data-theme="light"]) .art{background:#061211;border:1px solid #3c66492b;box-shadow:0 12px 45px #254c3310}
+:global(html[data-theme="light"]) .page a:focus-visible,:global(html[data-theme="light"]) .page button:focus-visible{outline-color:#5c783e}
+@media(max-width:700px){.headerActions{gap:12px}:global(html[data-theme="light"]) .art{border-radius:12px}}
+@media(max-width:400px){.header{width:calc(100% - 28px)}.brand{font-size:14px;letter-spacing:2px;gap:8px}.mark{width:27px;height:30px}.headerActions{gap:9px}.back{gap:0;min-width:25px;min-height:30px;justify-content:center}.back span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}}
+@media(max-height:450px) and (min-width:450px){.headerActions{gap:10px}}
