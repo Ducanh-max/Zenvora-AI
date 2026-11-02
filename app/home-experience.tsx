@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, BookOpen, MessageCircle, RotateCcw, Sprout } from "lucide-react";
+import { ArrowRight, BookOpen, MessageCircle, Sprout } from "lucide-react";
 import styles from "./garden-home.module.css";
 
 const features = [
@@ -13,7 +13,6 @@ const features = [
 
 export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
   const [finished, setFinished] = useState(false);
-  const [cycle, setCycle] = useState(0);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const introRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -32,7 +31,7 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
     window.addEventListener("message", receive);
     sendStart();
     return () => window.removeEventListener("message", receive);
-  }, [cycle, sendStart]);
+  }, [sendStart]);
 
   useEffect(() => {
     const htmlOverflow = document.documentElement.style.overflow;
@@ -58,11 +57,6 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
     frameRef.current?.contentWindow?.postMessage({ type: "zenvora:garden-pause" }, window.location.origin);
     setFinished(true);
   }
-  function replay() {
-    completedRef.current = false;
-    setFinished(false);
-    setCycle(value => value + 1);
-  }
 
   return <main className={styles.page}>
     <header className={styles.header}>
@@ -74,7 +68,7 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
     </header>
     <div className={styles.viewport}>
       <section ref={introRef} className={`${styles.intro} ${finished ? styles.introFinished : ""}`} aria-label="Kỹ năng lớn lên từ những điều nhỏ" aria-hidden={finished} inert={finished}>
-        <div className={styles.story}><iframe key={cycle} ref={frameRef} onLoad={sendStart} src="/zenvora-garden/animation.html?intro=once" title="Hoạt cảnh khu vườn: cây rễ nông đổ trong mưa, cây được chăm sóc lớn lên với bộ rễ sâu" className={styles.frame} loading="eager" referrerPolicy="same-origin"/></div>
+        <div className={styles.story}><iframe ref={frameRef} onLoad={sendStart} src="/zenvora-garden/animation.html?intro=once" title="Hoạt cảnh khu vườn: cây rễ nông đổ trong mưa, cây được chăm sóc lớn lên với bộ rễ sâu" className={styles.frame} loading="eager" referrerPolicy="same-origin"/></div>
         <button className={styles.skip} type="button" onClick={skip}>Bỏ qua hoạt cảnh <ArrowRight size={13}/></button>
       </section>
       {finished ? <section className={styles.content} aria-labelledby="invitation-title">
@@ -85,7 +79,6 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
           <div className={styles.actions}><Link className={styles.primary} href={signedIn ? "/learn" : "/register"}>{signedIn ? "Tiếp tục hành trình" : "Bắt đầu học miễn phí"}<ArrowRight size={17}/></Link><Link className={styles.secondary} href={signedIn ? "/learn/profile" : "/login"}>{signedIn ? "Tài khoản của bạn" : "Đã có tài khoản? Đăng nhập"}</Link></div>
         </div>
         <div className={styles.features} aria-label="Không gian học tiếng Anh">{features.map(({Icon,tag,title,text},i)=><article key={tag} className={styles.feature}><span className={styles.featureIcon}><Icon size={23} strokeWidth={1.5}/></span><div><span className={styles.featureTag}>{tag}</span><h2>{title}</h2><p>{text}</p></div><span className={styles.featureNumber}>0{i+1}</span></article>)}</div>
-        <button className={styles.replay} type="button" onClick={replay}><RotateCcw size={13}/> Xem lại câu chuyện</button>
       </section> : null}
     </div>
     <span className={styles.announcement} role="status">{finished ? "Hoạt cảnh đã kết thúc. Phần giới thiệu và bắt đầu học đã xuất hiện." : "Hoạt cảnh đang chạy. Phần giới thiệu sẽ tự hiện khi kết thúc."}</span>

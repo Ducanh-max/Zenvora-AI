@@ -192,7 +192,7 @@ function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.dev
 new ResizeObserver(resize).observe(canvas);
 function completeIntro(){
  if(completed||!introOnce)return;
- completed=true;paused=true;time=completionTime;draw(time);update();
+ completed=true;paused=true;time=completionTime;draw(time);
  window.parent.postMessage({type:'zenvora:garden-complete'},window.location.origin);
 }
 function tick(now){
@@ -204,19 +204,16 @@ function tick(now){
  last=now;requestAnimationFrame(tick)
 }
 requestAnimationFrame(tick);
-const toggle=document.querySelector('#soundToggle');
-function update(){toggle.textContent=paused?'▶':'Ⅱ';toggle.setAttribute('aria-label',paused?'Phát hoạt cảnh':'Tạm dừng hoạt cảnh');toggle.setAttribute('aria-pressed',String(paused))}
-toggle.addEventListener('click',()=>{if(completed)return;paused=!paused;last=null;update()});update();
 window.addEventListener('message',event=>{
  if(!introOnce||event.source!==window.parent||event.origin!==window.location.origin)return;
  if(event.data?.type==='zenvora:garden-start'&&waitingForStart){
   waitingForStart=false;last=null;
   if(reduced)completeIntro();
-  else{time=0;paused=false;draw(time);update()}
+  else{time=0;paused=false;draw(time);}
  }
- if(event.data?.type==='zenvora:garden-pause'){paused=true;last=null;update()}
+ if(event.data?.type==='zenvora:garden-pause'){paused=true;last=null;}
 });
 if(introOnce)window.parent.postMessage({type:'zenvora:garden-ready'},window.location.origin);
-window.zenvoraScene={seek(seconds){time=clamp(Number(seconds)||0,0,duration-.001);paused=true;last=null;update();draw(time)},play(){paused=false;last=null;update()},get state(){return{time,paused,duration,portrait}}};
+window.zenvoraScene={seek(seconds){time=clamp(Number(seconds)||0,0,duration-.001);paused=true;last=null;draw(time)},play(){paused=false;last=null;},get state(){return{time,paused,duration,portrait}}};
 document.addEventListener('visibilitychange',()=>{pageVisible=!document.hidden;last=null});
 })();
