@@ -5,6 +5,7 @@ import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import styles from "../auth-garden.module.css";
+import AuthFlowerVideo from "../auth-flower-video";
 
 function loginError(error: unknown) {
   const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
@@ -69,11 +70,7 @@ function LoginPageContent() {
           <p className={styles.switch}>Bạn mới đến AUNORA? <Link href="/register">Tạo tài khoản</Link></p>
           <div className={styles.note}><span aria-hidden="true">✧</span> Không cần hoàn hảo. Cứ bắt đầu nói thôi.</div>
         </section>
-        <aside className={styles.garden} aria-label="Khu vườn AUNORA">
-          <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
-          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn AUNORA" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
-          <p className={styles.gardenQuote}>Confidence grows<br/><em>with practice.</em></p>
-        </aside>
+        <AuthFlowerVideo variant="login"/>
       </div>
       <footer className={styles.footer}>AUNORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
     </main>
