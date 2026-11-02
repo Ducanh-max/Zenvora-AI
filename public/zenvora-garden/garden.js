@@ -6,6 +6,9 @@ const canvas=document.querySelector('#nightGarden');
 const ctx=canvas.getContext('2d',{alpha:false});
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const duration=15;
+const introOnce=new URLSearchParams(window.location.search).get('intro')==='once' && window.parent!==window;
+const completionTime=13.8;
+let completed=false,waitingForStart=introOnce;
 let time=reduced?12:0,paused=reduced,last=null,width=0,height=0,W=900,H=1600,portrait=true;
 let pageVisible=!document.hidden;
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
@@ -187,10 +190,33 @@ function draw(t){
 }
 function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);width=r.width;height=r.height;portrait=width<height;W=portrait?900:1600;H=portrait?1600:900;canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw(time)}
 new ResizeObserver(resize).observe(canvas);
-function tick(now){if(last!==null&&!paused&&pageVisible){time=(time+Math.max(0,(now-last)/1000))%duration;draw(time)}last=now;requestAnimationFrame(tick)}requestAnimationFrame(tick);
+function completeIntro(){
+ if(completed||!introOnce)return;
+ completed=true;paused=true;time=completionTime;draw(time);update();
+ window.parent.postMessage({type:'zenvora:garden-complete'},window.location.origin);
+}
+function tick(now){
+ if(last!==null&&!paused&&pageVisible&&!waitingForStart){
+  time+=Math.max(0,(now-last)/1000);
+  if(introOnce&&time>=completionTime)completeIntro();
+  else{time%=duration;draw(time)}
+ }
+ last=now;requestAnimationFrame(tick)
+}
+requestAnimationFrame(tick);
 const toggle=document.querySelector('#soundToggle');
 function update(){toggle.textContent=paused?'▶':'Ⅱ';toggle.setAttribute('aria-label',paused?'Phát hoạt cảnh':'Tạm dừng hoạt cảnh');toggle.setAttribute('aria-pressed',String(paused))}
-toggle.addEventListener('click',()=>{paused=!paused;last=null;update()});update();
+toggle.addEventListener('click',()=>{if(completed)return;paused=!paused;last=null;update()});update();
+window.addEventListener('message',event=>{
+ if(!introOnce||event.source!==window.parent||event.origin!==window.location.origin)return;
+ if(event.data?.type==='zenvora:garden-start'&&waitingForStart){
+  waitingForStart=false;last=null;
+  if(reduced)completeIntro();
+  else{time=0;paused=false;draw(time);update()}
+ }
+ if(event.data?.type==='zenvora:garden-pause'){paused=true;last=null;update()}
+});
+if(introOnce)window.parent.postMessage({type:'zenvora:garden-ready'},window.location.origin);
 window.zenvoraScene={seek(seconds){time=clamp(Number(seconds)||0,0,duration-.001);paused=true;last=null;update();draw(time)},play(){paused=false;last=null;update()},get state(){return{time,paused,duration,portrait}}};
 document.addEventListener('visibilitychange',()=>{pageVisible=!document.hidden;last=null});
 })();
