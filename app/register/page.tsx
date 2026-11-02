@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import styles from "../auth-garden.module.css";
+import AuthFlowerVideo from "../auth-flower-video";
 
 function registrationError(error: unknown) {
   const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
@@ -86,11 +87,7 @@ export default function RegisterPage() {
           <p className={styles.switch}>Đã có tài khoản? <Link href="/login">Đăng nhập</Link></p>
           <div className={styles.note}><span aria-hidden="true">✧</span> Mỗi ngày một chút. Tiến bộ từ gốc rễ.</div>
         </section>
-        <aside className={styles.garden} aria-label="Khu vườn AUNORA">
-          <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
-          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn AUNORA" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
-          <p className={styles.gardenQuote}>Small beginnings.<br/><em>Deep roots.</em></p>
-        </aside>
+        <AuthFlowerVideo variant="register"/>
       </div>
       <footer className={styles.footer}>AUNORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
     </main>
