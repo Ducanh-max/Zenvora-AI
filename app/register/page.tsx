@@ -65,14 +65,14 @@ export default function RegisterPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link href="/" className={styles.brand} aria-label="Zenvora — trang chủ"><span className={styles.mark} aria-hidden="true">z<span>✦</span></span><span>ZENVORA<span className={styles.brandDot}>.</span></span></Link>
+        <Link href="/" className={styles.brand} aria-label="AUNORA — trang chủ"><span className={styles.mark} aria-hidden="true">a<span>✦</span></span><span>AUNORA<span className={styles.brandDot}>.</span></span></Link>
         <Link href="/" className={styles.back}>← Về trang chủ</Link>
       </header>
       <div className={styles.layout}>
         <section className={styles.card} aria-labelledby="register-title">
           <span className={styles.eyebrow}>MỘT KHỞI ĐẦU NHỎ. MỘT HÀNH TRÌNH MỚI.</span>
           <h1 id="register-title">Gieo lời chào.<br/><em>Nuôi sự tự tin.</em></h1>
-          <p className={styles.intro}>Tạo tài khoản Zenvora để bắt đầu học<br/>và lưu những bước tiến của riêng bạn.</p>
+          <p className={styles.intro}>Tạo tài khoản AUNORA để bắt đầu học<br/>và lưu những bước tiến của riêng bạn.</p>
           <form onSubmit={submit} aria-busy={busy}>
             <fieldset className={styles.fields} disabled={busy}>
               <div className={styles.field}><label htmlFor="register-name">Họ và tên</label><input id="register-name" name="name" autoComplete="name" required maxLength={80} value={name} onChange={event => setName(event.target.value)} placeholder="Tên của bạn"/></div>
@@ -86,13 +86,13 @@ export default function RegisterPage() {
           <p className={styles.switch}>Đã có tài khoản? <Link href="/login">Đăng nhập</Link></p>
           <div className={styles.note}><span aria-hidden="true">✧</span> Mỗi ngày một chút. Tiến bộ từ gốc rễ.</div>
         </section>
-        <aside className={styles.garden} aria-label="Khu vườn Zenvora">
+        <aside className={styles.garden} aria-label="Khu vườn AUNORA">
           <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
-          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn Zenvora" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
+          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn AUNORA" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
           <p className={styles.gardenQuote}>Small beginnings.<br/><em>Deep roots.</em></p>
         </aside>
       </div>
-      <footer className={styles.footer}>ZENVORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
+      <footer className={styles.footer}>AUNORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
     </main>
   );
 }

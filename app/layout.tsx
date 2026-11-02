@@ -5,8 +5,8 @@ import FirebaseServices from "./firebase-services";
 import OnlinePresenceProvider from "./online-presence-provider";
 import "./globals.css";
 export const metadata: Metadata = {
-  title: "Zenvora — Học tiếng Anh cùng AI",
-  description: "Nuôi dưỡng tiếng Anh mỗi ngày cùng Zenvora và gia sư AI.",
+  title: "AUNORA — Học tiếng Anh cùng AI",
+  description: "Nuôi dưỡng tiếng Anh mỗi ngày cùng AUNORA và gia sư AI.",
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <html lang="vi"><body><OnlinePresenceProvider>{children}<Suspense fallback={null}><ScrollToTop /><FirebaseServices /></Suspense></OnlinePresenceProvider></body></html>;
