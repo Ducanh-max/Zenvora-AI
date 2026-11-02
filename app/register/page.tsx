@@ -4,19 +4,40 @@ import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import styles from "../auth-garden.module.css";
+
+function registrationError(error: unknown) {
+  const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (code === "weak_password" || message.includes("password should")) return "Mật khẩu chưa đủ mạnh. Hãy dùng ít nhất 8 ký tự và kết hợp chữ, số, ký hiệu.";
+  if (code === "email_address_invalid" || message.includes("invalid email")) return "Địa chỉ email chưa hợp lệ. Vui lòng kiểm tra lại.";
+  if (code === "user_already_exists" || code === "email_exists" || message.includes("already registered")) return "Không thể hoàn tất đăng ký. Nếu bạn đã có tài khoản, hãy đăng nhập hoặc khôi phục mật khẩu.";
+  if (code.includes("rate_limit") || message.includes("too many requests")) return "Bạn đã gửi quá nhiều yêu cầu. Vui lòng đợi một chút rồi thử lại.";
+  if (message.includes("fetch") || message.includes("network")) return "Chưa thể kết nối. Vui lòng kiểm tra mạng và thử lại.";
+  if (message.includes("cấu hình")) return "Đăng ký tạm thời chưa sẵn sàng. Vui lòng thử lại sau.";
+  return "Không thể đăng ký lúc này. Vui lòng thử lại sau.";
+}
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setBusy(true); setError(""); setNotice("");
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    if (!name.trim()) {
+      setError("Vui lòng nhập họ và tên của bạn.");
+      return;
+    }
+    setBusy(true);
+    setError("");
+    setNotice("");
     try {
       const supabase = createClient();
       const { data, error } = await supabase.auth.signUp({
@@ -28,29 +49,50 @@ export default function RegisterPage() {
         },
       });
       if (error) throw error;
-
       if (data.session) {
         router.replace("/learn");
         router.refresh();
       } else {
-        setNotice("Tạo tài khoản thành công! Hãy mở email để xác nhận tài khoản, sau đó quay lại đăng nhập AUNORA.");
+        setNotice("Nếu địa chỉ email này có thể đăng ký, bạn sẽ nhận được email xác nhận. Hãy kiểm tra hộp thư và thư rác trước khi đăng nhập.");
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Không thể tạo tài khoản. Vui lòng thử lại.");
+    } catch (error) {
+      setError(registrationError(error));
     } finally {
       setBusy(false);
     }
   }
 
-  return <main className="authpage">
-    <Link href="/" className="aunora-auth-brand"><span className="aunora-mark auth-brand-image"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA" /></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
-    <div className="auth-layout"><section className="authcard"><div className="eyebrow">BẮT ĐẦU MIỄN PHÍ</div><h1>Tạo tài khoản<br/><em>AUNORA.</em></h1><p>Mỗi ngày một bước nhỏ, tiếng Anh tiến bộ hơn.</p>
-      <form onSubmit={submit}><label htmlFor="register-name">Họ và tên</label><input id="register-name" autoComplete="name" required maxLength={80} value={name} onChange={e=>setName(e.target.value)} placeholder="Tên của bạn"/>
-        <label htmlFor="register-email">Email</label><input id="register-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/>
-        <label htmlFor="register-password">Mật khẩu</label><input id="register-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} placeholder="Ít nhất 8 ký tự"/>
-        {error&&<div className="formerror" role="alert">{error}</div>}{notice&&<div className="auth-notice" role="status">{notice}</div>}
-        <button className="btn authsubmit" disabled={busy}>{busy?"Đang tạo tài khoản...":"Tạo tài khoản"}</button>
-      </form><div className="authswitch">Đã có tài khoản? <Link href="/login">Đăng nhập</Link></div><p className="demo-note">Tài khoản được lưu trực tuyến và xác thực qua Supabase.</p>
-    </section><aside className="auth-mascot-panel"><div className="auth-mascot-glow"/><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta - gia sư AI của AUNORA"/><div className="auth-mascot-message"><span>✦ AUNORA AI TUTOR</span><strong>Xin chào, mình là Aivanta!</strong><p>Cùng học tiếng Anh mỗi ngày nhé! 💙</p></div></aside></div>
-  </main>;
+  return (
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <Link href="/" className={styles.brand} aria-label="Zenvora — trang chủ"><span className={styles.mark} aria-hidden="true">z<span>✦</span></span><span>ZENVORA<span className={styles.brandDot}>.</span></span></Link>
+        <Link href="/" className={styles.back}>← Về trang chủ</Link>
+      </header>
+      <div className={styles.layout}>
+        <section className={styles.card} aria-labelledby="register-title">
+          <span className={styles.eyebrow}>MỘT KHỞI ĐẦU NHỎ. MỘT HÀNH TRÌNH MỚI.</span>
+          <h1 id="register-title">Gieo lời chào.<br/><em>Nuôi sự tự tin.</em></h1>
+          <p className={styles.intro}>Tạo tài khoản Zenvora để bắt đầu học<br/>và lưu những bước tiến của riêng bạn.</p>
+          <form onSubmit={submit} aria-busy={busy}>
+            <fieldset className={styles.fields} disabled={busy}>
+              <div className={styles.field}><label htmlFor="register-name">Họ và tên</label><input id="register-name" name="name" autoComplete="name" required maxLength={80} value={name} onChange={event => setName(event.target.value)} placeholder="Tên của bạn"/></div>
+              <div className={styles.field}><label htmlFor="register-email">Email</label><input id="register-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required value={email} onChange={event => setEmail(event.target.value)} placeholder="ban@example.com"/></div>
+              <div className={styles.field}><label htmlFor="register-password">Mật khẩu</label><div className={styles.password}><input id="register-password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" required minLength={8} aria-describedby="password-help" value={password} onChange={event => setPassword(event.target.value)} placeholder="Tạo mật khẩu của bạn"/><button type="button" className={styles.reveal} aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? "Ẩn" : "Hiện"}</button></div><small className={styles.help} id="password-help">Ít nhất 8 ký tự. Nên kết hợp chữ, số và ký hiệu.</small></div>
+              {error ? <p className={styles.error} role="alert">{error}</p> : null}
+              {notice ? <p className={styles.notice} role="status">{notice}</p> : null}
+              <button className={styles.submit} type="submit" disabled={busy}>{busy ? <><span className={styles.spinner} aria-hidden="true"/>Đang tạo tài khoản…</> : <>Bắt đầu hành trình <span aria-hidden="true">↗</span></>}</button>
+            </fieldset>
+          </form>
+          <p className={styles.switch}>Đã có tài khoản? <Link href="/login">Đăng nhập</Link></p>
+          <div className={styles.note}><span aria-hidden="true">✧</span> Mỗi ngày một chút. Tiến bộ từ gốc rễ.</div>
+        </section>
+        <aside className={styles.garden} aria-label="Khu vườn Zenvora">
+          <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
+          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn Zenvora" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
+          <p className={styles.gardenQuote}>Small beginnings.<br/><em>Deep roots.</em></p>
+        </aside>
+      </div>
+      <footer className={styles.footer}>ZENVORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
+    </main>
+  );
 }

@@ -1,55 +1,41 @@
-"use client";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BookOpen, BrainCircuit, MessageCircle, Sparkles, ShieldCheck, Zap, Languages, Volume2, VolumeX, Maximize2 } from "lucide-react";
+import { ArrowRight, BookOpen, MessageCircle, Sprout } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import styles from "./garden-home.module.css";
 
-type Lang = "vi" | "en";
-const words = {
- vi: {
-  homeNav:"Trang chủ",aboutNav:"Về chúng tôi",featuresNav:"Tính năng", coursesNav:"Khóa học", login:"Đăng nhập", signup:"Bắt đầu miễn phí", kicker:"HỌC TIẾNG ANH THEO CÁCH MỚI",
-  title1:"Tiếng Anh tốt hơn,",title2:"bắt đầu từ hôm nay.",lead:"Học chủ động với bài tập tương tác, lộ trình rõ ràng và trợ lý AI luôn sẵn sàng đồng hành.",
-  explore:"Khám phá AUNORA",viewCourses:"Xem khóa học",trust1:"Học theo tốc độ của bạn",trust2:"Bài tập ngắn, dễ tiếp thu",
-  featureEyebrow:"HỌC HIỆU QUẢ HƠN",featureTitle:"Mọi thứ bạn cần để",featureAccent:"tiến bộ mỗi ngày.",featureLead:"Một không gian học tập gọn gàng, tập trung vào thực hành.",
-  f1:"Bài học tương tác",f1d:"Học qua tình huống, từ vựng và câu hỏi thay vì chỉ đọc lý thuyết.",f2:"Luyện tập thông minh",f2d:"Câu hỏi tương tác, phản hồi tức thì và theo dõi tiến độ.",f3:"Gia sư AI",f3d:"Trợ lý học tập giúp giải thích ngữ pháp và luyện hội thoại.",
-  space:"YOUR LEARNING SPACE",today:"Tiến độ hôm nay",word:"TỪ VỰNG HÔM NAY",meaning:"Tự tin — cảm thấy tin tưởng vào bản thân.",encourage:"✨ Tiếp tục cố gắng, bạn đang làm rất tốt!",streak:"Chuỗi học tập",ai:"Gia sư AI",
-  footer:"© 2026 AUNORA. Học tốt hơn mỗi ngày."
- },
- en: {
-  homeNav:"Home",aboutNav:"About us",featuresNav:"Features",coursesNav:"Courses",login:"Log in",signup:"Get started free",kicker:"A NEW WAY TO LEARN ENGLISH",
-  title1:"Better English,",title2:"starts today.",lead:"Learn actively with interactive exercises, a clear learning path, and an AI tutor ready to help.",
-  explore:"Explore AUNORA",viewCourses:"Explore courses",trust1:"Learn at your own pace",trust2:"Short, effective lessons",
-  featureEyebrow:"LEARN MORE EFFECTIVELY",featureTitle:"Everything you need to",featureAccent:"make progress every day.",featureLead:"A focused learning space built around practice.",
-  f1:"Interactive lessons",f1d:"Learn through real-life situations, vocabulary, and questions instead of just reading theory.",f2:"Smart practice",f2d:"Interactive questions, instant feedback, and progress tracking.",f3:"AI Tutor",f3d:"A learning assistant that explains grammar and helps you practice conversations.",
-  space:"YOUR LEARNING SPACE",today:"Today's progress",word:"WORD OF THE DAY",meaning:"Feeling sure about yourself.",encourage:"✨ Keep going, you're doing great!",streak:"Day streak",ai:"AI Tutor",
-  footer:"© 2026 AUNORA. Learn better every day."
- }
-};
-export default function Home() {
- const [lang,setLang]=useState<Lang>("vi");
- const [muted,setMuted]=useState(true);
- const videoRef=useRef<HTMLVideoElement>(null);
- function toggleSound(){const video=videoRef.current;if(!video)return;video.muted=!video.muted;setMuted(video.muted);}
- function openFullscreen(){const video=videoRef.current;if(!video)return;void video.requestFullscreen?.();}
- useEffect(()=>{const saved=localStorage.getItem("aunora_language");if(saved==="en"||saved==="vi")setLang(saved);},[]);
- function changeLang(value:Lang){setLang(value);localStorage.setItem("aunora_language",value);}
- const t=words[lang];
- const features=[
-  {icon:BookOpen,title:t.f1,text:t.f1d},
-  {icon:BrainCircuit,title:t.f2,text:t.f2d},
-  {icon:MessageCircle,title:t.f3,text:t.f3d}
- ];
- return <main className="marketing-page">
-  <nav className="nav wrap"><Link href="/" className="aunora-auth-brand"><span className="aunora-mark"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA" /></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link><div className="navlinks"><Link href="/">{t.homeNav}</Link><Link href="/about">{t.aboutNav}</Link><a href="#features">{t.featuresNav}</a><Link href="/courses">{t.coursesNav}</Link></div><div className="navactions"><div className="marketing-language" role="group" aria-label="Choose language"><Languages size={15}/><button type="button" className={lang==="vi"?"active":""} onClick={()=>changeLang("vi")}>VI</button><button type="button" className={lang==="en"?"active":""} onClick={()=>changeLang("en")}>EN</button></div><Link href="/login">{t.login}</Link><Link className="btn small" href="/register">{t.signup} <ArrowRight size={16}/></Link></div></nav>
-  <section className="hero wrap"><div><div className="eyebrow"><Sparkles size={15}/> {t.kicker}</div><h1>{t.title1}<br/><em>{t.title2}</em></h1><p className="lead">{t.lead}</p><div className="actions"><Link className="btn" href="/register">{t.explore} <ArrowRight size={18}/></Link><Link className="plain" href="/courses">{t.viewCourses}</Link></div><div className="trust"><span><ShieldCheck size={16}/> {t.trust1}</span><span><Zap size={16}/> {t.trust2}</span></div></div>
-  <div className="visual landing-video-visual">
-    <div className="landing-video-frame">
-      <video ref={videoRef} className="landing-intro-video" src="/videos/aunora-intro.mp4.mp4" poster="/brand/aivanta-mascot.webp.png" autoPlay muted loop playsInline preload="metadata" aria-label={lang==="vi"?"Video giới thiệu AUNORA và Aivanta":"AUNORA and Aivanta introduction video"} />
-      <div className="landing-video-controls"><span>✦ AUNORA · AIVANTA</span><div><button type="button" onClick={toggleSound} aria-label={muted?(lang==="vi"?"Bật tiếng":"Unmute"):(lang==="vi"?"Tắt tiếng":"Mute")}>{muted?<VolumeX size={19}/>:<Volume2 size={19}/>}</button><button type="button" onClick={openFullscreen} aria-label={lang==="vi"?"Xem toàn màn hình":"Fullscreen"}><Maximize2 size={19}/></button></div></div>
-    </div>
-    <p className="landing-video-caption">{lang==="vi"?"Gặp gỡ Aivanta – người bạn đồng hành cùng bạn trên hành trình học tiếng Anh.":"Meet Aivanta – your companion on the journey to better English."}</p>
-   </div></section>
-  <section id="features" className="features wrap"><div className="center"><div className="eyebrow">{t.featureEyebrow}</div><h2>{t.featureTitle} <em>{t.featureAccent}</em></h2><p>{t.featureLead}</p></div><div className="grid">{features.map(({icon:Icon,title,text})=><article key={title}><div className="icon"><Icon/></div><h3>{title}</h3><p>{text}</p></article>)}</div></section>
-  <section className="courses"><div className="wrap courseinner"><div><div className="eyebrow">{t.coursesNav.toUpperCase()}</div><h2>{lang==="vi"?"Bắt đầu từ nền tảng,":"Start with the basics,"}<br/><em>{lang==="vi"?"tiến xa hơn mỗi ngày.":"go further every day."}</em></h2><p>{lang==="vi"?"Khám phá 5 khóa học được thiết kế theo lộ trình rõ ràng.":"Explore five courses designed around a clear learning path."}</p><Link className="btn" href="/courses">{t.viewCourses} <ArrowRight size={16}/></Link></div><article className="coursecard"><div className="coursehead"><b>{lang==="vi"?"MIỄN PHÍ":"FREE"}</b><span>01 / 05</span></div><div className="letter">A</div><h3>English Starter</h3><p>{lang==="vi"?"Xây dựng nền tảng từ vựng, câu giao tiếp và ngữ pháp cơ bản.":"Build your foundation in vocabulary, everyday phrases, and basic grammar."}</p><div className="meta">🌱 {lang==="vi"?"Cơ bản":"Beginner"} <span>12 {lang==="vi"?"bài học":"lessons"}</span></div><Link href="/courses" className="btn full">{t.viewCourses} <ArrowRight size={16}/></Link></article></div></section>
-  <footer className="wrap footer"><Link href="/" className="brand"><img src="/brand/aunora-logo.webp.png" alt="" className="landing-footer-logo"/> AUNORA</Link><small>{t.footer}</small></footer>
- </main>;
+export default async function Home() {
+  let signedIn = false;
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      signedIn = Boolean(user);
+    } catch {
+      // Keep the public introduction available during a temporary auth outage.
+    }
+  }
+  const features = [
+    { Icon: BookOpen, title: "Bắt đầu từ nền tảng", text: "Từ vựng, ngữ pháp và tình huống thực tế theo từng bước nhỏ.", href: "/courses", action: "Khám phá khóa học" },
+    { Icon: MessageCircle, title: "Tự tin cất lời", text: "Dành thời gian luyện nói để tiếng Anh trở nên quen thuộc hơn.", href: "/learn/speaking", action: "Vào không gian luyện nói" },
+    { Icon: Sprout, title: "Có AI đồng hành", text: "Hỏi điều chưa rõ, luyện hội thoại và tiếp tục hành trình của riêng bạn.", href: "/learn/tutor", action: "Gặp gia sư AI" },
+  ];
+  return <main className={styles.page}>
+    <header className={styles.header}>
+      <Link href="/" className={styles.brand} aria-label="Zenvora — Trang chủ"><span className={styles.mark} aria-hidden="true"><Sprout size={23} strokeWidth={1.3}/></span><span>ZENVORA<small>YOUR ENGLISH TAKES ROOT</small></span></Link>
+      <nav className={styles.navigation} aria-label="Điều hướng chính">
+        <Link href="/courses" className={styles.coursesLink}>Khóa học</Link>
+        <Link href={signedIn ? "/learn/profile" : "/login"} className={styles.login}>{signedIn ? "Tài khoản" : "Đăng nhập"}</Link>
+        <Link href={signedIn ? "/learn" : "/register"} className={styles.headerButton}>{signedIn ? "Vào học" : "Đăng ký"}<ArrowRight size={15}/></Link>
+      </nav>
+    </header>
+    <section className={styles.story} aria-label="Kỹ năng lớn lên từ những điều nhỏ">
+      <iframe src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn: cây rễ nông đổ trong mưa, cây được chăm sóc lớn lên với bộ rễ sâu" className={styles.frame} loading="eager" referrerPolicy="same-origin"/>
+    </section>
+    <section className={styles.invitation} aria-labelledby="invitation-title">
+      <div><p className={styles.eyebrow}><span aria-hidden="true"/> A LITTLE PRACTICE. DEEPER ROOTS.</p><h1 id="invitation-title">Tiếng Anh vững vàng.<br className={styles.mobileBreak}/><em> Từ những điều nhỏ.</em></h1><p className={styles.lead}>Một bài học ngắn, một cuộc trò chuyện mới. Nuôi dưỡng sự tự tin của bạn mỗi ngày.</p></div>
+      <div className={styles.actions}><Link className={styles.primary} href={signedIn ? "/learn" : "/register"}>{signedIn ? "Tiếp tục hành trình" : "Bắt đầu học miễn phí"}<ArrowRight size={17}/></Link><Link className={styles.secondary} href={signedIn ? "/learn/profile" : "/login"}>{signedIn ? "Tài khoản của bạn" : "Đã có tài khoản? Đăng nhập"}</Link></div>
+    </section>
+    <section className={styles.features} aria-label="Không gian học tiếng Anh">{features.map(({Icon,title,text,href,action},i)=><Link key={href} href={href} className={styles.feature}><Icon size={22} strokeWidth={1.25}/><span className={styles.featureNumber}>0{i+1}</span><h2>{title}</h2><p>{text}</p><span className={styles.featureLink}>{action}<ArrowRight size={14}/></span></Link>)}</section>
+    <footer className={styles.footer}><Link href="/">ZENVORA</Link><span>Learn a little. Grow a little. Every day.</span><Link href="/about">Về chúng tôi</Link></footer>
+  </main>;
 }

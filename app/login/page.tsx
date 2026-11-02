@@ -4,55 +4,82 @@ import Link from "next/link";
 import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import styles from "../auth-garden.module.css";
+
+function loginError(error: unknown) {
+  const code = typeof error === "object" && error !== null && "code" in error ? String(error.code) : "";
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+  if (code === "invalid_credentials" || message.includes("invalid login credentials")) return "Email hoặc mật khẩu chưa đúng. Vui lòng kiểm tra và thử lại.";
+  if (code === "email_not_confirmed") return "Bạn cần xác nhận email trước khi đăng nhập. Hãy kiểm tra hộp thư và thư rác.";
+  if (code.includes("rate_limit") || message.includes("too many requests")) return "Bạn đã thử quá nhiều lần. Vui lòng đợi một chút rồi thử lại.";
+  if (message.includes("fetch") || message.includes("network")) return "Chưa thể kết nối. Vui lòng kiểm tra mạng và thử lại.";
+  if (message.includes("cấu hình")) return "Đăng nhập tạm thời chưa sẵn sàng. Vui lòng thử lại sau.";
+  return "Không thể đăng nhập lúc này. Vui lòng thử lại hoặc khôi phục mật khẩu.";
+}
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  async function submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setBusy(true); setError("");
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError("");
     try {
       const supabase = createClient();
-      const { error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
       if (error) throw error;
       const next = searchParams.get("next");
-      const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+      const safeNext = next && next.startsWith("/") && !next.startsWith("//") && !/[\\\u0000-\u001f\u007f]/.test(next) ? next : null;
       const { data: { user } } = await supabase.auth.getUser();
-      const destination = safeNext || (user?.app_metadata?.role === "admin" ? "/admin" : "/learn");
-      router.replace(destination);
+      router.replace(safeNext || (user?.app_metadata?.role === "admin" ? "/admin" : "/learn"));
       router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Không thể đăng nhập. Vui lòng thử lại.");
+    } catch (error) {
+      setError(loginError(error));
     } finally {
       setBusy(false);
     }
   }
 
-  return <main className="authpage">
-    <Link href="/" className="aunora-auth-brand"><span className="aunora-mark auth-brand-image"><img src="/brand/aunora-logo.webp.png" alt="Logo AUNORA" /></span><span className="aunora-wordmark"><b>AUNORA</b><small>LEARN • GROW • GLOW</small></span></Link>
-    <div className="auth-layout"><section className="authcard"><div className="eyebrow">CHÀO MỪNG TRỞ LẠI</div><h1>Tiếp tục hành trình<br/><em>học tiếng Anh.</em></h1><p>Đăng nhập để tiếp tục bài học của bạn.</p>
-      <form onSubmit={submit}><label htmlFor="login-email">Email</label><input id="login-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/><label htmlFor="login-password">Mật khẩu</label><input id="login-password" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Nhập mật khẩu"/>
-        {error&&<div className="formerror" role="alert">{error}</div>}
-        <button className="btn authsubmit" disabled={busy}>{busy?"Đang đăng nhập...":"Đăng nhập"}</button>
-      </form><div className="authswitch"><Link href="/forgot-password">Quên mật khẩu?</Link></div><div className="authswitch">Chưa có tài khoản? <Link href="/register">Đăng ký miễn phí</Link></div><p className="demo-note">Tài khoản được xác thực an toàn qua Supabase.</p>
-    </section><aside className="auth-mascot-panel"><div className="auth-mascot-glow"/><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta - gia sư AI của AUNORA"/><div className="auth-mascot-message"><span>✦ AUNORA AI TUTOR</span><strong>Xin chào, mình là Aivanta!</strong><p>Cùng học tiếng Anh mỗi ngày nhé! 💙</p></div></aside></div>
-  </main>;
-}
-
-
-export default function LoginPage() {
   return (
-    <Suspense fallback={<main className="authpage"><section className="authcard"><p>Đang tải trang đăng nhập...</p></section></main>}>
-      <LoginPageContent />
-    </Suspense>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <Link href="/" className={styles.brand} aria-label="Zenvora — trang chủ"><span className={styles.mark} aria-hidden="true">z<span>✦</span></span><span>ZENVORA<span className={styles.brandDot}>.</span></span></Link>
+        <Link href="/" className={styles.back}>← Về trang chủ</Link>
+      </header>
+      <div className={styles.layout}>
+        <section className={styles.card} aria-labelledby="login-title">
+          <span className={styles.eyebrow}>MỖI NGÀY, MỘT CHÚT TỰ TIN</span>
+          <h1 id="login-title">Chào mừng<br/><em>bạn trở lại.</em></h1>
+          <p className={styles.intro}>Khu vườn của bạn vẫn đang lớn lên.<br/>Đăng nhập để tiếp tục hành trình tiếng Anh.</p>
+          <form onSubmit={submit} aria-busy={busy}>
+            <fieldset className={styles.fields} disabled={busy}>
+              <div className={styles.field}><label htmlFor="login-email">Email</label><input id="login-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required value={email} onChange={event => setEmail(event.target.value)} placeholder="ban@example.com"/></div>
+              <div className={styles.field}><div className={styles.labelRow}><label htmlFor="login-password">Mật khẩu</label><Link href="/forgot-password">Quên mật khẩu?</Link></div><div className={styles.password}><input id="login-password" name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" required value={password} onChange={event => setPassword(event.target.value)} placeholder="Nhập mật khẩu của bạn"/><button type="button" className={styles.reveal} aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"} aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? "Ẩn" : "Hiện"}</button></div></div>
+              {error ? <p className={styles.error} role="alert">{error}</p> : null}
+              <button className={styles.submit} type="submit" disabled={busy}>{busy ? <><span className={styles.spinner} aria-hidden="true"/>Đang đăng nhập…</> : <>Tiếp tục hành trình <span aria-hidden="true">↗</span></>}</button>
+            </fieldset>
+          </form>
+          <p className={styles.switch}>Bạn mới đến Zenvora? <Link href="/register">Tạo tài khoản</Link></p>
+          <div className={styles.note}><span aria-hidden="true">✧</span> Không cần hoàn hảo. Cứ bắt đầu nói thôi.</div>
+        </section>
+        <aside className={styles.garden} aria-label="Khu vườn Zenvora">
+          <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
+          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn Zenvora" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
+          <p className={styles.gardenQuote}>Confidence grows<br/><em>with practice.</em></p>
+        </aside>
+      </div>
+      <footer className={styles.footer}>ZENVORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
+    </main>
   );
 }
 
+export default function LoginPage() {
+  return <Suspense fallback={<main className={styles.page}><div className={styles.loading} role="status"><span className={styles.spinner} aria-hidden="true"/> Đang tải trang đăng nhập…</div></main>}><LoginPageContent/></Suspense>;
+}
