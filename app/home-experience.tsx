@@ -6,9 +6,9 @@ import { ArrowRight, BookOpen, MessageCircle, RotateCcw, Sprout } from "lucide-r
 import styles from "./garden-home.module.css";
 
 const features = [
-  { Icon: BookOpen, title: "Bắt đầu từ nền tảng", text: "Từ vựng và tình huống thực tế.", href: "/courses", action: "Khám phá khóa học" },
-  { Icon: MessageCircle, title: "Tự tin cất lời", text: "Luyện nói, từng cuộc trò chuyện.", href: "/learn/speaking", action: "Luyện nói tiếng Anh" },
-  { Icon: Sprout, title: "Có AI đồng hành", text: "Hỏi điều chưa rõ, học theo cách riêng.", href: "/learn/tutor", action: "Gặp gia sư AI" },
+  { Icon: BookOpen, tag: "BUILD YOUR FOUNDATION", title: "Bắt đầu từ nền tảng", text: "Từ vựng và tình huống thực tế.", href: "/courses", action: "Khám phá khóa học" },
+  { Icon: MessageCircle, tag: "FIND YOUR VOICE", title: "Tự tin cất lời", text: "Luyện nói, từng cuộc trò chuyện.", href: "/learn/speaking", action: "Luyện nói tiếng Anh" },
+  { Icon: Sprout, tag: "MEET YOUR AI COMPANION", title: "Có AI đồng hành", text: "Hỏi điều chưa rõ, học theo cách riêng.", href: "/learn/tutor", action: "Gặp gia sư AI" },
 ];
 
 export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
@@ -66,7 +66,7 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
 
   return <main className={styles.page}>
     <header className={styles.header}>
-      <Link href="/" className={styles.brand} aria-label="Zenvora — Trang chủ"><span className={styles.mark} aria-hidden="true"><Sprout size={22} strokeWidth={1.3}/></span><span>ZENVORA<small>YOUR ENGLISH TAKES ROOT</small></span></Link>
+      <Link href="/" className={styles.brand} aria-label="AUNORA — Trang chủ"><span className={styles.mark} aria-hidden="true"><Sprout size={22} strokeWidth={1.3}/></span><span>AUNORA<small>LEARN · GROW · GLOW</small></span></Link>
       <nav className={styles.navigation} aria-label="Điều hướng chính">
         <Link href="/courses" className={styles.coursesLink}>Khóa học</Link>
         <Link href={signedIn ? "/learn/profile" : "/login"} className={styles.login}>{signedIn ? "Tài khoản" : "Đăng nhập"}</Link>
@@ -80,16 +80,16 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
       </section>
       {finished ? <section className={styles.content} aria-labelledby="invitation-title">
         <div className={styles.invitation}>
-          <p className={styles.eyebrow}><span aria-hidden="true"/> A LITTLE PRACTICE. DEEPER ROOTS.</p>
+          <p className={styles.eyebrow}><span aria-hidden="true"/> YOUR NEXT CHAPTER STARTS HERE</p>
           <h1 id="invitation-title" ref={headingRef} tabIndex={-1}>Tiếng Anh vững vàng.<br/><em>Từ những điều nhỏ.</em></h1>
           <p className={styles.lead}>Một bài học ngắn, một cuộc trò chuyện mới.<br/>Nuôi dưỡng sự tự tin của bạn mỗi ngày.</p>
           <div className={styles.actions}><Link className={styles.primary} href={signedIn ? "/learn" : "/register"}>{signedIn ? "Tiếp tục hành trình" : "Bắt đầu học miễn phí"}<ArrowRight size={17}/></Link><Link className={styles.secondary} href={signedIn ? "/learn/profile" : "/login"}>{signedIn ? "Tài khoản của bạn" : "Đã có tài khoản? Đăng nhập"}</Link></div>
         </div>
-        <div className={styles.features} aria-label="Không gian học tiếng Anh">{features.map(({Icon,title,text,href,action},i)=><Link key={href} href={href} className={styles.feature}><Icon size={21} strokeWidth={1.25}/><div><h2>{title}</h2><p>{text}</p><span className={styles.featureLink}>{action}<ArrowRight size={13}/></span></div><span className={styles.featureNumber}>0{i+1}</span></Link>)}</div>
+        <div className={styles.features} aria-label="Không gian học tiếng Anh">{features.map(({Icon,tag,title,text,href,action},i)=><Link key={href} href={href} className={styles.feature}><span className={styles.featureIcon}><Icon size={23} strokeWidth={1.5}/></span><div><span className={styles.featureTag}>{tag}</span><h2>{title}</h2><p>{text}</p><span className={styles.featureLink}>{action}<ArrowRight size={13}/></span></div><span className={styles.featureNumber}>0{i+1}</span></Link>)}</div>
         <button className={styles.replay} type="button" onClick={replay}><RotateCcw size={13}/> Xem lại câu chuyện</button>
       </section> : null}
     </div>
     <span className={styles.announcement} role="status">{finished ? "Hoạt cảnh đã kết thúc. Phần giới thiệu và bắt đầu học đã xuất hiện." : "Hoạt cảnh đang chạy. Phần giới thiệu sẽ tự hiện khi kết thúc."}</span>
-    <noscript><div className={styles.noScript}><h1>Học tiếng Anh cùng Zenvora</h1><Link href="/register">Đăng ký</Link><Link href="/login">Đăng nhập</Link></div></noscript>
+    <noscript><div className={styles.noScript}><h1>Học tiếng Anh cùng AUNORA</h1><Link href="/register">Đăng ký</Link><Link href="/login">Đăng nhập</Link></div></noscript>
   </main>;
 }

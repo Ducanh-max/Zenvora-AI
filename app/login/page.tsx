@@ -50,7 +50,7 @@ function LoginPageContent() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link href="/" className={styles.brand} aria-label="Zenvora — trang chủ"><span className={styles.mark} aria-hidden="true">z<span>✦</span></span><span>ZENVORA<span className={styles.brandDot}>.</span></span></Link>
+        <Link href="/" className={styles.brand} aria-label="AUNORA — trang chủ"><span className={styles.mark} aria-hidden="true">a<span>✦</span></span><span>AUNORA<span className={styles.brandDot}>.</span></span></Link>
         <Link href="/" className={styles.back}>← Về trang chủ</Link>
       </header>
       <div className={styles.layout}>
@@ -66,16 +66,16 @@ function LoginPageContent() {
               <button className={styles.submit} type="submit" disabled={busy}>{busy ? <><span className={styles.spinner} aria-hidden="true"/>Đang đăng nhập…</> : <>Tiếp tục hành trình <span aria-hidden="true">↗</span></>}</button>
             </fieldset>
           </form>
-          <p className={styles.switch}>Bạn mới đến Zenvora? <Link href="/register">Tạo tài khoản</Link></p>
+          <p className={styles.switch}>Bạn mới đến AUNORA? <Link href="/register">Tạo tài khoản</Link></p>
           <div className={styles.note}><span aria-hidden="true">✧</span> Không cần hoàn hảo. Cứ bắt đầu nói thôi.</div>
         </section>
-        <aside className={styles.garden} aria-label="Khu vườn Zenvora">
+        <aside className={styles.garden} aria-label="Khu vườn AUNORA">
           <div className={styles.gardenHeading}><span className={styles.eyebrow}>THE ENGLISH GARDEN</span><span className={styles.gardenChapter}>CHAPTER 01</span></div>
-          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn Zenvora" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
+          <div className={styles.frameWrap}><iframe className={styles.frame} src="/zenvora-garden/animation.html" title="Hoạt cảnh khu vườn AUNORA" loading="lazy" aria-hidden="true" tabIndex={-1}/></div>
           <p className={styles.gardenQuote}>Confidence grows<br/><em>with practice.</em></p>
         </aside>
       </div>
-      <footer className={styles.footer}>ZENVORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
+      <footer className={styles.footer}>AUNORA <span>LEARN A LITTLE. GROW EVERY DAY.</span></footer>
     </main>
   );
 }
