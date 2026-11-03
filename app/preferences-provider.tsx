@@ -1,8 +1,10 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import { flushSync } from "react-dom";
+import { transitionTheme } from "./theme-transition";
 
 export type Language = "vi" | "en";
 export type Theme = "dark" | "light";
@@ -19,6 +21,7 @@ function apply(theme: Theme, language: Language) {
 
 export default function PreferencesProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const changingTheme = useRef(false);
   const [theme, updateTheme] = useState<Theme>("dark");
   const [language, updateLanguage] = useState<Language>("vi");
   useEffect(() => {
@@ -46,8 +49,16 @@ export default function PreferencesProvider({ children }: { children: ReactNode 
   }, [language, pathname]);
 
   const setTheme = useCallback((value: Theme) => {
-    updateTheme(value); document.documentElement.dataset.theme = value; document.documentElement.style.colorScheme = value;
-    try { localStorage.setItem("aunora_theme", value); } catch { /* Session preference remains active. */ }
+    if (changingTheme.current || document.documentElement.dataset.theme === value) return;
+    changingTheme.current = true;
+    void transitionTheme(value, () => {
+      flushSync(() => {
+        updateTheme(value);
+        document.documentElement.dataset.theme = value;
+        document.documentElement.style.colorScheme = value;
+      });
+      try { localStorage.setItem("aunora_theme", value); } catch { /* Session preference remains active. */ }
+    }).finally(() => { changingTheme.current = false; });
   }, []);
   const setLanguage = useCallback((value: Language) => {
     updateLanguage(value); document.documentElement.dataset.language = value; document.documentElement.lang = value;

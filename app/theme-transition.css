@@ -1,0 +1,11 @@
+/* Theme changes are a vertical reveal, not a crossfade or a layout movement. */
+html[data-theme-slide]::view-transition-old(root),
+html[data-theme-slide]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html[data-theme-slide]::view-transition-old(root){z-index:1}
+html[data-theme-slide]::view-transition-new(root){z-index:2}
+html[data-theme-slide="down"]::view-transition-new(root){animation:aunora-theme-down 550ms cubic-bezier(.22,1,.36,1) both}
+html[data-theme-slide="up"]::view-transition-new(root){animation:aunora-theme-up 550ms cubic-bezier(.22,1,.36,1) both}
+html[data-theme-slide] *,html[data-theme-slide] *::before,html[data-theme-slide] *::after{transition:none!important}
+@keyframes aunora-theme-down{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes aunora-theme-up{from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0 0 0 0)}}
+@media(prefers-reduced-motion:reduce){html[data-theme-slide]::view-transition-old(root),html[data-theme-slide]::view-transition-new(root){animation:none!important}}

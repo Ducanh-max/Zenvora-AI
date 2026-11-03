@@ -5,6 +5,7 @@ import FirebaseServices from "./firebase-services";
 import OnlinePresenceProvider from "./online-presence-provider";
 import PreferencesProvider from "./preferences-provider";
 import "./globals.css";
+import "./theme-transition.css";
 export const metadata: Metadata = {
   title: "AUNORA — Học tiếng Anh cùng AI",
   description: "Nuôi dưỡng tiếng Anh mỗi ngày cùng AUNORA và gia sư AI.",
