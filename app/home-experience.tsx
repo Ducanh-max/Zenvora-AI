@@ -21,6 +21,7 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
   const { language } = usePreferences();
   const t = copy[language];
   const [finished, setFinished] = useState(false);
+  const [introMounted, setIntroMounted] = useState(true);
   const frameRef = useRef<HTMLIFrameElement>(null);
   const introRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -61,6 +62,13 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
     }
   }, [finished]);
 
+  useEffect(() => {
+    if (!finished) return;
+    // Release the finished canvas after its exit transition.
+    const timer = window.setTimeout(() => setIntroMounted(false), 600);
+    return () => window.clearTimeout(timer);
+  }, [finished]);
+
   function skip() {
     completedRef.current = true;
     frameRef.current?.contentWindow?.postMessage({ type: "zenvora:garden-pause" }, window.location.origin);
@@ -77,10 +85,10 @@ export default function HomeExperience({ signedIn }: { signedIn: boolean }) {
       </nav>
     </header>
     <div className={styles.viewport}>
-      <section ref={introRef} className={`${styles.intro} ${finished ? styles.introFinished : ""}`} aria-label={t.scene} aria-hidden={finished} inert={finished}>
+      {introMounted ? <section ref={introRef} className={`${styles.intro} ${finished ? styles.introFinished : ""}`} aria-label={t.scene} aria-hidden={finished} inert={finished}>
         <div className={styles.story}><iframe ref={frameRef} onLoad={sendStart} src="/zenvora-garden/animation.html?intro=once" title={t.sceneTitle} className={styles.frame} loading="eager" referrerPolicy="same-origin"/></div>
         <button className={styles.skip} type="button" onClick={skip}>{t.skip} <ArrowRight size={13}/></button>
-      </section>
+      </section> : null}
       {finished ? <section className={styles.content} aria-labelledby="invitation-title">
         <div className={styles.invitation}>
           <p className={styles.eyebrow}><span aria-hidden="true"/> {t.eyebrow}</p>

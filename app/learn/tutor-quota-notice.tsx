@@ -1,12 +1,51 @@
 "use client";
 import Link from "next/link";
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 type Quota={used:number;quota:number;remaining:number;locked:boolean;resetAt:string};
 export default function TutorQuotaNotice({onLock}:{onLock?:(locked:boolean)=>void}){
  const [quota,setQuota]=useState<Quota|null>(null),[now,setNow]=useState(Date.now());
+ const lockCallback=useRef(onLock);
+ useEffect(()=>{lockCallback.current=onLock},[onLock]);
  const [conversation,setConversation]=useState<{title:string;percent:number}|null>(null);
  useEffect(()=>{const read=()=>{try{const raw=localStorage.getItem("aunora_conversation_progress");if(!raw){setConversation(null);return;}const data=JSON.parse(raw);const count=Math.max(0,Math.min(5,Number(data.count)||0));setConversation({title:String(data.title||"Hội thoại với Aivanta"),percent:Math.round(count/5*100)});}catch{setConversation(null)}};read();window.addEventListener("focus",read);window.addEventListener("storage",read);window.addEventListener("aunora-progress-updated",read);return()=>{window.removeEventListener("focus",read);window.removeEventListener("storage",read);window.removeEventListener("aunora-progress-updated",read)}},[]);
- useEffect(()=>{let alive=true;const refresh=async()=>{try{const res=await fetch("/api/tutor/quota",{cache:"no-store"});if(!res.ok)return;const data:Quota=await res.json();if(alive){setQuota(data);onLock?.(data.locked)}}catch{}};void refresh();const interval=setInterval(()=>{setNow(Date.now());void refresh()},1000*15);return()=>{alive=false;clearInterval(interval)}},[onLock]);
+ useEffect(()=>{
+  let alive=true,busy=false,queued=false;
+  let controller:AbortController|null=null;
+  const refresh=async()=>{
+   if(!alive||document.visibilityState==="hidden"||navigator.onLine===false)return;
+   if(busy){queued=true;return;}
+   busy=true;
+   const request=new AbortController();controller=request;
+   try{
+    const response=await fetch("/api/tutor/quota",{cache:"no-store",signal:request.signal});
+    if(!response.ok)return;
+    const data:Quota=await response.json();
+    if(alive&&!request.signal.aborted){
+     setNow(Date.now());
+     setQuota(previous=>previous&&previous.used===data.used&&previous.quota===data.quota&&previous.remaining===data.remaining&&previous.locked===data.locked&&previous.resetAt===data.resetAt?previous:data);
+     lockCallback.current?.(data.locked);
+    }
+   }catch{/* Keep the last known quota during network interruptions. */}
+   finally{busy=false;controller=null;if(queued){queued=false;void refresh();}}
+  };
+  const onVisibility=()=>{if(document.visibilityState==="hidden")controller?.abort();else void refresh();};
+  const onRefresh=()=>void refresh();
+  void refresh();
+  const interval=window.setInterval(onRefresh,30000);
+  document.addEventListener("visibilitychange",onVisibility);
+  window.addEventListener("focus",onRefresh);
+  window.addEventListener("online",onRefresh);
+  window.addEventListener("aunora-progress-updated",onRefresh);
+  window.addEventListener("aunora-quota-updated",onRefresh);
+  return()=>{
+   alive=false;controller?.abort();window.clearInterval(interval);
+   document.removeEventListener("visibilitychange",onVisibility);
+   window.removeEventListener("focus",onRefresh);
+   window.removeEventListener("online",onRefresh);
+   window.removeEventListener("aunora-progress-updated",onRefresh);
+   window.removeEventListener("aunora-quota-updated",onRefresh);
+  };
+ },[]);
  if(!quota||quota.quota<0)return null;
  const locked=quota.locked && new Date(quota.resetAt).getTime()>now;
  const completed=conversation?.percent===100;

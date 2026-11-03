@@ -1,16 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import {imageAsset} from "@/lib/image-assets";
 import { createPortal } from "react-dom";
-import LessonTutor from "./lesson-tutor";
-import LessonPractice from "./lesson-practice";
-import AdventureLesson from "./adventure-lesson";
-import ScheduledReview from "./scheduled-review";
+
+
+
+
 import {SAMPLE_IDS} from "./sample-intro-content";
 import "./course-design.css";
 import "./adventure-lesson.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, ChevronRight, RotateCcw, Trophy, Volume2, XCircle } from "lucide-react";
+
+function LessonLoading() {
+  return <p role="status" style={{padding:24,textAlign:"center"}}>Đang tải nội dung…</p>;
+}
+const LessonTutor=dynamic(()=>import("./lesson-tutor"),{loading:LessonLoading});
+const LessonPractice=dynamic(()=>import("./lesson-practice"),{loading:LessonLoading});
+const AdventureLesson=dynamic(()=>import("./adventure-lesson"),{loading:LessonLoading});
+const ScheduledReview=dynamic(()=>import("./scheduled-review"),{loading:LessonLoading});
 
 type Vocabulary = { word: string; meaning: string; pronunciation?: string; example: string };
 type Example = { english: string; vietnamese: string };
@@ -73,11 +83,16 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const [selected, setSelected] = useState<LibraryLesson | null>(null);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [enteringLesson, setEnteringLesson] = useState<LibraryLesson | null>(null);
+  const enteringTimer=useRef<number|undefined>(undefined);
+  useEffect(()=>()=>{if(enteringTimer.current!==undefined)window.clearTimeout(enteringTimer.current)},[]);
   useEffect(()=>{try{const saved=sessionStorage.getItem("aunora_active_lesson")||localStorage.getItem("aunora_resume_lesson");if(!saved)return;const item=JSON.parse(saved) as {slug:string;course:string};const found=lessons.find(l=>l.slug===item.slug&&courses.some(c=>c.id===l.course_id&&c.slug===item.course));if(found){setSelectedCourseSlug(item.course);setSelectedSection(Math.floor(Math.max(0,lessons.filter(l=>l.course_id===found.course_id).sort((a,b)=>a.sort_order-b.sort_order).findIndex(l=>l.id===found.id))/10));setSelected(found);sessionStorage.removeItem("aunora_active_lesson");sessionStorage.removeItem("aunora_returning_to_lesson");localStorage.removeItem("aunora_resume_lesson");}}catch{}},[lessons,courses]);
   useEffect(()=>{if(selected){try{sessionStorage.setItem("aunora_active_lesson",JSON.stringify({slug:selected.slug,course:selectedCourseSlug}));localStorage.setItem("aunora_last_unfinished_lesson",JSON.stringify({slug:selected.slug,course:selectedCourseSlug,id:selected.id,title:selected.title}));}catch{}}},[selected,selectedCourseSlug]);
   function openLesson(lesson: LibraryLesson) {
+    if(enteringTimer.current!==undefined)window.clearTimeout(enteringTimer.current);
+    // Begin fetching the lesson while the brief entrance transition runs.
+    if((lesson.content.vocabulary||[]).length>=3)void import("./adventure-lesson").catch(()=>{});
     setEnteringLesson(lesson);
-    window.setTimeout(() => { setSelected(lesson); setMode("learn"); setEnteringLesson(null); }, 550);
+    enteringTimer.current=window.setTimeout(() => { enteringTimer.current=undefined;setSelected(lesson); setMode("learn"); setEnteringLesson(null); }, 180);
   }
   const [mode, setMode] = useState<"learn" | "quiz" | "result">("learn");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -186,7 +201,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
   const availableQuestionCount = selected ? buildQuestionBank(selected).length : 0;
 
   if (enteringLesson) {
-    return <section className="aunora-loading" aria-live="polite" aria-busy="true"><div className="aunora-loading-card" role="status"><img className="aunora-loading-wolf" src="/brand/wolf-face/aivanta-face.png" alt=""/><h1 className="aunora-loading-title">Aivanta đang chuẩn bị bài học...</h1><p className="aunora-loading-desc">Sẵn sàng khám phá: {enteringLesson.title}</p><div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar"/></div></div></section>;
+    return <section className="aunora-loading" aria-live="polite" aria-busy="true"><div className="aunora-loading-card" role="status"><img className="aunora-loading-wolf" src="/_next/image?url=%2Fbrand%2Fwolf-face%2Faivanta-face.png&w=640&q=85" alt=""/><h1 className="aunora-loading-title">Aivanta đang chuẩn bị bài học...</h1><p className="aunora-loading-desc">Sẵn sàng khám phá: {enteringLesson.title}</p><div className="aunora-loading-track" aria-hidden="true"><div className="aunora-loading-bar"/></div></div></section>;
   }
   if (selected && (selected.content.vocabulary || []).length >= 3) {
     return <AdventureLesson canReviewQuestions={canReviewQuestions} lesson={{id:selected.id,title:selected.title,words:selected.content.vocabulary||[],dialogue:selected.content.dialogue,examples:selected.content.examples,goal:selected.content.lesson_goal,review:selected.slug.includes("-review-"),test:selected.slug.includes("-test-")}} onExit={resetLesson} onFinish={async(correct,total)=>{setScore(correct);setSaving(true);try{const response=await fetch("/api/lesson-progress",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({lessonId:selected.slug,courseId:selectedCourseSlug||"english-starter",score:Math.max(0,Math.min(correct,total)),totalQuestions:total})});if(!response.ok){const payload=await response.json().catch(()=>({error:"Không thể lưu tiến độ"}));throw new Error(payload.error||"Không thể lưu tiến độ");}setDone(previous=>previous.includes(selected.slug)?previous:[...previous,selected.slug]);animateCarAfterLesson(selected);try{localStorage.removeItem("aunora_lesson_step_"+selected.id);localStorage.removeItem("aunora_last_unfinished_lesson")}catch{}resetLesson();}finally{setSaving(false);}}}/>;
@@ -255,18 +270,18 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const totalWords=courseLessons.reduce((sum,lesson)=>sum+(lesson.content.vocabulary||[]).length,0);
     const courseImageFiles=["coursesenglish-starter.png.png","coursesdaily-life.png.png","coursestravel-english.png.png","coursesstudy-work.png.png","coursesadvanced-english.png.png"];
     const courseIndex=courses.findIndex(course=>course.id===activeCourse.id);
-    const courseImage=activeCourse.is_free?"/images/aunora/"+courseImageFiles[Math.max(0,courseIndex)%courseImageFiles.length]:"/images/courses/"+activeCourse.slug+".webp.png";
+    const courseImage=imageAsset(activeCourse.is_free?"/images/aunora/"+courseImageFiles[Math.max(0,courseIndex)%courseImageFiles.length]:"/images/courses/"+activeCourse.slug+".webp.png",1080);
     const heroBackground=`linear-gradient(90deg,rgba(8,38,99,.94),rgba(18,69,137,.77) 48%,rgba(18,69,137,.03) 78%),url("${courseImage}")`;
     const cardBackground=`linear-gradient(90deg,#ffffff 2%,#fffffff2 46%,#ffffff22 100%),url("${courseImage}")`;
     const isMapView=activeCourse.is_free && selectedSection===null;
     const isLessonMap=activeCourse.is_free && selectedSection!==null;
     return <section className={"aunora-course-design"+(isMapView?" acd-world-view":"")}>
       <ScheduledReview refresh={done.length}/><button className="acd-back" onClick={()=>{if(selectedSection!==null)setSelectedSection(null);else setSelectedCourseSlug(null)}}><ArrowLeft size={18}/> {selectedSection!==null?"Quay lại các chủ đề":"Tất cả khóa học"}</button>
-      {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ {Math.ceil(courseLessons.length/10)} phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/brand/aivanta-mascot.webp.png" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
+      {isLessonMap?null:isMapView?<div className="acd-world-intro"><div><span className="acd-world-eyebrow">✦ AUNORA ACADEMY · LỘ TRÌNH HỌC TẬP</span><h1>{activeCourse.title}</h1><p>{activeCourse.description||"Cùng Aivanta khám phá tiếng Anh qua bốn hành trình thú vị!"}</p><div className="acd-world-stats"><span>📖 {courseLessons.length} bài học</span><span>🗺️ {Math.ceil(courseLessons.length/10)} phần</span><span>✨ {totalWords} từ vựng</span></div></div><img src="/_next/image?url=%2Fbrand%2Faivanta-mascot.webp.png&w=640&q=85" alt="Aivanta đồng hành cùng bạn"/></div>:<header className="acd-hero" style={{backgroundImage:heroBackground}}><div className="acd-hero-copy"><span className="acd-badge">{activeCourse.level||"Beginner"} · {activeCourse.is_free?"MIỄN PHÍ":"KHÓA HỌC"}</span><h1>{activeCourse.title}{selectedSection!==null?" · Phần "+(selectedSection+1):""}</h1><p>{activeCourse.description||"Xây nền tảng từ vựng và câu giao tiếp hằng ngày với Aivanta."}</p><div className="acd-hero-stats"><span>📖 {courseLessons.length} bài học</span><span>✍️ {totalWords} từ vựng</span></div></div></header>}
       {sectionTransition!==null&&typeof document!=="undefined"&&createPortal(
         <div className="acd-section-transition" role="dialog" aria-modal="true" aria-label="Chúc mừng hoàn thành phần học" onClick={()=>setSectionTransition(null)} style={{position:"fixed",inset:0,zIndex:2147483647,display:"flex",alignItems:"center",justifyContent:"center",padding:16,boxSizing:"border-box",background:"rgba(9,30,75,.76)",overflowY:"auto"}}>
           <div className="acd-section-transition-card" onClick={event=>event.stopPropagation()} style={{boxSizing:"border-box",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:10,width:"min(420px, 100%)",maxWidth:420,maxHeight:"calc(100dvh - 32px)",overflowY:"auto",padding:"22px 20px",margin:"auto",borderRadius:24,background:"linear-gradient(145deg,#fff,#e7f5ff)",textAlign:"center",boxShadow:"0 20px 70px rgba(7,26,76,.35)"}}>
-            <img src="/brand/aivanta-mascot.webp.png" alt="Aivanta" width={130} height={130} style={{display:"block",width:130,height:130,minWidth:0,minHeight:0,maxWidth:130,maxHeight:130,flex:"0 0 130px",objectFit:"contain",margin:"0 auto"}}/>
+            <img src="/_next/image?url=%2Fbrand%2Faivanta-mascot.webp.png&w=640&q=85" alt="Aivanta" width={130} height={130} style={{display:"block",width:130,height:130,minWidth:0,minHeight:0,maxWidth:130,maxHeight:130,flex:"0 0 130px",objectFit:"contain",margin:"0 auto"}}/>
             <span>✨ CHÚC MỪNG!</span>
             <h2>Hoàn thành Phần {sectionTransition}!</h2>
             <p>🗺️ Đang mở hành trình Phần {sectionTransition+1}…</p>
@@ -293,8 +308,8 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
             const isTest=offset%4===3;
             return <button key={lesson.slug} type="button" className={"acd-lesson-point acd-lesson-point-"+offset+(finished?" is-done":"")+(current?" is-current":"")+(isTest?" is-test":"")} onClick={()=>{setArrivedLesson(lesson);setCarPhase("waiting")}} aria-label={(finished?"Ôn tập bài ":"Bài ")+(offset+1)+": "+lesson.title} title={lesson.title}><span>{finished?"✓":isTest?"★":offset+1}</span><small>{finished?"Ôn tập +5 EXP":isTest?"Kiểm tra":"Bài "+(offset+1)}</small></button>;
           })}</div>
-          <div className={"acd-car-marker"+(carArriving?" is-driving":"")+(carPhase==="entering"?" is-entering":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/images/aunora/learning-parts/vehicles/aivanta-car.png" alt="Aivanta lái xe"/></div>
-          {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span><img src="/brand/wolf-face/aivanta-face.png" alt="" style={{width:27,height:27,objectFit:"contain",verticalAlign:"middle",marginRight:7}}/>{done.includes(arrivedLesson.slug)?"Ôn tập kiến thức đã học!":"Aivanta đã đến bài tiếp theo!"}</span><h3>{arrivedLesson.title}</h3><p>⭐ {done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP":"Hoàn thành bài học · +10 EXP"}</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>{done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP →":"Bắt đầu · +10 EXP →"}</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
+          <div className={"acd-car-marker"+(carArriving?" is-driving":"")+(carPhase==="entering"?" is-entering":"")} style={{left:([13,20,27,34,68,75,82,89,83,76,69,62,38,31,24,17][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%",top:([32,29,28,31,34,32,34,38,65,69,73,77,74,70,66,63][carMotion?.section===sectionIndex?carMotion.index:Math.min(15,Math.max(0,sectionLessons.findIndex(item=>!done.includes(item.slug))))])+"%"}} aria-label="Aivanta đang lái xe tới bài học tiếp theo"><img src="/_next/image?url=%2Fimages%2Faunora%2Flearning-parts%2Fvehicles%2Faivanta-car.png&w=640&q=85" alt="Aivanta lái xe"/></div>
+          {arrivedLesson&&<div className="acd-arrival-card" role="dialog" aria-label="Bài học tiếp theo"><button type="button" className="acd-arrival-close" onClick={()=>setArrivedLesson(null)} aria-label="Đóng">×</button><span><img src="/_next/image?url=%2Fbrand%2Fwolf-face%2Faivanta-face.png&w=640&q=85" alt="" style={{width:27,height:27,objectFit:"contain",verticalAlign:"middle",marginRight:7}}/>{done.includes(arrivedLesson.slug)?"Ôn tập kiến thức đã học!":"Aivanta đã đến bài tiếp theo!"}</span><h3>{arrivedLesson.title}</h3><p>⭐ {done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP":"Hoàn thành bài học · +10 EXP"}</p><button type="button" className="acd-arrival-start" onClick={()=>{const lesson=arrivedLesson;setArrivedLesson(null);setCarPhase("entering");openLesson(lesson)}}>{done.includes(arrivedLesson.slug)?"Ôn tập · +5 EXP →":"Bắt đầu · +10 EXP →"}</button><small>Chưa muốn học? Đóng bảng này hoặc chọn lại bài trên bản đồ.</small></div>}
           <div className="acd-lesson-chests">{Array.from({length:Math.ceil(sectionLessons.length/4)},(_,group)=>group).map(group=>{const groupLessons=sectionLessons.slice(group*4,group*4+4);const cleared=groupLessons.length>0&&groupLessons.every(item=>done.includes(item.slug));return <div className={"acd-chest acd-chest-"+group+(cleared?" is-open":"")} key={group} title={cleared?"Đã mở rương!":"Hoàn thành nhóm bài để mở rương"} aria-label={"Rương "+(group+1)+(cleared?" đã mở":" chưa mở")}>{cleared?"🎁":"🧰"}</div>})}</div>
           <div className="acd-lesson-map-footer"><strong>Tiến độ: {completed}/{sectionLessons.length} bài · {Math.ceil(sectionLessons.length/4)} rương phần thưởng</strong></div>
         </section>;
@@ -317,7 +332,7 @@ export default function LibraryClient({ courses, lessons, progress, quizSize, in
     const completeCount = courseLessonsForCard.filter(lesson => done.includes(lesson.slug)).length;
     const feature = index < 3;
     return <article className={`als-card als-card-${index} ${feature?"als-feature":"als-wide"}`} key={course.id}>
-      <div className={"als-art"+(!course.is_free?" als-explorer-art":"")}><img src={course.is_free?"/images/aunora/"+coursePictures[index%coursePictures.length]:"/images/courses/"+course.slug+".webp.png"} alt={course.title}/>{index===0&&<span className="als-free">🌱 Miễn phí</span>}</div>
+      <div className={"als-art"+(!course.is_free?" als-explorer-art":"")}><img src={imageAsset(course.is_free?"/images/aunora/"+coursePictures[index%coursePictures.length]:"/images/courses/"+course.slug+".webp.png",640)} loading="lazy" decoding="async" alt={course.title}/>{index===0&&<span className="als-free">🌱 Miễn phí</span>}</div>
       <div className="als-info"><div className="als-info-top"><h2>{courseNames[index]||course.title}</h2><span className="als-symbol">{["🌱","♧","✈","▤","☏"][index%5]}</span></div>
       <p>{courseSummaries[index]||course.description}</p>
       <div className="als-pills"><span>▥ {course.level||"A1"}</span><span>▤ {courseLessonsForCard.length} bài học</span><span>◎ {completeCount}/{courseLessonsForCard.length} hoàn thành</span></div>

@@ -51,11 +51,14 @@ function drawRoots(segments,x,y,spread,depth,growth,gold,rotation=0,t=0){
  if(gold>.02){ctx.shadowColor=`rgba(222,185,92,${gold*.45})`;ctx.shadowBlur=4}
  for(const s of segments){
   const g=clamp((growth-s.birth)/s.span);if(g<=0)continue;
-  const count=(s.points.length-1)*g,end=Math.floor(count),points=s.points.slice(0,end+1);
-  if(end<s.points.length-1)points.push(pt(lerp(s.points[end].x,s.points[end+1].x,count-end),lerp(s.points[end].y,s.points[end+1].y,count-end)));
+  const count=(s.points.length-1)*g,end=Math.floor(count);
+  let tip=s.points[end];
   const r=Math.round(lerp(130,219,gold)),gcol=Math.round(lerp(124,193,gold)),b=Math.round(lerp(91,124,gold));
-  path(points.map(p=>pt(p.x*spread,p.y*depth)),`rgb(${r},${gcol},${b})`,Math.max(.48,2.6-s.rank*.38),(.48+gold*.32)*(1-s.rank*.06));
-  if(s.tip&&gold>.5&&s.phase>5.85){const endp=points[points.length-1];circle(endp.x*spread,endp.y*depth,1.15,'#f3dda0',gold*(.35+.35*Math.sin(t*1.5+s.phase)**2))}
+  ctx.save();ctx.globalAlpha*=(.48+gold*.32)*(1-s.rank*.06);ctx.strokeStyle=`rgb(${r},${gcol},${b})`;ctx.lineWidth=Math.max(.48,2.6-s.rank*.38);ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<=end;i++){const p=s.points[i];i?ctx.lineTo(p.x*spread,p.y*depth):ctx.moveTo(p.x*spread,p.y*depth)}
+  if(end<s.points.length-1){const next=s.points[end+1],part=count-end;tip=pt(lerp(tip.x,next.x,part),lerp(tip.y,next.y,part));ctx.lineTo(tip.x*spread,tip.y*depth)}
+  ctx.stroke();ctx.restore();
+  if(s.tip&&gold>.5&&s.phase>5.85)circle(tip.x*spread,tip.y*depth,1.15,'#f3dda0',gold*(.35+.35*Math.sin(t*1.5+s.phase)**2))
  }
  ctx.restore();
 }
@@ -67,6 +70,7 @@ function blob(cx,cy,rx,ry,seed){
 }
 const canopyShape=blob(0,-.76,.30,.23,26);
 const canopyPatches=[[-.13,-.81,.15,.14,14],[-.02,-.9,.13,.12,16],[.12,-.81,.14,.15,20],[.01,-.72,.17,.16,25],[-.15,-.7,.13,.12,37]];
+const canopyPaths=canopyPatches.map(([cx,cy,rx,ry,seed])=>blob(cx,cy,rx,ry,seed));
 const canopyDetails=(()=>{const r=rng(45);return Array.from({length:65},()=>{const a=r()*Math.PI*2,rad=Math.sqrt(r());return{x:Math.cos(a)*rad*.25,y:-.76+Math.sin(a)*rad*.18,a:r()*3,light:r()}})})();
 function tree(x,y,size,rotation,wind,t,variant=0,growth=1){
  ctx.save();ctx.translate(x,y);ctx.rotate(rotation);ctx.scale(size,size);
@@ -79,7 +83,7 @@ function tree(x,y,size,rotation,wind,t,variant=0,growth=1){
  path([pt(-.011,-.02),pt(-.005,-.2),pt(-.008,-.38)],'#b2955b',.003,.28);
  ctx.save();ctx.translate(bend,0);ctx.rotate(wind*.006);
  const grad=ctx.createLinearGradient(-.25,-1,.23,-.51);grad.addColorStop(0,variant?'#48744b':'#2b654e');grad.addColorStop(.52,variant?'#335c3e':'#1d513e');grad.addColorStop(1,variant?'#213e2e':'#12392e');ctx.fillStyle=grad;ctx.fill(canopyShape);ctx.clip(canopyShape);
- for(let i=0;i<canopyPatches.length;i++){const [cx,cy,rx,ry,se]=canopyPatches[i];ctx.fillStyle=variant?['#608557','#648c5b','#467249','#416c43','#52794b'][i]:['#397459','#3e775b','#28634b','#255c44','#326b50'][i];ctx.globalAlpha=.55;ctx.fill(blob(cx,cy,rx,ry,se))}
+ for(let i=0;i<canopyPatches.length;i++){const [cx,cy,rx,ry,se]=canopyPatches[i];ctx.fillStyle=variant?['#608557','#648c5b','#467249','#416c43','#52794b'][i]:['#397459','#3e775b','#28634b','#255c44','#326b50'][i];ctx.globalAlpha=.55;ctx.fill(canopyPaths[i])}
  ctx.globalAlpha=1;
  for(const p of canopyDetails){ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.strokeStyle=p.light>.55?'#b2c591':'#173e2c';ctx.globalAlpha=p.light>.55?.09:.19;ctx.lineWidth=.003;ctx.beginPath();ctx.moveTo(-.006,0);ctx.quadraticCurveTo(0,-.007,.009,-.001);ctx.stroke();ctx.restore()}
  if(variant){for(let i=0;i<7;i++){const p=canopyDetails[i*7];circle(p.x,p.y,.0027,'#dfd494',growth*(.3+.45*Math.sin(t*1.5+i)**2))}}
@@ -125,12 +129,13 @@ function pose(x,y,size,t,graduate,can){
  if(graduate){ctx.fillStyle='#d2b650';ctx.beginPath();ctx.moveTo(head.x-22,head.y-14);ctx.lineTo(head.x+1,head.y-22);ctx.lineTo(head.x+25,head.y-14);ctx.lineTo(head.x+1,head.y-7);ctx.closePath();ctx.fill();path([pt(head.x+21,head.y-13),pt(head.x+22,head.y+2+Math.sin(t*2)*1.5)],'#c5aa4d',1.5)}
  ctx.restore();
 }
+const textLayouts=new Map();
 function drawText(s,x,y,size,color,alpha=1,italic=false,tracking=0){
  if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;ctx.font=language==='vi'?`${size}px Arial, sans-serif`:`${italic?'italic ':''}${size}px Georgia, serif`;ctx.fillStyle=color;ctx.textBaseline='middle';
- if(!tracking){ctx.textAlign='center';ctx.fillText(s,x,y)}else{const letters=[...s],tw=letters.reduce((v,c)=>v+ctx.measureText(c).width,0)+tracking*(letters.length-1);let xx=x-tw/2;for(const c of letters){ctx.fillText(c,xx,y);xx+=ctx.measureText(c).width+tracking}}ctx.restore()
+ if(!tracking){ctx.textAlign='center';ctx.fillText(s,x,y)}else{const key=ctx.font+'|'+tracking+'|'+s;let layout=textLayouts.get(key);if(!layout){const letters=[...s],widths=letters.map(c=>ctx.measureText(c).width);layout={letters,widths,total:widths.reduce((a,b)=>a+b,0)+tracking*(letters.length-1)};textLayouts.set(key,layout)}let xx=x-layout.total/2;for(let i=0;i<layout.letters.length;i++){ctx.fillText(layout.letters[i],xx,y);xx+=layout.widths[i]+tracking}}ctx.restore()
 }
 function draw(t){
- if(!width)return;
+ if(!width||!height)return;
  const ground=portrait?1040:610,left=portrait?240:445,right=portrait?690:1180;
  const treeH=portrait?520:405,personH=portrait?190:159;
  const storm=ease(2.6,3.8,t)*(1-ease(5.6,7.4,t));
@@ -190,33 +195,39 @@ function draw(t){
  ctx.restore();
  if(fade<1){ctx.fillStyle=`rgba(4,6,7,${1-fade})`;ctx.fillRect(0,0,W,H)}
 }
-function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);width=r.width;height=r.height;portrait=width<height;W=portrait?900:1600;H=portrait?1600:900;canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw(time)}
+function resize(){const r=canvas.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2,Math.sqrt(5000000/Math.max(1,r.width*r.height)));if(width===r.width&&height===r.height&&canvas.width===Math.round(r.width*dpr))return;width=r.width;height=r.height;portrait=width<height;W=portrait?900:1600;H=portrait?1600:900;canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw(time)}
 new ResizeObserver(resize).observe(canvas);
 function completeIntro(){
  if(completed||!introOnce)return;
  completed=true;paused=true;time=completionTime;draw(time);
  window.parent.postMessage({type:'zenvora:garden-complete'},window.location.origin);
 }
+let animationFrame=null;
+function schedule(){if(animationFrame===null&&!paused&&pageVisible&&!waitingForStart)animationFrame=requestAnimationFrame(tick)}
+function stop(){if(animationFrame!==null)cancelAnimationFrame(animationFrame);animationFrame=null;last=null}
 function tick(now){
+ animationFrame=null;
  if(last!==null&&!paused&&pageVisible&&!waitingForStart){
   time+=Math.max(0,(now-last)/1000);
   if(introOnce&&time>=completionTime)completeIntro();
   else{time%=duration;draw(time)}
  }
- last=now;requestAnimationFrame(tick)
+ last=now;schedule()
 }
-requestAnimationFrame(tick);
+schedule();
 window.addEventListener('message',event=>{
  if(!introOnce||event.source!==window.parent||event.origin!==window.location.origin)return;
  if(event.data?.type==='aunora:language'&&(event.data.language==='vi'||event.data.language==='en')){language=event.data.language;draw(time)}
  if(event.data?.type==='zenvora:garden-start'&&waitingForStart){
   waitingForStart=false;last=null;
   if(reduced)completeIntro();
-  else{time=0;paused=false;draw(time);}
+  else{time=0;paused=false;draw(time);schedule();}
  }
- if(event.data?.type==='zenvora:garden-pause'){paused=true;last=null;}
+ if(event.data?.type==='zenvora:garden-pause'){paused=true;stop();}
 });
 if(introOnce)window.parent.postMessage({type:'zenvora:garden-ready'},window.location.origin);
-window.zenvoraScene={seek(seconds){time=clamp(Number(seconds)||0,0,duration-.001);paused=true;last=null;draw(time)},play(){paused=false;last=null;},get state(){return{time,paused,duration,portrait}}};
-document.addEventListener('visibilitychange',()=>{pageVisible=!document.hidden;last=null});
+window.zenvoraScene={seek(seconds){time=clamp(Number(seconds)||0,0,duration-.001);paused=true;stop();draw(time)},play(){if(completed)return;paused=false;last=null;schedule();},get state(){return{time,paused,duration,portrait}}};
+document.addEventListener('visibilitychange',()=>{pageVisible=!document.hidden;if(pageVisible){last=null;schedule()}else stop()});
+window.addEventListener('pagehide',stop);
+window.addEventListener('pageshow',()=>{pageVisible=!document.hidden;last=null;schedule()});
 })();

@@ -77,7 +77,7 @@ export default function LearnPage(){
  const t=copy[lang];
  return <main className="aunora-dashboard">
   <aside className={`aunora-side ${mobileOpen?"is-open":""}`}>
-   <Link href="/learn" className="aunora-logo-lockup"><span className="aunora-logo-symbol"><img className="aunora-brand-logo" src="/brand/aunora-logo.webp.png" alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/><span className="brand-logo-fallback">A</span></span><span><b>AUNORA</b><small>HỌC TIẾNG ANH CÙNG AI</small></span></Link>
+   <Link href="/learn" className="aunora-logo-lockup"><span className="aunora-logo-symbol"><img className="aunora-brand-logo" src="/_next/image?url=%2Fbrand%2Faunora-logo.webp.png&w=256&q=85" alt="" onError={(event)=>{event.currentTarget.style.display="none";}}/><span className="brand-logo-fallback">A</span></span><span><b>AUNORA</b><small>HỌC TIẾNG ANH CÙNG AI</small></span></Link>
    <div className="side-caption">{t.space}</div>
    <nav className="side-nav">{menuItems.map(item=><Link key={item.key} href={item.href} onClick={()=>setMobileOpen(false)} className={item.active?"current":""}><item.icon size={19}/><span>{t[item.key]}</span></Link>)}</nav>
    <div className="side-bottom"><div className="side-account"><Link href="/learn/profile" className="side-user-avatar">{profile?.avatar?<img src={profile.avatar} alt="Avatar"/>:<UserRound size={19}/>}</Link><div><b>{profile?.name||t.account}</b><Link href="/learn/profile">{t.profile}</Link></div><button onClick={()=>setShowLogoutConfirm(true)} aria-label={t.logout} title={t.logout}><LogOut size={17}/></button></div>

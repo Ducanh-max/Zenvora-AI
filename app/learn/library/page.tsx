@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { ArrowLeft, BookOpen, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import LibraryClient, { type LibraryLesson } from "./library-client";
@@ -18,13 +17,13 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
   const params = await searchParams;
   const membership = await getMembership();
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const { user } = membership;
 
-  const [{ data: courses, error: coursesError }, { data: lessons, error: lessonsError }, { data: entitlement }] = await Promise.all([
+  const [{ data: courses, error: coursesError }, { data: lessons, error: lessonsError }, { data: entitlement }, { data: progress }] = await Promise.all([
     supabase.from("zenvora_courses").select("id,slug,title,level,description,is_free,sort_order").order("sort_order", { ascending: true }),
     supabase.from("zenvora_lessons").select("id,course_id,slug,title,summary,content,sort_order").eq("is_published",true).order("sort_order", { ascending: true }),
     supabase.from("aunora_user_entitlements").select("plan_id,active_until").eq("user_id", user.id).maybeSingle(),
+    supabase.from("aunora_lesson_progress").select("lesson_id,completed,score,total_questions").eq("user_id", user.id),
   ]);
 
   let planId = user.app_metadata?.role === "admin" ? "elite" : (entitlement?.plan_id || "starter");
@@ -34,9 +33,6 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
   const visibleCourses = (courses || []).filter(course => course.is_free || explorerAllowed);
   const visibleCourseIds = new Set(visibleCourses.map(course => course.id));
   const visibleLessons = (lessons || []).filter(lesson => visibleCourseIds.has(lesson.course_id));
-  const { data: progress } = await supabase.from("aunora_lesson_progress")
-    .select("lesson_id,completed,score,total_questions")
-    .eq("user_id", user.id);
 
   return <main className="quizpage aunora-quiz lesson-hub als-page">
     <div className="quiztop">
@@ -45,7 +41,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
       <span className="lesson-chip">{plan.name}</span>
     </div>
     <section className="library-heading">
-      <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH CỦA BẠN</div><img className="library-aivanta" src="/brand/aivanta-mascot.webp.png" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
+      <div className="eyebrow"><Sparkles size={14}/> LỘ TRÌNH TIẾNG ANH CỦA BẠN</div><img className="library-aivanta" src="/_next/image?url=%2Fbrand%2Faivanta-mascot.webp.png&w=640&q=85" alt="Aivanta chào mừng bạn đến thư viện bài học"/>
       <h1>Học từng bước, <em>tiến bộ mỗi ngày.</em></h1>
       <p>Bản thử nghiệm hiện có chủ đề Giới thiệu bản thân gồm 4 bài. Các khóa khác đang được xây dựng.</p>
       <div className="library-summary"><b>{visibleCourses.filter(course=>visibleLessons.some(lesson=>lesson.course_id===course.id)).length} khóa có nội dung · {visibleLessons.length} bài học</b><span>Chủ đề mẫu: Giới thiệu bản thân</span><span>Bài 1–3: 10 hoạt động + 2 câu Aivanta · Bài 4: 12 hoạt động ôn tập.</span></div>
@@ -55,7 +51,7 @@ export default async function LibraryPage({ searchParams }: { searchParams?: Pro
     <p className="library-footnote">Chọn khóa học phù hợp với mục tiêu của bạn và bắt đầu hành trình học tiếng Anh.</p>
   
 <style>{`
-.als-page{max-width:none!important;min-height:100vh!important;padding:12px max(22px,calc((100vw - 1450px)/2)) 50px!important;background:linear-gradient(90deg,#061b46df,#0b2850b8),url('/images/aunora/aunora-castle-background.png.png') center center/cover fixed!important;color:#fff!important}
+.als-page{max-width:none!important;min-height:100vh!important;padding:12px max(22px,calc((100vw - 1450px)/2)) 50px!important;background:linear-gradient(90deg,#061b46df,#0b2850b8),url('/_next/image?url=%2Fimages%2Faunora%2Faunora-castle-background.png.png&w=1920&q=85') center center/cover fixed!important;color:#fff!important}
 /* Course and lesson maps use the available viewport; the library welcome banner is only for course selection. */
 .als-page:has(.aunora-course-design) .library-heading{display:none!important}
 /* Full-screen lesson: remove the library header and navigation above the lesson progress. */
